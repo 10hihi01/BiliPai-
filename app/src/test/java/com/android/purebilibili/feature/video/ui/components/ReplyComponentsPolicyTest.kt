@@ -1,6 +1,7 @@
 package com.android.purebilibili.feature.video.ui.components
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.android.purebilibili.data.model.response.ReplyMember
 import com.android.purebilibili.data.model.response.ReplyCardLabel
 import com.android.purebilibili.data.model.response.ReplyContent
@@ -570,7 +571,7 @@ class ReplyComponentsPolicyTest {
         assertEquals(78, policy.decorationWidthReserveDp)
         assertEquals(56, policy.dividerStartPaddingDp)
         assertEquals(
-            289,
+            292,
             resolveReplyItemTextColumnWidthDp(containerWidthDp = 360, policy = policy)
         )
         assertEquals(
@@ -580,6 +581,14 @@ class ReplyComponentsPolicyTest {
         assertEquals(
             118,
             resolveReplyItemHeaderEndPaddingDp(hasPiliPlusDecoration = true, policy = policy)
+        )
+        assertEquals(
+            12,
+            resolveReplyItemContentStartPaddingDp(containerWidth = 279.dp, policy = policy)
+        )
+        assertEquals(
+            44,
+            resolveReplyItemContentStartPaddingDp(containerWidth = 280.dp, policy = policy)
         )
     }
 

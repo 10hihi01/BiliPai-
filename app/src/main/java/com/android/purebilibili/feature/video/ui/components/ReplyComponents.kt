@@ -133,6 +133,13 @@ internal fun resolveReplyItemHeaderEndPaddingDp(
     return policy.actionButtonSizeDp + if (hasPiliPlusDecoration) policy.decorationWidthReserveDp else 0
 }
 
+internal fun resolveReplyItemContentStartPaddingDp(
+    containerWidth: Dp,
+    policy: ReplyItemLayoutPolicy = resolveReplyItemLayoutPolicy()
+): Int {
+    return if (containerWidth >= 280.dp) policy.contentSpacingDp else policy.horizontalPaddingDp
+}
+
 internal fun resolveReplyItemTextColumnWidthDp(
     containerWidthDp: Int,
     policy: ReplyItemLayoutPolicy = resolveReplyItemLayoutPolicy()
@@ -1067,7 +1074,7 @@ fun ReplyItemView(
                 }
             )
     ) {
-        Row(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
@@ -1077,35 +1084,35 @@ fun ReplyItemView(
                     end = layoutPolicy.horizontalPaddingDp.dp
                 )
         ) {
-            // Avatar
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(FormatUtils.fixImageUrl(item.member.avatar))
-                    .crossfade(!lightweightMode)
-                    .build(),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(layoutPolicy.avatarSizeDp.dp)
-                    .clip(CircleShape)
-                    .background(appearance.placeholderColor)
-                    .clickable { onAvatarClick(item.member.mid) }
-            )
-            
-            Spacer(modifier = Modifier.width(layoutPolicy.avatarContentSpacingDp.dp))
+            val headerEndPadding = resolveReplyItemHeaderEndPaddingDp(
+                hasPiliPlusDecoration = piliPlusDecoration != null,
+                policy = layoutPolicy
+            ).dp
+            val startPadding = resolveReplyItemContentStartPaddingDp(
+                containerWidth = maxWidth,
+                policy = layoutPolicy
+            ).dp
 
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-            ) {
-                val headerEndPadding = resolveReplyItemHeaderEndPaddingDp(
-                    hasPiliPlusDecoration = piliPlusDecoration != null,
-                    policy = layoutPolicy
-                ).dp
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    // User Info Header
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // User Info Header
+                Row() {
+                    // Avatar
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(FormatUtils.fixImageUrl(item.member.avatar))
+                            .crossfade(!lightweightMode)
+                            .build(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(layoutPolicy.avatarSizeDp.dp)
+                            .clip(CircleShape)
+                            .background(appearance.placeholderColor)
+                            .clickable { onAvatarClick(item.member.mid) }
+                    )
+
+                    Spacer(modifier = Modifier.width(layoutPolicy.avatarContentSpacingDp.dp))
+
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(end = headerEndPadding)
@@ -1150,18 +1157,24 @@ fun ReplyItemView(
                                 NameplateTag(imageUrl = nameplateImage)
                             }
                         }
+
+                        Text(
+                            text = metadataText,
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp,
+                            color = appearance.secondaryTextColor
+                        )
                     }
+                }
 
-                    Text(
-                        text = metadataText,
-                        fontSize = 12.sp,
-                        lineHeight = 16.sp,
-                        color = appearance.secondaryTextColor
-                    )
+                Spacer(modifier = Modifier.height(6.dp))
 
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    // Content
+                // Content
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = startPadding)
+                ) {
                     ReplyMessageText(
                         text = item.content.message,
                         fontSize = 15.sp,
@@ -1353,7 +1366,7 @@ fun ReplyItemView(
                                     .padding(vertical = 4.dp)
                             )
                         }
-                        
+
                         if (threadReplyCount > 0) {
                             Box(
                                 modifier = Modifier
@@ -1375,34 +1388,34 @@ fun ReplyItemView(
                     }
                     }
                 }
-
-                if (piliPlusDecoration != null) {
-                    FanGroupDecorationBadge(
-                        visual = piliPlusDecoration,
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(
-                                top = 2.dp,
-                                end = layoutPolicy.actionButtonSizeDp.dp
-                            )
-                    )
-                }
-
-                IconButton(
-                    onClick = { showActionSheet = true },
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(layoutPolicy.actionButtonSizeDp.dp)
-                        .testTag("$COMMENT_ACTION_BUTTON_TAG_PREFIX${item.rpid}")
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.MoreVert,
-                        contentDescription = "评论操作",
-                        tint = appearance.actionTint,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
             }
+        }
+
+        if (piliPlusDecoration != null) {
+            FanGroupDecorationBadge(
+                visual = piliPlusDecoration,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(
+                        top = 2.dp,
+                        end = layoutPolicy.actionButtonSizeDp.dp
+                    )
+            )
+        }
+
+        IconButton(
+            onClick = { showActionSheet = true },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .size(layoutPolicy.actionButtonSizeDp.dp)
+                .testTag("$COMMENT_ACTION_BUTTON_TAG_PREFIX${item.rpid}")
+        ) {
+            Icon(
+                imageVector = Icons.Filled.MoreVert,
+                contentDescription = "评论操作",
+                tint = appearance.actionTint,
+                modifier = Modifier.size(18.dp)
+            )
         }
         
         HorizontalDivider(
