@@ -295,170 +295,172 @@ internal fun SettingsRootCategoryContent(
     actions: SettingsRootCategoryActions,
     state: SettingsRootCategoryState
 ) {
-    when (category) {
-        SettingsRootCategory.INTERFACE_THEME -> SettingsSceneShortcutSection(
-            shortcuts = listOf(
-                SettingsSceneShortcut(
-                    target = SettingsSearchTarget.INTERFACE_THEME,
-                    title = "界面与主题",
-                    value = "UI 预设、主题、字体、DPI、动态图标与开屏",
-                    onClick = actions.onAppearanceClick
-                ),
-                SettingsSceneShortcut(
-                    target = SettingsSearchTarget.ANIMATION,
-                    title = "动效与图标",
-                    value = "过渡动画、触感反馈、动态图标与底栏搜索入口",
-                    onClick = actions.onAnimationClick
-                )
-            )
-        )
-        SettingsRootCategory.HOME_FEED -> {
-            SettingsSceneShortcutSection(
+    Column {
+        when (category) {
+            SettingsRootCategory.INTERFACE_THEME -> SettingsSceneShortcutSection(
                 shortcuts = listOf(
                     SettingsSceneShortcut(
-                        target = SettingsSearchTarget.HOME_FEED,
-                        title = "首页展示与壁纸",
-                        value = "展示样式、首页壁纸效果、推荐流卡片宽度",
+                        target = SettingsSearchTarget.INTERFACE_THEME,
+                        title = "界面与主题",
+                        value = "UI 预设、主题、字体、DPI、动态图标与开屏",
                         onClick = actions.onAppearanceClick
+                    ),
+                    SettingsSceneShortcut(
+                        target = SettingsSearchTarget.ANIMATION,
+                        title = "动效与图标",
+                        value = "过渡动画、触感反馈、动态图标与底栏搜索入口",
+                        onClick = actions.onAnimationClick
                     )
                 )
             )
-            Spacer(modifier = Modifier.height(12.dp))
-            FeedApiSection(
-                feedApiType = state.feedApiType,
-                onFeedApiTypeChange = actions.onFeedApiTypeChange,
-                incrementalTimelineRefreshEnabled = state.incrementalTimelineRefreshEnabled,
-                onIncrementalTimelineRefreshChange = actions.onIncrementalTimelineRefreshChange,
-                dynamicImagePreviewTextVisible = state.dynamicImagePreviewTextVisible,
-                onDynamicImagePreviewTextVisibleChange = actions.onDynamicImagePreviewTextVisibleChange,
-                dynamicVisibleTabIds = state.dynamicVisibleTabIds,
-                onDynamicTabVisibilityChange = actions.onDynamicTabVisibilityChange,
-                homeRefreshCount = state.homeRefreshCount,
-                onHomeRefreshCountChange = actions.onHomeRefreshCountChange
-            )
-        }
-        SettingsRootCategory.NAVIGATION_LABELS -> SettingsSceneShortcutSection(
-            shortcuts = listOf(
-                SettingsSceneShortcut(
-                    target = SettingsSearchTarget.NAVIGATION,
-                    title = "导航与标签",
-                    value = "底栏、顶部标签、平板侧边栏与底栏项目顺序",
-                    onClick = actions.onBottomBarClick
+            SettingsRootCategory.HOME_FEED -> {
+                SettingsSceneShortcutSection(
+                    shortcuts = listOf(
+                        SettingsSceneShortcut(
+                            target = SettingsSearchTarget.HOME_FEED,
+                            title = "首页展示与壁纸",
+                            value = "展示样式、首页壁纸效果、推荐流卡片宽度",
+                            onClick = actions.onAppearanceClick
+                        )
+                    )
                 )
-            )
-        )
-        SettingsRootCategory.PLAYBACK_QUALITY -> SettingsSceneShortcutSection(
-            shortcuts = listOf(
-                SettingsSceneShortcut(
-                    target = SettingsSearchTarget.PLAYBACK_QUALITY,
-                    title = "播放与画质",
-                    value = "解码、默认画质、自动最高画质、网络、省流量、字幕、倍速与连播",
-                    onClick = actions.onPlaybackClick
+                Spacer(modifier = Modifier.height(12.dp))
+                FeedApiSection(
+                    feedApiType = state.feedApiType,
+                    onFeedApiTypeChange = actions.onFeedApiTypeChange,
+                    incrementalTimelineRefreshEnabled = state.incrementalTimelineRefreshEnabled,
+                    onIncrementalTimelineRefreshChange = actions.onIncrementalTimelineRefreshChange,
+                    dynamicImagePreviewTextVisible = state.dynamicImagePreviewTextVisible,
+                    onDynamicImagePreviewTextVisibleChange = actions.onDynamicImagePreviewTextVisibleChange,
+                    dynamicVisibleTabIds = state.dynamicVisibleTabIds,
+                    onDynamicTabVisibilityChange = actions.onDynamicTabVisibilityChange,
+                    homeRefreshCount = state.homeRefreshCount,
+                    onHomeRefreshCountChange = actions.onHomeRefreshCountChange
                 )
-            )
-        )
-        SettingsRootCategory.FULLSCREEN_GESTURE -> SettingsSceneShortcutSection(
-            shortcuts = listOf(
-                SettingsSceneShortcut(
-                    target = SettingsSearchTarget.FULLSCREEN_GESTURE,
-                    title = "全屏与手势",
-                    value = "全屏方向、截图按钮、应用内截图、亮度/音量/进度手势",
-                    onClick = actions.onPlaybackClick
-                )
-            )
-        )
-        SettingsRootCategory.INTERACTION_COMMENT -> SettingsSceneShortcutSection(
-            shortcuts = listOf(
-                SettingsSceneShortcut(
-                    target = SettingsSearchTarget.INTERACTION_COMMENT,
-                    title = "互动与评论",
-                    value = "评论发送检测、评论装扮、AI 总结、双击点赞与视频简介",
-                    onClick = actions.onPlaybackClick
-                )
-            )
-        )
-        SettingsRootCategory.DATA_BACKUP -> DataStorageSection(
-            customDownloadPath = state.customDownloadPath,
-            cacheSize = state.cacheSize,
-            onSettingsShareClick = actions.onSettingsShareClick,
-            onWebDavBackupClick = actions.onWebDavBackupClick,
-            onDownloadPathClick = actions.onDownloadPathClick,
-            onClearCacheClick = actions.onClearCacheClick
-        )
-        SettingsRootCategory.PRIVACY_PERMISSION -> PrivacySection(
-            privacyModeEnabled = state.privacyModeEnabled,
-            onPrivacyModeChange = actions.onPrivacyModeChange,
-            onPermissionClick = actions.onPermissionClick,
-            onBlockedListClick = actions.onBlockedListClick
-        )
-        SettingsRootCategory.DIAGNOSTICS_DEVELOPER -> {
-            SettingsSceneShortcutSection(
+            }
+            SettingsRootCategory.NAVIGATION_LABELS -> SettingsSceneShortcutSection(
                 shortcuts = listOf(
                     SettingsSceneShortcut(
-                        target = SettingsSearchTarget.DIAGNOSTICS,
-                        title = "播放器诊断",
-                        value = "诊断日志、详细统计信息、画质降档弹窗与仅提示一次",
+                        target = SettingsSearchTarget.NAVIGATION,
+                        title = "导航与标签",
+                        value = "底栏、顶部标签、平板侧边栏与底栏项目顺序",
+                        onClick = actions.onBottomBarClick
+                    )
+                )
+            )
+            SettingsRootCategory.PLAYBACK_QUALITY -> SettingsSceneShortcutSection(
+                shortcuts = listOf(
+                    SettingsSceneShortcut(
+                        target = SettingsSearchTarget.PLAYBACK_QUALITY,
+                        title = "播放与画质",
+                        value = "解码、默认画质、自动最高画质、网络、省流量、字幕、倍速与连播",
                         onClick = actions.onPlaybackClick
                     )
                 )
             )
-            Spacer(modifier = Modifier.height(12.dp))
-            DeveloperSection(
-                crashTrackingEnabled = state.crashTrackingEnabled,
-                analyticsEnabled = state.analyticsEnabled,
-                pluginCount = state.pluginCount,
-                onCrashTrackingChange = actions.onCrashTrackingChange,
-                onAnalyticsChange = actions.onAnalyticsChange,
-                onPluginsClick = actions.onPluginsClick,
-                onExportLogsClick = actions.onExportLogsClick
+            SettingsRootCategory.FULLSCREEN_GESTURE -> SettingsSceneShortcutSection(
+                shortcuts = listOf(
+                    SettingsSceneShortcut(
+                        target = SettingsSearchTarget.FULLSCREEN_GESTURE,
+                        title = "全屏与手势",
+                        value = "全屏方向、截图按钮、应用内截图、亮度/音量/进度手势",
+                        onClick = actions.onPlaybackClick
+                    )
+                )
             )
-        }
-        SettingsRootCategory.ABOUT_SUPPORT -> {
-            ReleaseChannelPinnedCard(
-                onGithubClick = actions.onGithubClick,
-                onTelegramClick = actions.onTelegramClick,
-                onDisclaimerClick = actions.onDisclaimerClick
+            SettingsRootCategory.INTERACTION_COMMENT -> SettingsSceneShortcutSection(
+                shortcuts = listOf(
+                    SettingsSceneShortcut(
+                        target = SettingsSearchTarget.INTERACTION_COMMENT,
+                        title = "互动与评论",
+                        value = "评论发送检测、评论装扮、AI 总结、双击点赞与视频简介",
+                        onClick = actions.onPlaybackClick
+                    )
+                )
             )
-            Spacer(modifier = Modifier.height(12.dp))
-            FollowAuthorSection(
-                onTelegramClick = actions.onTelegramClick,
-                onTwitterClick = actions.onTwitterClick,
-                onDonateClick = actions.onDonateClick
+            SettingsRootCategory.DATA_BACKUP -> DataStorageSection(
+                customDownloadPath = state.customDownloadPath,
+                cacheSize = state.cacheSize,
+                onSettingsShareClick = actions.onSettingsShareClick,
+                onWebDavBackupClick = actions.onWebDavBackupClick,
+                onDownloadPathClick = actions.onDownloadPathClick,
+                onClearCacheClick = actions.onClearCacheClick
             )
-            Spacer(modifier = Modifier.height(12.dp))
-            AboutSection(
-                versionName = state.versionName,
-                easterEggEnabled = state.easterEggEnabled,
-                onDisclaimerClick = actions.onDisclaimerClick,
-                onLicenseClick = actions.onLicenseClick,
-                onGithubClick = actions.onGithubClick,
-                onVerificationClick = actions.onVerificationClick,
-                onBuildSourceClick = actions.onBuildSourceClick,
-                onBuildFingerprintClick = actions.onBuildFingerprintClick,
-                onCheckUpdateClick = actions.onCheckUpdateClick,
-                onViewReleaseNotesClick = actions.onViewReleaseNotesClick,
-                autoCheckUpdateEnabled = state.autoCheckUpdateEnabled,
-                onAutoCheckUpdateChange = actions.onAutoCheckUpdateChange,
-                onVersionClick = actions.onVersionClick,
-                onReplayOnboardingClick = actions.onReplayOnboardingClick,
-                onEasterEggChange = actions.onEasterEggChange,
-                updateStatusText = state.updateStatusText,
-                isCheckingUpdate = state.isCheckingUpdate,
-                verificationLabel = state.verificationLabel,
-                verificationSubtitle = state.verificationSubtitle,
-                buildSourceValue = state.buildSourceValue,
-                buildSourceSubtitle = state.buildSourceSubtitle,
-                buildFingerprintValue = state.buildFingerprintValue,
-                buildFingerprintCopyValue = state.buildFingerprintCopyValue,
-                buildFingerprintSubtitle = state.buildFingerprintSubtitle,
-                versionClickCount = state.versionClickCount,
-                versionClickThreshold = state.versionClickThreshold
+            SettingsRootCategory.PRIVACY_PERMISSION -> PrivacySection(
+                privacyModeEnabled = state.privacyModeEnabled,
+                onPrivacyModeChange = actions.onPrivacyModeChange,
+                onPermissionClick = actions.onPermissionClick,
+                onBlockedListClick = actions.onBlockedListClick
             )
-            Spacer(modifier = Modifier.height(12.dp))
-            SupportToolsSection(
-                onTipsClick = actions.onTipsClick,
-                onOpenLinksClick = actions.onOpenLinksClick
-            )
+            SettingsRootCategory.DIAGNOSTICS_DEVELOPER -> {
+                SettingsSceneShortcutSection(
+                    shortcuts = listOf(
+                        SettingsSceneShortcut(
+                            target = SettingsSearchTarget.DIAGNOSTICS,
+                            title = "播放器诊断",
+                            value = "诊断日志、详细统计信息、画质降档弹窗与仅提示一次",
+                            onClick = actions.onPlaybackClick
+                        )
+                    )
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                DeveloperSection(
+                    crashTrackingEnabled = state.crashTrackingEnabled,
+                    analyticsEnabled = state.analyticsEnabled,
+                    pluginCount = state.pluginCount,
+                    onCrashTrackingChange = actions.onCrashTrackingChange,
+                    onAnalyticsChange = actions.onAnalyticsChange,
+                    onPluginsClick = actions.onPluginsClick,
+                    onExportLogsClick = actions.onExportLogsClick
+                )
+            }
+            SettingsRootCategory.ABOUT_SUPPORT -> {
+                ReleaseChannelPinnedCard(
+                    onGithubClick = actions.onGithubClick,
+                    onTelegramClick = actions.onTelegramClick,
+                    onDisclaimerClick = actions.onDisclaimerClick
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                FollowAuthorSection(
+                    onTelegramClick = actions.onTelegramClick,
+                    onTwitterClick = actions.onTwitterClick,
+                    onDonateClick = actions.onDonateClick
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                AboutSection(
+                    versionName = state.versionName,
+                    easterEggEnabled = state.easterEggEnabled,
+                    onDisclaimerClick = actions.onDisclaimerClick,
+                    onLicenseClick = actions.onLicenseClick,
+                    onGithubClick = actions.onGithubClick,
+                    onVerificationClick = actions.onVerificationClick,
+                    onBuildSourceClick = actions.onBuildSourceClick,
+                    onBuildFingerprintClick = actions.onBuildFingerprintClick,
+                    onCheckUpdateClick = actions.onCheckUpdateClick,
+                    onViewReleaseNotesClick = actions.onViewReleaseNotesClick,
+                    autoCheckUpdateEnabled = state.autoCheckUpdateEnabled,
+                    onAutoCheckUpdateChange = actions.onAutoCheckUpdateChange,
+                    onVersionClick = actions.onVersionClick,
+                    onReplayOnboardingClick = actions.onReplayOnboardingClick,
+                    onEasterEggChange = actions.onEasterEggChange,
+                    updateStatusText = state.updateStatusText,
+                    isCheckingUpdate = state.isCheckingUpdate,
+                    verificationLabel = state.verificationLabel,
+                    verificationSubtitle = state.verificationSubtitle,
+                    buildSourceValue = state.buildSourceValue,
+                    buildSourceSubtitle = state.buildSourceSubtitle,
+                    buildFingerprintValue = state.buildFingerprintValue,
+                    buildFingerprintCopyValue = state.buildFingerprintCopyValue,
+                    buildFingerprintSubtitle = state.buildFingerprintSubtitle,
+                    versionClickCount = state.versionClickCount,
+                    versionClickThreshold = state.versionClickThreshold
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                SupportToolsSection(
+                    onTipsClick = actions.onTipsClick,
+                    onOpenLinksClick = actions.onOpenLinksClick
+                )
+            }
         }
     }
 }
