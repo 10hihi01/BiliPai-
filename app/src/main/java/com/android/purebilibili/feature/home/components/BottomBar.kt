@@ -712,17 +712,13 @@ internal fun Modifier.kernelSuFloatingDockSurface(
                         backdrop = backdrop,
                         shape = { shape },
                         effects = {
-                            if (glassEnabled || (blurEnabled && !useHazeBlur)) {
-                                vibrancy()
-                                blur(nativeSpec.blurRadiusDp.dp.toPx())
-                                if (glassEnabled && drawShellLens) {
-                                    lens(
-                                        refractionHeight = nativeSpec.refractionHeightDp.dp.toPx(),
-                                        refractionAmount = nativeSpec.refractionAmountDp.dp.toPx(),
-                                        depthEffect = true,
-                                        chromaticAberration = nativeSpec.chromaticAberration
-                                    )
-                                }
+                            if (glassEnabled && drawShellLens) {
+                                lens(
+                                    refractionHeight = nativeSpec.refractionHeightDp.dp.toPx(),
+                                    refractionAmount = nativeSpec.refractionAmountDp.dp.toPx(),
+                                    depthEffect = true,
+                                    chromaticAberration = nativeSpec.chromaticAberration
+                                )
                             }
                         },
                         highlight = {
@@ -1514,19 +1510,13 @@ internal fun resolveBottomBarBackdropNativeSurfaceSpec(
     blurRadiusDp: Float,
     verticalProgress: Float = 0f
 ): BottomBarBackdropNativeSurfaceSpec {
-    val progress = verticalProgress.coerceIn(0f, 1f)
-    val transparentBlurRadiusDp = lerp(
-        start = minOf(blurRadiusDp * 0.22f, 4.8f),
-        stop = minOf(blurRadiusDp * 0.28f, 5.8f),
-        fraction = progress
-    )
     return BottomBarBackdropNativeSurfaceSpec(
-        blurRadiusDp = transparentBlurRadiusDp,
-        refractionHeightDp = lerp(14f, 22f, progress),
-        refractionAmountDp = lerp(12f, 18f, progress),
-        surfaceAlphaMultiplier = lerp(0.32f, 0.24f, progress),
-        highlightAlpha = lerp(0.10f, 0.18f, progress),
-        shadowAlpha = lerp(0.06f, 0.10f, progress),
+        blurRadiusDp = 0f,
+        refractionHeightDp = 11f,
+        refractionAmountDp = 28f,
+        surfaceAlphaMultiplier = 0.85f,
+        highlightAlpha = 0.06f,
+        shadowAlpha = 0.08f,
         chromaticAberration = false
     )
 }
@@ -2978,8 +2968,6 @@ private fun KernelSuAlignedBottomBar(
                                             backdrop = backdrop,
                                             shape = { shellShape },
                                             effects = {
-                                                vibrancy()
-                                                blur(nativeCaptureSpec.blurRadiusDp.dp.toPx())
                                                 lens(
                                                     refractionHeight = nativeCaptureSpec.refractionHeightDp.dp.toPx(),
                                                     refractionAmount = nativeCaptureSpec.refractionAmountDp.dp.toPx(),

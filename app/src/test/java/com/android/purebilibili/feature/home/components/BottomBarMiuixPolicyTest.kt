@@ -110,18 +110,18 @@ class BottomBarMiuixPolicyTest {
     @Test
     fun `transparent glass preset keeps lightweight library effect chain`() {
         val source = loadSource("app/src/main/java/com/android/purebilibili/feature/home/components/BottomBar.kt")
+        val transparentPresetSource = source
+            .substringAfter("BottomBarLiquidGlassPreset.BACKDROP_NATIVE -> drawBackdrop(")
+            .substringBefore("BottomBarLiquidGlassPreset.BILIPAI_TUNED -> drawBackdrop(")
 
         assertTrue(source.contains("BottomBarLiquidGlassPreset.BACKDROP_NATIVE"))
         assertTrue(source.contains("resolveBottomBarBackdropNativeSurfaceSpec("))
-        assertTrue(source.contains("surfaceAlphaMultiplier = lerp(0.32f, 0.24f, progress)"))
-        assertTrue(source.contains("highlightAlpha = lerp(0.10f, 0.18f, progress)"))
-        assertTrue(source.contains("shadowAlpha = lerp(0.06f, 0.10f, progress)"))
-        assertTrue(
-            Regex(
-                """BottomBarLiquidGlassPreset\.BACKDROP_NATIVE[\s\S]*?drawBackdrop\([\s\S]*?effects = \{[\s\S]*?vibrancy\(\)[\s\S]*?blur\([\s\S]*?lens\(""",
-                RegexOption.MULTILINE
-            ).containsMatchIn(source)
-        )
+        assertTrue(source.contains("surfaceAlphaMultiplier = 0.85f"))
+        assertTrue(source.contains("highlightAlpha = 0.06f"))
+        assertTrue(source.contains("shadowAlpha = 0.08f"))
+        assertFalse(transparentPresetSource.contains("vibrancy()"))
+        assertFalse(transparentPresetSource.contains("blur("))
+        assertTrue(transparentPresetSource.contains("lens("))
     }
 
     private fun loadSource(path: String): String {
