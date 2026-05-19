@@ -1,5 +1,27 @@
 # Changelog
 
+## v8.3.4 (2026-05-19)
+
+### 版本信息
+- 版本号从 `8.3.3` 升级到 `8.3.4`，`versionCode` 升级到 `198`。
+- 本次为“评论楼中楼与竖屏评论体验、空间长图文、播放器手势/横竖屏、音频备用源、流畅度优先依赖维护”的维护更新，汇总 8.3.3 到 8.3.4 的全部改动。
+
+### 更新内容
+- **评论楼中楼与评论详情**：移除楼中楼模糊背景，修复分页加载和动效闪退；新增楼中楼下拉关闭把手，优化滚动加载、文本展开、下滑关闭跟手和竖屏评论展开比例，让二级评论进入、加载、关闭更稳定。
+- **竖屏评论与播放器联动**：重做竖屏评论播放器联动，修复竖屏评论进入横屏后的画面对齐问题，并减少评论展开时播放器区域比例突变。
+- **空间页与长图文**：修复空间长图文专栏显示，补齐空间动态模型解析、长图文内容块解析、动态导航与加载策略，减少空间页图文内容空白或误跳转。
+- **播放器手势与横竖屏**：修复竖屏弹幕首次设置不生效、双击快进提示计时异常；降低横竖屏自动切换灵敏度，修复竖屏和横屏视频位置偏移。
+- **视频音频稳定性**：修复视频播放时音频备用源选择错误的问题，按当前选中音轨匹配 `backupUrl`，在主音频 URL 无音轨或渲染异常时可回退到同一音质的备用音频源，减少“自动/192K 来回切才有声音”的情况。
+- **依赖维护**：按“流畅度优先、低运行风险”原则维护 AGP、Kotlin、Compose BOM、Lifecycle、Activity Compose、Window 与 Compose Animation 版本，不引入新的业务依赖。
+- **版本与文档同步**：版本号升级到 `8.3.4` / `versionCode 198`，README、README_EN 和更新日志同步到 8.3.4。
+- **回归覆盖**：新增或更新楼中楼展示、评论 Sheet、竖屏评论展示、竖屏分页、双击提示、空间动态加载/导航、空间模型解析、长图文解析、动态接口契约、视频详情布局和播放音频备用源等策略与结构测试。
+
+### 验证
+- `./gradlew :app:testDebugUnitTest --tests 'com.android.purebilibili.feature.video.viewmodel.PlaybackCdnFallbackPolicyTest'`
+- `./gradlew :app:testDebugUnitTest --tests 'com.android.purebilibili.feature.video.usecase.VideoPlaybackUseCaseQualitySwitchTest'`
+- `./gradlew :app:compileDebugKotlin`
+- `git diff --check`
+
 ## v8.3.3 (2026-05-19)
 
 ### 版本信息

@@ -15,7 +15,7 @@
 </p>
 
 <p>
-  <img src="https://img.shields.io/badge/Version-8.3.3-007AFF?style=flat-square&labelColor=ffffff" alt="Version 8.3.3" />
+  <img src="https://img.shields.io/badge/Version-8.3.4-007AFF?style=flat-square&labelColor=ffffff" alt="Version 8.3.4" />
   <img src="https://img.shields.io/badge/Android-8.0%2B-34C759?style=flat-square&logo=android&logoColor=white" alt="Android 8.0+" />
   <img src="https://img.shields.io/badge/Kotlin-100%25-7F52FF?style=flat-square&logo=kotlin&logoColor=white" alt="Kotlin" />
   <img src="https://img.shields.io/badge/License-GPL--3.0-FF3B30?style=flat-square" alt="GPL-3.0" />
@@ -179,13 +179,14 @@ cd BiliPai
 
 ## 最近更新
 
-当前仓库版本号已更新到 `8.3.3 / versionCode 197`。公开发布说明请以 [CHANGELOG.md](CHANGELOG.md) 为准；最新完整记录为 `v8.3.3`：
+当前仓库版本号已更新到 `8.3.4 / versionCode 198`。公开发布说明请以 [CHANGELOG.md](CHANGELOG.md) 为准；最新完整记录为 `v8.3.4`：
 
-- 播放链路补充音频/CDN 异常回退诊断，空间页补齐已看进度、续播、发布时间和播放量展示，今日推荐 UP 榜可直接进入 UP 空间。
-- 评论楼中楼首屏加载更多二级回复，补齐文本展开、逐级展开动画和可选模糊开关。
-- 设置顶部集中放置 Telegram 频道、Twitter / X 和打赏作者入口，并整理发布渠道声明，减少重复 UI。
-- UP 空间投稿工具栏改为紧凑 dock，长按当前标签后展开可横向滑动的“视频 / 图文 / 合集 / 系列”标签栏，指示器按文案自适应。
-- 修复皮肤贴纸、首页顶部、底栏液态玻璃实验回退、番剧历史记录“未知UP主”和番剧黑屏误提示等近期反馈。
+- 评论楼中楼移除模糊背景，修复分页加载和动效闪退，新增下拉关闭把手，并优化滚动加载、文本展开和下滑关闭跟手。
+- 竖屏评论播放器联动重做，修复竖屏评论进入横屏后的画面对齐和展开比例问题。
+- 修复空间长图文专栏显示，补齐空间动态模型解析、长图文内容块解析、动态导航与加载策略。
+- 修复竖屏弹幕首次设置、双击快进提示计时、横竖屏自动切换灵敏度和横竖屏视频位置偏移。
+- 修复视频音频备用源选择错误，按当前音轨匹配备用音频源，减少自动/192K 切换后才有声音的问题。
+- 按流畅度优先原则维护 AGP、Kotlin、Compose BOM、Lifecycle、Activity Compose、Window 与 Compose Animation 版本。
 
 ## 路线图
 

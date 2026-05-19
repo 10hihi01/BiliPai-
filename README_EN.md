@@ -5,11 +5,11 @@
 </p>
 
 <p align="center">
-  <sub>Last updated: 2026-05-19 · Synced to v8.3.3 (source of truth: <a href="CHANGELOG.md">CHANGELOG</a> + code)</sub>
+  <sub>Last updated: 2026-05-19 · Synced to v8.3.4 (source of truth: <a href="CHANGELOG.md">CHANGELOG</a> + code)</sub>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-8.3.3-fb7299?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/Version-8.3.4-fb7299?style=flat-square" alt="Version">
   <img src="https://img.shields.io/github/stars/jay3-yy/BiliPai?style=flat-square&color=yellow" alt="Stars">
   <img src="https://img.shields.io/github/forks/jay3-yy/BiliPai?style=flat-square&color=green" alt="Forks">
   <img src="https://img.shields.io/github/last-commit/jay3-yy/BiliPai?style=flat-square&color=purple" alt="Last Commit">
@@ -432,14 +432,15 @@ A lightweight plugin format requiring **no coding**, just a simple JSON file to 
 
 See full changelog: [CHANGELOG.md](CHANGELOG.md)
 
-### Latest (v8.3.3 · 2026-05-19)
+### Latest (v8.3.4 · 2026-05-19)
 
-- Added more playback/CDN audio fallback diagnostics and improved Space progress, resume, publish-time, play-count, Today Watch UP-rank navigation, and speed-lock unlock behavior.
-- Improved nested comment loading, text expansion, transition motion, and the optional nested-reply blur switch.
-- Moved Telegram channel, Twitter / X, and donation entries to the top Settings group, and cleaned up duplicated publishing-channel statement UI.
-- Reworked the Space contribution toolbar into a compact dock: long-press the current tab to expand the horizontally scrollable Video / Article / Collection / Series tabs, with adaptive indicator width.
-- Fixed skin-sticker and Home-top visuals, removed the unstable transparent bottom-bar liquid-glass experiment, and fixed PGC history cards showing an unknown uploader plus false Bangumi black-screen warnings.
-- Bumped the app to `8.3.3` with `versionCode` `197`.
+- Removed nested-reply blur, fixed nested-reply pagination and motion crashes, added a pull-down close handle, and improved nested-reply scrolling, text expansion, and drag-to-dismiss behavior.
+- Reworked portrait comment/player coordination and fixed alignment when portrait comments transition into landscape playback.
+- Fixed Space long-article rendering and tightened Space dynamic models, article block parsing, navigation, and loading policies.
+- Fixed first-use portrait danmaku settings, double-tap seek hint timing, auto rotation sensitivity, and portrait/landscape video positioning.
+- Fixed audio backup-source selection by matching backup URLs to the currently selected audio track, reducing silent playback that only recovers after toggling Auto / 192K.
+- Maintained AGP, Kotlin, Compose BOM, Lifecycle, Activity Compose, Window, and Compose Animation with a smoothness-first, low-risk dependency policy.
+- Bumped the app to `8.3.4` with `versionCode` `198`.
 
 ---
 
