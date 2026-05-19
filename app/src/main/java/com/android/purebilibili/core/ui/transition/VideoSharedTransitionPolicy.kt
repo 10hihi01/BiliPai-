@@ -22,18 +22,6 @@ internal fun shouldEnableVideoCoverSharedTransition(
         hasAnimatedVisibilityScope
 }
 
-internal fun shouldEnableVideoPlayerShellSharedTransition(
-    transitionEnabled: Boolean,
-    hasSharedTransitionScope: Boolean,
-    hasAnimatedVisibilityScope: Boolean,
-    forceCoverOnlyOnReturn: Boolean
-): Boolean {
-    // 返回时仍让外层播放器 shell 持有 sharedBounds；封面只负责遮住 Surface，避免黑屏。
-    return transitionEnabled &&
-        hasSharedTransitionScope &&
-        hasAnimatedVisibilityScope
-}
-
 internal fun shouldEnableVideoMetadataSharedTransition(
     coverSharedEnabled: Boolean,
     isQuickReturnLimited: Boolean,

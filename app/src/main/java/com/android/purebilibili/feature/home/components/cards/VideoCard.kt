@@ -404,7 +404,7 @@ fun ElegantVideoCard(
             .padding(bottom = 12.dp)
     ) {
         val connectedCardShape = remember(cardCornerRadius) { RoundedCornerShape(cardCornerRadius) }
-        val cardContainerBaseModifier = if (infoSurfaceAppearance.useTintedSurface) {
+        val cardContainerModifier = if (infoSurfaceAppearance.useTintedSurface) {
             Modifier
                 .fillMaxWidth()
                 .shadow(
@@ -417,25 +417,28 @@ fun ElegantVideoCard(
         } else {
             Modifier.fillMaxWidth()
         }
-        val cardContainerModifier = if (coverSharedEnabled) {
-            with(requireNotNull(sharedTransitionScope)) {
-                cardContainerBaseModifier.sharedBounds(
-                    sharedContentState = rememberSharedContentState(key = "video_cover_${video.bvid}"),
-                    animatedVisibilityScope = requireNotNull(animatedVisibilityScope),
-                    boundsTransform = { _, _ ->
-                        com.android.purebilibili.core.theme.AnimationSpecs.BiliPaiSpringSpec
-                    },
-                    clipInOverlayDuringTransition = OverlayClip(connectedCardShape)
-                )
-            }
-        } else {
-            cardContainerBaseModifier
-        }
         Column(
             modifier = cardContainerModifier
         ) {
         //  封面容器 - 官方 B 站风格，支持共享元素过渡（受开关控制）
-        val coverModifier = Modifier
+        val coverModifier = if (coverSharedEnabled) {
+            with(requireNotNull(sharedTransitionScope)) {
+                Modifier
+                    .sharedBounds(
+                        sharedContentState = rememberSharedContentState(key = "video_cover_${video.bvid}"),
+                        animatedVisibilityScope = requireNotNull(animatedVisibilityScope),
+                        //  添加回弹效果的 spring 动画
+                        boundsTransform = { _, _ ->
+                            com.android.purebilibili.core.theme.AnimationSpecs.BiliPaiSpringSpec
+                        },
+                        clipInOverlayDuringTransition = OverlayClip(
+                            RoundedCornerShape(cardCornerRadius)  //  过渡时保持动态圆角
+                        )
+                    )
+            }
+        } else {
+            Modifier
+        }
         
         //  [性能优化] 封面圆角形状缓存（避免重组时重复创建）
         val coverShape = remember(cardCornerRadius, infoSurfaceAppearance.useTintedSurface) {

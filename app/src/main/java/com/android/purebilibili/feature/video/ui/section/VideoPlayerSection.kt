@@ -421,7 +421,6 @@ fun VideoPlayerSection(
     onTriple: () -> Unit = {},  // [新增] 一键三连回调
     onPageSelect: (Int) -> Unit = {},
     forceCoverOnly: Boolean = false,
-    playerShellSharedBoundsActive: Boolean = false,
     allowLivePlayerSharedElement: Boolean = true,
     suppressSubtitleOverlay: Boolean = false,
     subtitleDisplayModePreferenceOverride: SubtitleDisplayMode? = null,
@@ -2501,7 +2500,6 @@ fun VideoPlayerSection(
         transitionEnabled = transitionEnabled,
         hasSharedTransitionScope = sharedTransitionScope != null,
         hasAnimatedVisibilityScope = animatedVisibilityScope != null,
-        playerShellSharedBoundsActive = playerShellSharedBoundsActive,
         sourceRoute = CardPositionManager.lastVideoSourceRoute
     )
     

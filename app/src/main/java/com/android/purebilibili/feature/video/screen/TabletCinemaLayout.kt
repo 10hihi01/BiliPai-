@@ -91,7 +91,6 @@ import com.android.purebilibili.core.ui.LocalSharedTransitionScope
 import com.android.purebilibili.core.store.SettingsManager
 import com.android.purebilibili.core.store.TabletCommentPanelWidthPreset
 import com.android.purebilibili.core.ui.transition.VIDEO_SHARED_COVER_ASPECT_RATIO
-import com.android.purebilibili.core.ui.transition.shouldEnableVideoPlayerShellSharedTransition
 import com.android.purebilibili.core.util.ShareUtils
 import com.android.purebilibili.data.model.response.BgmInfo
 import com.android.purebilibili.data.model.response.ViewPoint
@@ -389,13 +388,13 @@ private fun CinemaStagePlayer(
     val success = uiState as? PlayerUiState.Success
     val sharedTransitionScope = LocalSharedTransitionScope.current
     val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
-    val playerShellSharedBoundsActive = shouldEnableVideoPlayerShellSharedTransition(
-        transitionEnabled = transitionEnabled,
-        hasSharedTransitionScope = sharedTransitionScope != null,
-        hasAnimatedVisibilityScope = animatedVisibilityScope != null,
-        forceCoverOnlyOnReturn = forceCoverOnlyOnReturn
-    )
-    val playerContainerModifier = if (playerShellSharedBoundsActive) {
+    val playerContainerModifier = if (
+        shouldEnableVideoCoverSharedTransition(
+            transitionEnabled = transitionEnabled,
+            hasSharedTransitionScope = sharedTransitionScope != null,
+            hasAnimatedVisibilityScope = animatedVisibilityScope != null
+        ) && !forceCoverOnlyOnReturn
+    ) {
         with(requireNotNull(sharedTransitionScope)) {
             Modifier.sharedBounds(
                 sharedContentState = rememberSharedContentState(key = "video_cover_$bvid"),
@@ -473,7 +472,6 @@ private fun CinemaStagePlayer(
                 onRelatedVideoClick = onRelatedVideoClick,
                 relatedVideos = success?.related ?: emptyList(),
                 forceCoverOnly = forceCoverOnlyOnReturn,
-                playerShellSharedBoundsActive = playerShellSharedBoundsActive,
                 ugcSeason = success?.info?.ugc_season,
                 isFollowed = success?.isFollowing ?: false,
                 isLiked = success?.isLiked ?: false,

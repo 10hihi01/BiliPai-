@@ -864,10 +864,8 @@ internal fun shouldEnableForcedReturnCoverSharedBounds(
     transitionEnabled: Boolean,
     hasSharedTransitionScope: Boolean,
     hasAnimatedVisibilityScope: Boolean,
-    playerShellSharedBoundsActive: Boolean = false,
     sourceRoute: String?
 ): Boolean {
-    if (playerShellSharedBoundsActive) return false
     val sourceRouteBase = sourceRoute?.substringBefore("?")
     val allowBySourceRoute = sourceRouteBase == null ||
         com.android.purebilibili.navigation.isVideoCardReturnTargetRoute(sourceRouteBase)
