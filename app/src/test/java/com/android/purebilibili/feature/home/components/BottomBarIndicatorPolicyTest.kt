@@ -571,8 +571,8 @@ class BottomBarIndicatorPolicyTest {
             motionSpec = resolveBottomBarMotionSpec(BottomBarMotionProfile.ANDROID_NATIVE_FLOATING)
         )
 
-        assertTrue(transform.scaleX > 1.35f)
-        assertTrue(transform.scaleY > 1.35f)
+        assertEquals(88f / 56f, transform.scaleX, 0.001f)
+        assertEquals(88f / 56f, transform.scaleY, 0.001f)
     }
 
     @Test
@@ -598,8 +598,8 @@ class BottomBarIndicatorPolicyTest {
 
         assertEquals(full.scaleX, partial.scaleX, 0.001f)
         assertEquals(full.scaleY, partial.scaleY, 0.001f)
-        assertTrue(partial.scaleX > 1.35f)
-        assertTrue(partial.scaleY > 1.35f)
+        assertEquals(88f / 56f, partial.scaleX, 0.001f)
+        assertEquals(88f / 56f, partial.scaleY, 0.001f)
         assertTrue(deformed.scaleX > partial.scaleX)
         assertTrue(deformed.scaleY < partial.scaleY)
     }
@@ -636,7 +636,7 @@ class BottomBarIndicatorPolicyTest {
         )
 
         assertTrue(settling.scaleX > 1f)
-        assertTrue(settling.scaleX > full.scaleX)
+        assertTrue(settling.scaleX < full.scaleX)
         assertTrue(settling.scaleX > settling.scaleY)
         assertTrue(settling.scaleY > 1f)
     }

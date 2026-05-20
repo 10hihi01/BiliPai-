@@ -962,7 +962,7 @@ internal data class BottomBarIndicatorVisualPolicy(
 )
 
 internal const val BOTTOM_BAR_REFRACTION_IDLE_HOLD_MS = 96L
-private const val BOTTOM_BAR_INDICATOR_DRAG_SCALE_TARGET = 78f / 56f
+private const val BOTTOM_BAR_INDICATOR_DRAG_SCALE_TARGET = 88f / 56f
 
 internal fun resolveBottomBarIndicatorVisualPolicyWithHold(
     basePolicy: BottomBarIndicatorVisualPolicy,
@@ -1300,6 +1300,25 @@ internal fun rememberBottomBarClickPulseTransform(
         )
     }
     return resolveBottomBarClickPulseTransform(progress.value)
+}
+
+@Composable
+private fun rememberBottomBarTapSwitchPressProgress(
+    pulseKey: Int
+): Float {
+    val progress = remember { Animatable(0f) }
+    LaunchedEffect(pulseKey) {
+        if (pulseKey <= 0) return@LaunchedEffect
+        progress.snapTo(1f)
+        progress.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(
+                durationMillis = 240,
+                easing = FastOutSlowInEasing
+            )
+        )
+    }
+    return progress.value
 }
 
 @Composable
@@ -2473,11 +2492,19 @@ private fun KernelSuAlignedBottomBar(
         preset = liquidGlassPreset,
         profile = tunedRefractionMotionProfile
     )
-    val motionProgress = maxOf(pressMotionProgress, refractionMotionProfile.progress)
+    var bottomBarTapSwitchPulseKey by remember { mutableIntStateOf(0) }
+    val tapSwitchPressProgress = rememberBottomBarTapSwitchPressProgress(
+        pulseKey = bottomBarTapSwitchPulseKey
+    )
+    val effectivePressProgress = maxOf(
+        dampedDragState.pressProgress,
+        tapSwitchPressProgress
+    )
+    val motionProgress = maxOf(effectivePressProgress, refractionMotionProfile.progress)
     val indicatorDragScaleProgress = rememberBottomBarIndicatorDragScaleProgress(
         isDragging = dampedDragState.isDragging
     )
-    val indicatorLayerScaleProgress = maxOf(indicatorDragScaleProgress, pressMotionProgress)
+    val indicatorLayerScaleProgress = maxOf(indicatorDragScaleProgress, effectivePressProgress)
     var searchExpansionOverride by remember {
         mutableStateOf(BottomBarSearchExpansionOverride.FOLLOW_AUTO)
     }
@@ -2688,15 +2715,15 @@ private fun KernelSuAlignedBottomBar(
             val backdropPresetProgress = resolveBottomBarEffectiveBackdropPresetProgress(
                 preset = liquidGlassPreset,
                 motionProgress = motionProgress,
-                pressProgress = dampedDragState.pressProgress
+                pressProgress = effectivePressProgress
             )
             val effectiveCaptureProgress = backdropPresetProgress.captureProgress
             val effectiveIndicatorProgress = backdropPresetProgress.indicatorProgress
             val isBottomBarPressActive =
-                dampedDragState.pressProgress > BottomBarTransientAlphaThreshold
+                effectivePressProgress > BottomBarTransientAlphaThreshold
             val effectiveIndicatorEffectProgress = maxOf(
                 effectiveIndicatorProgress,
-                dampedDragState.pressProgress
+                effectivePressProgress
             )
             val captureLensSpec = resolveBottomBarBackdropPresetCaptureLens(
                 progress = effectiveCaptureProgress
@@ -2713,7 +2740,7 @@ private fun KernelSuAlignedBottomBar(
             val indicatorReadabilitySurfaceColor = Color.Transparent
             val indicatorGlowAlpha = resolveBottomBarIndicatorGlowAlpha(
                 glassEnabled = glassEnabled,
-                pressProgress = dampedDragState.pressProgress
+                pressProgress = effectivePressProgress
             )
             val isBottomBarInteractionActive = dampedDragState.isDragging ||
                 dampedDragState.isRunning ||
@@ -3174,6 +3201,7 @@ private fun KernelSuAlignedBottomBar(
                                     haptic(HapticType.LIGHT)
                                     searchExpansionOverride = searchOverride
                                 } else {
+                                    bottomBarTapSwitchPulseKey += 1
                                     dampedDragState.updateIndex(index)
                                     performMaterialBottomBarTap(
                                         haptic = haptic,
@@ -3188,6 +3216,7 @@ private fun KernelSuAlignedBottomBar(
                     if (isTablet && onToggleSidebar != null) {
                         BottomBarInputTarget(
                             onClick = {
+                                bottomBarTapSwitchPulseKey += 1
                                 dampedDragState.updateIndex(visibleItems.size)
                                 performMaterialBottomBarTap(
                                     haptic = haptic,
