@@ -139,6 +139,40 @@ internal sealed interface BiliPaiNavKey : NavKey {
     }
 
     @Serializable
+    data object Inbox : BiliPaiNavKey {
+        override val routeBase: String = "inbox"
+    }
+
+    @Serializable
+    data object ReplyMe : BiliPaiNavKey {
+        override val routeBase: String = "message/reply_me"
+    }
+
+    @Serializable
+    data object AtMe : BiliPaiNavKey {
+        override val routeBase: String = "message/at_me"
+    }
+
+    @Serializable
+    data object LikeMe : BiliPaiNavKey {
+        override val routeBase: String = "message/like_me"
+    }
+
+    @Serializable
+    data object SystemNotice : BiliPaiNavKey {
+        override val routeBase: String = "message/system_notice"
+    }
+
+    @Serializable
+    data class Chat(
+        val talkerId: Long,
+        val sessionType: Int,
+        val userName: String = ""
+    ) : BiliPaiNavKey {
+        override val routeBase: String = "chat"
+    }
+
+    @Serializable
     data object Partition : BiliPaiNavKey {
         override val routeBase: String = "partition"
     }

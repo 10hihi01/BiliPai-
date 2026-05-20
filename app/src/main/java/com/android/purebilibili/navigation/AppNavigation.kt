@@ -1748,6 +1748,61 @@ fun AppNavigation(
                                     pushNavigation3Key(BiliPaiNavKey.Live(roomId, title, uname))
                                 }
                             )
+                        BiliPaiNavEntryContentRole.INBOX ->
+                            com.android.purebilibili.feature.message.InboxScreen(
+                                onBack = { performSystemBackAction() },
+                                onTopItemClick = { destination ->
+                                    when (destination) {
+                                        com.android.purebilibili.feature.message.MessageCenterDestination.ReplyMe ->
+                                            pushNavigation3Key(BiliPaiNavKey.ReplyMe)
+                                        com.android.purebilibili.feature.message.MessageCenterDestination.AtMe ->
+                                            pushNavigation3Key(BiliPaiNavKey.AtMe)
+                                        com.android.purebilibili.feature.message.MessageCenterDestination.LikeMe ->
+                                            pushNavigation3Key(BiliPaiNavKey.LikeMe)
+                                        com.android.purebilibili.feature.message.MessageCenterDestination.SystemNotice ->
+                                            pushNavigation3Key(BiliPaiNavKey.SystemNotice)
+                                    }
+                                },
+                                onSessionClick = { talkerId, sessionType, userName ->
+                                    pushNavigation3Key(BiliPaiNavKey.Chat(talkerId, sessionType, userName))
+                                }
+                            )
+                        BiliPaiNavEntryContentRole.REPLY_ME ->
+                            com.android.purebilibili.feature.message.feed.ReplyMeScreen(
+                                onBack = { performSystemBackAction() },
+                                onOpenLink = ::openMessageLink,
+                                onOpenSpace = { mid -> pushNavigation3Key(BiliPaiNavKey.Space(mid)) }
+                            )
+                        BiliPaiNavEntryContentRole.AT_ME ->
+                            com.android.purebilibili.feature.message.feed.AtMeScreen(
+                                onBack = { performSystemBackAction() },
+                                onOpenLink = ::openMessageLink,
+                                onOpenSpace = { mid -> pushNavigation3Key(BiliPaiNavKey.Space(mid)) }
+                            )
+                        BiliPaiNavEntryContentRole.LIKE_ME ->
+                            com.android.purebilibili.feature.message.feed.LikeMeScreen(
+                                onBack = { performSystemBackAction() },
+                                onOpenLink = ::openMessageLink,
+                                onOpenSpace = { mid -> pushNavigation3Key(BiliPaiNavKey.Space(mid)) }
+                            )
+                        BiliPaiNavEntryContentRole.SYSTEM_NOTICE ->
+                            com.android.purebilibili.feature.message.feed.SystemNoticeScreen(
+                                onBack = { performSystemBackAction() },
+                                onOpenLink = ::openMessageLink
+                            )
+                        BiliPaiNavEntryContentRole.CHAT -> {
+                                val chatKey = key as BiliPaiNavKey.Chat
+                                com.android.purebilibili.feature.message.ChatScreen(
+                                    talkerId = chatKey.talkerId,
+                                    sessionType = chatKey.sessionType,
+                                    userName = chatKey.userName.ifBlank { "用户${chatKey.talkerId}" },
+                                    onBack = { performSystemBackAction() },
+                                    onNavigateToVideo = { bvid ->
+                                        navigateToVideoInNavigation3(bvid, 0L, "")
+                                    },
+                                    onOpenBilibiliLink = ::openBilibiliLink
+                                )
+                            }
                         BiliPaiNavEntryContentRole.FAVORITE -> {
                                 val favoriteViewModel: FavoriteViewModel = viewModel()
                                 CommonListScreen(

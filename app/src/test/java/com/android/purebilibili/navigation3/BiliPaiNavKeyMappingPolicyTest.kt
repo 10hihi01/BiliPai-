@@ -74,6 +74,19 @@ class BiliPaiNavKeyMappingPolicyTest {
     }
 
     @Test
+    fun messageRoutes_mapToNavigation3Keys() {
+        assertEquals(BiliPaiNavKey.Inbox, legacyRouteToBiliPaiNavKey(ScreenRoutes.Inbox.route))
+        assertEquals(BiliPaiNavKey.ReplyMe, legacyRouteToBiliPaiNavKey(ScreenRoutes.ReplyMe.route))
+        assertEquals(BiliPaiNavKey.AtMe, legacyRouteToBiliPaiNavKey(ScreenRoutes.AtMe.route))
+        assertEquals(BiliPaiNavKey.LikeMe, legacyRouteToBiliPaiNavKey(ScreenRoutes.LikeMe.route))
+        assertEquals(BiliPaiNavKey.SystemNotice, legacyRouteToBiliPaiNavKey(ScreenRoutes.SystemNotice.route))
+        assertEquals(
+            BiliPaiNavKey.Chat(talkerId = 42L, sessionType = 1, userName = "测试用户"),
+            legacyRouteToBiliPaiNavKey("chat/42/1?name=%E6%B5%8B%E8%AF%95%E7%94%A8%E6%88%B7")
+        )
+    }
+
+    @Test
     fun cardReturnTargets_matchExistingSharedElementDestinations() {
         assertEquals(true, isCardReturnTargetNavKey(BiliPaiNavKey.Home))
         assertEquals(true, isCardReturnTargetNavKey(BiliPaiNavKey.Search))

@@ -26,6 +26,12 @@ internal enum class BiliPaiNavEntryContentRole {
     LIVE_AREA,
     LIVE_AREA_DETAIL,
     LIVE_FOLLOWING,
+    INBOX,
+    REPLY_ME,
+    AT_ME,
+    LIKE_ME,
+    SYSTEM_NOTICE,
+    CHAT,
     LOGIN,
     STORY,
     PARTITION,
@@ -66,6 +72,12 @@ internal fun resolveBiliPaiNavEntryContentRole(key: BiliPaiNavKey): BiliPaiNavEn
         BiliPaiNavKey.LiveArea -> BiliPaiNavEntryContentRole.LIVE_AREA
         is BiliPaiNavKey.LiveAreaDetail -> BiliPaiNavEntryContentRole.LIVE_AREA_DETAIL
         BiliPaiNavKey.LiveFollowing -> BiliPaiNavEntryContentRole.LIVE_FOLLOWING
+        BiliPaiNavKey.Inbox -> BiliPaiNavEntryContentRole.INBOX
+        BiliPaiNavKey.ReplyMe -> BiliPaiNavEntryContentRole.REPLY_ME
+        BiliPaiNavKey.AtMe -> BiliPaiNavEntryContentRole.AT_ME
+        BiliPaiNavKey.LikeMe -> BiliPaiNavEntryContentRole.LIKE_ME
+        BiliPaiNavKey.SystemNotice -> BiliPaiNavEntryContentRole.SYSTEM_NOTICE
+        is BiliPaiNavKey.Chat -> BiliPaiNavEntryContentRole.CHAT
         BiliPaiNavKey.Login -> BiliPaiNavEntryContentRole.LOGIN
         BiliPaiNavKey.Story -> BiliPaiNavEntryContentRole.STORY
         BiliPaiNavKey.Partition -> BiliPaiNavEntryContentRole.PARTITION

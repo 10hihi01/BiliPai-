@@ -32,6 +32,12 @@ internal fun BiliPaiNavKey.toLegacyRoute(): String {
         BiliPaiNavKey.LiveArea -> ScreenRoutes.LiveArea.route
         is BiliPaiNavKey.LiveAreaDetail -> ScreenRoutes.LiveAreaDetail.createRoute(parentAreaId, areaId, title)
         BiliPaiNavKey.LiveFollowing -> ScreenRoutes.LiveFollowing.route
+        BiliPaiNavKey.Inbox -> ScreenRoutes.Inbox.route
+        BiliPaiNavKey.ReplyMe -> ScreenRoutes.ReplyMe.route
+        BiliPaiNavKey.AtMe -> ScreenRoutes.AtMe.route
+        BiliPaiNavKey.LikeMe -> ScreenRoutes.LikeMe.route
+        BiliPaiNavKey.SystemNotice -> ScreenRoutes.SystemNotice.route
+        is BiliPaiNavKey.Chat -> ScreenRoutes.Chat.createRoute(talkerId, sessionType, userName)
         BiliPaiNavKey.Partition -> ScreenRoutes.Partition.route
         BiliPaiNavKey.Story -> ScreenRoutes.Story.route
         BiliPaiNavKey.AudioMode -> ScreenRoutes.AudioMode.route
@@ -94,6 +100,18 @@ internal fun legacyRouteToBiliPaiNavKey(route: String?): BiliPaiNavKey {
             )
         }
         normalized == ScreenRoutes.LiveFollowing.route -> BiliPaiNavKey.LiveFollowing
+        normalized == ScreenRoutes.Inbox.route -> BiliPaiNavKey.Inbox
+        normalized == ScreenRoutes.ReplyMe.route -> BiliPaiNavKey.ReplyMe
+        normalized == ScreenRoutes.AtMe.route -> BiliPaiNavKey.AtMe
+        normalized == ScreenRoutes.LikeMe.route -> BiliPaiNavKey.LikeMe
+        normalized == ScreenRoutes.SystemNotice.route -> BiliPaiNavKey.SystemNotice
+        segments.firstOrNull() == "chat" && segments.size >= 3 -> {
+            BiliPaiNavKey.Chat(
+                talkerId = segments[1].toLongOrNull() ?: 0L,
+                sessionType = segments[2].toIntOrNull() ?: 1,
+                userName = query["name"].orEmpty()
+            )
+        }
         normalized == ScreenRoutes.Partition.route -> BiliPaiNavKey.Partition
         normalized == ScreenRoutes.Story.route -> BiliPaiNavKey.Story
         normalized == ScreenRoutes.AudioMode.route -> BiliPaiNavKey.AudioMode
