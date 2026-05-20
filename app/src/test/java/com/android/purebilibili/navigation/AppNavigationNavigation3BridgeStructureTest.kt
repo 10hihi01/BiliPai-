@@ -39,18 +39,20 @@ class AppNavigationNavigation3BridgeStructureTest {
     }
 
     @Test
-    fun appNavigationHasControlledNavDisplayMainChainEntryPoint() {
+    fun appNavigationUsesNavDisplayAsSingleMainChain() {
         val source = appNavigationSource()
 
-        assertTrue(source.contains("shouldUseBiliPaiNavDisplayMainChain()"))
         assertTrue(source.contains("BiliPaiNavDisplayHost("))
         assertTrue(source.contains("sharedTransitionScope = LocalSharedTransitionScope.current"))
         assertTrue(source.contains("resolveBiliPaiNavEntryContentRole"))
+        assertTrue(source.contains("BiliPaiNavEntryContentRole.HOME ->"))
+        assertTrue(source.contains("BiliPaiNavEntryContentRole.HISTORY ->"))
         assertTrue(source.contains("BiliPaiNavEntryContentRole.SETTINGS ->"))
         assertTrue(source.contains("BiliPaiNavEntryContentRole.WATCH_LATER ->"))
         assertTrue(source.contains("BiliPaiNavEntryContentRole.FAVORITE ->"))
         assertTrue(source.contains("onBack = { performSystemBackAction() }"))
-        assertTrue(source.contains("else NavHost("))
+        assertFalse(source.contains("shouldUseBiliPaiNavDisplayMainChain()"))
+        assertFalse(source.contains("else NavHost("))
     }
 
     private fun appNavigationSource(): String {
