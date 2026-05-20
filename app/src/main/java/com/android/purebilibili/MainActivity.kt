@@ -57,8 +57,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.media3.common.util.UnstableApi
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import androidx.window.layout.WindowMetrics
 import androidx.window.layout.WindowMetricsCalculator
 import coil.compose.AsyncImagePainter
@@ -259,15 +257,6 @@ internal fun resolveIntentLinkFallbackUrl(rawInput: String): String? {
 
     return BilibiliUrlParser.extractUrls(rawInput)
         .firstNotNullOfOrNull(::normalizeIntentLinkWebCandidate)
-}
-
-private suspend fun awaitNavControllerReady(
-    navController: NavHostController
-) {
-    if (navController.currentDestination != null) return
-    snapshotFlow { navController.currentDestination != null }
-        .filter { it }
-        .first()
 }
 
 private fun normalizeIntentLinkWebCandidate(rawInput: String): String? {
@@ -978,7 +967,6 @@ open class MainActivity : AppCompatActivity() {
             val context = LocalContext.current
             val uriHandler = LocalUriHandler.current
             val scope = rememberCoroutineScope()
-            val navController = rememberNavController()
             var startupUpdateCheckResult by remember { mutableStateOf<AppUpdateCheckResult?>(null) }
             var startupUpdateDownloadState by remember { mutableStateOf(AppUpdateDownloadState()) }
             var pendingCrashSnapshotPath by remember {
@@ -995,54 +983,6 @@ open class MainActivity : AppCompatActivity() {
                             startupUpdateCheckResult = info
                         }
                     }
-                }
-            }
-            
-            //  [新增] 监听 pendingVideoId 并导航到视频详情页
-            LaunchedEffect(pendingVideoId) {
-                pendingVideoId?.let { videoId ->
-                    awaitNavControllerReady(navController)
-                    val currentEntry = navController.currentBackStackEntry
-                    val currentRoute = currentEntry?.destination?.route
-                    val currentBvid = currentEntry?.arguments?.getString("bvid")
-                    val shouldNavigate = shouldNavigateToVideoFromNotification(
-                        currentRoute = currentRoute,
-                        currentBvid = currentBvid,
-                        targetBvid = videoId
-                    )
-
-                    if (shouldNavigate) {
-                        Logger.d(TAG, "🚀 导航到视频: $videoId")
-                        miniPlayerManager.isNavigatingToVideo = true
-                        navController.navigate(resolveMainActivityVideoRoute(bvid = videoId, cid = 0L)) {
-                            launchSingleTop = true
-                        }
-                    } else {
-                        Logger.d(TAG, "🎯 已在目标视频页，跳过重复导航: $videoId")
-                    }
-                    pendingVideoId = null
-                }
-            }
-            
-            // 🚀 [新增] 监听 pendingRoute 并导航到对应页面 (App Shortcuts)
-            LaunchedEffect(pendingRoute) {
-                pendingRoute?.let { route ->
-                    awaitNavControllerReady(navController)
-                    Logger.d(TAG, "🚀 导航到快捷入口: $route")
-                    val targetRoute = resolveShortcutRoute(route)
-                    targetRoute?.let { 
-                        navController.navigate(it) { launchSingleTop = true }
-                    }
-                    pendingRoute = null  // 清除，避免重复导航
-                }
-            }
-
-            LaunchedEffect(pendingNavigationRoute) {
-                pendingNavigationRoute?.let { route ->
-                    awaitNavControllerReady(navController)
-                    Logger.d(TAG, "🚀 导航到指定页面: $route")
-                    navController.navigate(route) { launchSingleTop = true }
-                    pendingNavigationRoute = null
                 }
             }
             
@@ -1265,9 +1205,26 @@ open class MainActivity : AppCompatActivity() {
                             //  SharedTransitionProvider 包裹导航，启用共享元素过渡
                             SharedTransitionProvider {
                                 AppNavigation(
-                                    navController = navController,
                                     miniPlayerManager = miniPlayerManager,
                                     isInPipMode = isPipRenderingActive,
+                                    pendingVideoId = pendingVideoId,
+                                    pendingShortcutRoute = pendingRoute,
+                                    pendingNavigationRoute = pendingNavigationRoute,
+                                    onPendingVideoIdConsumed = { consumedVideoId ->
+                                        if (pendingVideoId == consumedVideoId) {
+                                            pendingVideoId = null
+                                        }
+                                    },
+                                    onPendingShortcutRouteConsumed = { consumedRoute ->
+                                        if (pendingRoute == consumedRoute) {
+                                            pendingRoute = null
+                                        }
+                                    },
+                                    onPendingNavigationRouteConsumed = { consumedRoute ->
+                                        if (pendingNavigationRoute == consumedRoute) {
+                                            pendingNavigationRoute = null
+                                        }
+                                    },
                                     initialSearchKeyword = pendingSearchKeyword,
                                     onInitialSearchKeywordConsumed = { consumedKeyword ->
                                         if (pendingSearchKeyword == consumedKeyword) {
@@ -1314,20 +1271,15 @@ open class MainActivity : AppCompatActivity() {
                                     val liveTitle = miniPlayerManager.currentTitle
                                     val liveUname = miniPlayerManager.currentLiveUname
                                     miniPlayerManager.exitMiniMode(animate = false)
-                                    navController.navigate(
+                                    pendingNavigationRoute =
                                         ScreenRoutes.Live.createRoute(roomId, liveTitle, liveUname)
-                                    ) {
-                                        launchSingleTop = true
-                                    }
                                 } else {
                                     //  [修改] 导航回详情页，而不是只显示全屏播放器
                                     miniPlayerManager.currentBvid?.let { bvid ->
                                         miniPlayerManager.isNavigatingToVideo = true
                                         miniPlayerManager.exitMiniMode(animate = false)
                                         val cid = miniPlayerManager.currentCid
-                                        navController.navigate(resolveMainActivityVideoRoute(bvid = bvid, cid = cid)) {
-                                            launchSingleTop = true
-                                        }
+                                        pendingNavigationRoute = resolveMainActivityVideoRoute(bvid = bvid, cid = cid)
                                     }
                                 }
                             }
@@ -1350,9 +1302,7 @@ open class MainActivity : AppCompatActivity() {
                                     miniPlayerManager.exitMiniMode(animate = false)
                                     //  [修复] 使用正确的 cid，而不是 0
                                     val cid = miniPlayerManager.currentCid
-                                    navController.navigate(resolveMainActivityVideoRoute(bvid = bvid, cid = cid)) {
-                                        launchSingleTop = true
-                                    }
+                                    pendingNavigationRoute = resolveMainActivityVideoRoute(bvid = bvid, cid = cid)
                                 }
                             }
                         )

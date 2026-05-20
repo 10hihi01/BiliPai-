@@ -131,20 +131,20 @@ class AppTopLevelNavigationPolicyTest {
     }
 
     @Test
-    fun classicBackHandler_isComposedAfterNavHostSoItCanOverrideNavigationPredictiveBack() {
+    fun classicBackHandler_isComposedAfterNavDisplaySoItCanOwnAppBackAction() {
         val sourceFile = listOf(
             File("app/src/main/java/com/android/purebilibili/navigation/AppNavigation.kt"),
             File("src/main/java/com/android/purebilibili/navigation/AppNavigation.kt")
         ).first { it.exists() }
         val source = sourceFile.readText()
-        val navHostIndex = source.indexOf("NavHost(")
+        val navDisplayIndex = source.indexOf("BiliPaiNavDisplayHost(")
         val classicBackHandlerIndex = source.indexOf("BackHandler(enabled = shouldInterceptSystemBack)")
 
-        assertTrue(navHostIndex >= 0)
+        assertTrue(navDisplayIndex >= 0)
         assertTrue(classicBackHandlerIndex >= 0)
         assertTrue(
-            classicBackHandlerIndex > navHostIndex,
-            "关闭预测性返回时的经典 BackHandler 必须在 NavHost 之后组合，才能覆盖 Navigation Compose 的返回回调。"
+            classicBackHandlerIndex > navDisplayIndex,
+            "关闭预测性返回时的经典 BackHandler 必须在 NavDisplay 之后组合，才能由应用壳接管返回动作。"
         )
     }
 

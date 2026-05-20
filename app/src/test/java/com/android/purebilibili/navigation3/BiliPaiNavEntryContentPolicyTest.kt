@@ -35,6 +35,7 @@ class BiliPaiNavEntryContentPolicyTest {
         assertEquals(BiliPaiNavEntryContentRole.LIKE_ME, resolveBiliPaiNavEntryContentRole(BiliPaiNavKey.LikeMe))
         assertEquals(BiliPaiNavEntryContentRole.SYSTEM_NOTICE, resolveBiliPaiNavEntryContentRole(BiliPaiNavKey.SystemNotice))
         assertEquals(BiliPaiNavEntryContentRole.CHAT, resolveBiliPaiNavEntryContentRole(BiliPaiNavKey.Chat(1L, 1, "用户")))
+        assertEquals(BiliPaiNavEntryContentRole.AUDIO_MODE, resolveBiliPaiNavEntryContentRole(BiliPaiNavKey.AudioMode))
         assertEquals(BiliPaiNavEntryContentRole.ONBOARDING, resolveBiliPaiNavEntryContentRole(BiliPaiNavKey.Onboarding))
         assertEquals(BiliPaiNavEntryContentRole.FOLLOWING, resolveBiliPaiNavEntryContentRole(BiliPaiNavKey.Following(1L)))
         assertEquals(BiliPaiNavEntryContentRole.DOWNLOAD_LIST, resolveBiliPaiNavEntryContentRole(BiliPaiNavKey.DownloadList))
@@ -71,7 +72,7 @@ class BiliPaiNavEntryContentPolicyTest {
     fun remainingDetailKeysStayDeferredUntilTheirLegacyRouteBodiesAreExtracted() {
         assertEquals(BiliPaiNavEntryContentRole.CATEGORY, resolveBiliPaiNavEntryContentRole(BiliPaiNavKey.Category(1)))
         assertEquals(
-            BiliPaiNavEntryContentRole.DEFERRED_LEGACY_ROUTE,
+            BiliPaiNavEntryContentRole.HOME,
             resolveBiliPaiNavEntryContentRole(BiliPaiNavKey.Unknown("download"))
         )
     }

@@ -76,8 +76,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
-import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.android.purebilibili.R
 import com.android.purebilibili.navigation.ScreenRoutes
 import kotlinx.coroutines.flow.distinctUntilChanged

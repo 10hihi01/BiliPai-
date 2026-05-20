@@ -38,6 +38,7 @@ internal enum class BiliPaiNavEntryContentRole {
     LIKE_ME,
     SYSTEM_NOTICE,
     CHAT,
+    AUDIO_MODE,
     LOGIN,
     STORY,
     PARTITION,
@@ -52,8 +53,7 @@ internal enum class BiliPaiNavEntryContentRole {
     DYNAMIC_DETAIL,
     ARTICLE_DETAIL,
     LIVE,
-    BANGUMI_DETAIL,
-    DEFERRED_LEGACY_ROUTE
+    BANGUMI_DETAIL
 }
 
 internal fun resolveBiliPaiNavEntryContentRole(key: BiliPaiNavKey): BiliPaiNavEntryContentRole {
@@ -95,6 +95,7 @@ internal fun resolveBiliPaiNavEntryContentRole(key: BiliPaiNavKey): BiliPaiNavEn
         BiliPaiNavKey.LikeMe -> BiliPaiNavEntryContentRole.LIKE_ME
         BiliPaiNavKey.SystemNotice -> BiliPaiNavEntryContentRole.SYSTEM_NOTICE
         is BiliPaiNavKey.Chat -> BiliPaiNavEntryContentRole.CHAT
+        BiliPaiNavKey.AudioMode -> BiliPaiNavEntryContentRole.AUDIO_MODE
         BiliPaiNavKey.Login -> BiliPaiNavEntryContentRole.LOGIN
         BiliPaiNavKey.Story -> BiliPaiNavEntryContentRole.STORY
         BiliPaiNavKey.Partition -> BiliPaiNavEntryContentRole.PARTITION
@@ -110,6 +111,6 @@ internal fun resolveBiliPaiNavEntryContentRole(key: BiliPaiNavKey): BiliPaiNavEn
         is BiliPaiNavKey.ArticleDetail -> BiliPaiNavEntryContentRole.ARTICLE_DETAIL
         is BiliPaiNavKey.Live -> BiliPaiNavEntryContentRole.LIVE
         is BiliPaiNavKey.BangumiDetail -> BiliPaiNavEntryContentRole.BANGUMI_DETAIL
-        else -> BiliPaiNavEntryContentRole.DEFERRED_LEGACY_ROUTE
+        is BiliPaiNavKey.Unknown -> BiliPaiNavEntryContentRole.HOME
     }
 }

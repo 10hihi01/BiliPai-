@@ -12,14 +12,14 @@ class AppNavigationNavigation3BridgeStructureTest {
         val source = appNavigationSource()
 
         assertTrue(source.contains("navigation3BackStack"))
-        assertTrue(source.contains("resolveBiliPaiNavKeyForLegacyBackStackEntry"))
         assertTrue(source.contains("pushBiliPaiNavKey"))
         assertTrue(source.contains("popBiliPaiNavKey"))
+        assertTrue(source.contains("legacyRouteToBiliPaiNavKey"))
     }
 
     @Test
     fun videoReturnRouteLayerUsesNavigation3MotionDecision() {
-        val source = appNavigationSource()
+        val source = navigation3Source()
 
         assertTrue(source.contains("resolveBiliPaiNavMotionDecision"))
         assertTrue(source.contains("BiliPaiNavRouteTransition.NO_OP_SHARED_ELEMENT"))
@@ -54,6 +54,7 @@ class AppNavigationNavigation3BridgeStructureTest {
     @Test
     fun appNavigationUsesNavDisplayAsSingleMainChain() {
         val source = appNavigationSource()
+        val buildFile = appBuildGradleSource()
 
         assertTrue(source.contains("BiliPaiNavDisplayHost("))
         assertTrue(source.contains("sharedTransitionScope = LocalSharedTransitionScope.current"))
@@ -88,6 +89,7 @@ class AppNavigationNavigation3BridgeStructureTest {
         assertTrue(source.contains("BiliPaiNavEntryContentRole.LIKE_ME ->"))
         assertTrue(source.contains("BiliPaiNavEntryContentRole.SYSTEM_NOTICE ->"))
         assertTrue(source.contains("BiliPaiNavEntryContentRole.CHAT ->"))
+        assertTrue(source.contains("BiliPaiNavEntryContentRole.AUDIO_MODE ->"))
         assertTrue(source.contains("BiliPaiNavEntryContentRole.ONBOARDING ->"))
         assertTrue(source.contains("BiliPaiNavEntryContentRole.FOLLOWING ->"))
         assertTrue(source.contains("BiliPaiNavEntryContentRole.DOWNLOAD_LIST ->"))
@@ -112,13 +114,22 @@ class AppNavigationNavigation3BridgeStructureTest {
         assertTrue(source.contains("BiliPaiNavEntryContentRole.TIPS_SETTINGS ->"))
         assertTrue(source.contains("onBack = { performSystemBackAction() }"))
         assertFalse(source.contains("shouldUseBiliPaiNavDisplayMainChain()"))
-        assertFalse(source.contains("else NavHost("))
+        assertFalse(source.contains("DEFERRED_LEGACY_ROUTE"))
+        assertFalse(source.contains("NavHost("))
+        assertFalse(buildFile.contains("navigation-compose"))
     }
 
     private fun appNavigationSource(): String {
         return listOf(
             File("app/src/main/java/com/android/purebilibili/navigation/AppNavigation.kt"),
             File("src/main/java/com/android/purebilibili/navigation/AppNavigation.kt")
+        ).first { it.exists() }.readText()
+    }
+
+    private fun appBuildGradleSource(): String {
+        return listOf(
+            File("app/build.gradle.kts"),
+            File("build.gradle.kts")
         ).first { it.exists() }.readText()
     }
 
@@ -131,6 +142,18 @@ class AppNavigationNavigation3BridgeStructureTest {
         return root
             .walkTopDown()
             .filter { it.isFile && it.extension == "kt" && it.name != "CardPositionManager.kt" }
+            .joinToString(separator = "\n") { it.readText() }
+    }
+
+    private fun navigation3Source(): String {
+        val root = listOf(
+            File("app/src/main/java/com/android/purebilibili/navigation3"),
+            File("src/main/java/com/android/purebilibili/navigation3")
+        ).first { it.exists() }
+
+        return root
+            .walkTopDown()
+            .filter { it.isFile && it.extension == "kt" }
             .joinToString(separator = "\n") { it.readText() }
     }
 }

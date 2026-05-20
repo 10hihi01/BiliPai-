@@ -2,19 +2,20 @@ package com.android.purebilibili.navigation
 
 import java.io.File
 import kotlin.test.Test
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class BottomPagerStatePersistenceStructureTest {
 
     @Test
-    fun `bottom pager keeps saveable state by bottom tab identity`() {
+    fun `bottom tabs no longer depend on local pager state holder`() {
         val source = loadSource("app/src/main/java/com/android/purebilibili/navigation/AppNavigation.kt")
 
-        assertTrue(source.contains("rememberSaveableStateHolder()"))
-        assertTrue(source.contains("bottomPagerSaveableStateHolder.SaveableStateProvider("))
-        assertTrue(source.contains("key = resolveBottomPagerSaveableStateKey(pageItem)"))
-        assertTrue(source.contains("key = { page ->"))
-        assertTrue(source.contains("resolveBottomPagerItemForPage(page, visibleBottomBarItems)"))
+        assertTrue(source.contains("BiliPaiNavDisplayHost("))
+        assertFalse(source.contains("bottomPagerSaveableStateHolder.SaveableStateProvider("))
+        assertFalse(source.contains("rememberSaveableStateHolder()"))
+        assertFalse(source.contains("HorizontalPager("))
+        assertFalse(source.contains("VerticalPager("))
     }
 
     private fun loadSource(path: String): String {

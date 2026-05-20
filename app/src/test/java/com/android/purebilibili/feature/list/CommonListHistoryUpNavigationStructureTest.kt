@@ -25,7 +25,7 @@ class CommonListHistoryUpNavigationStructureTest {
     fun `history route connects up click to space screen`() {
         val source = loadSource("app/src/main/java/com/android/purebilibili/navigation/AppNavigation.kt")
 
-        assertTrue(source.contains("onUpClick = { mid -> navController.navigate(ScreenRoutes.Space.createRoute(mid)) }"))
+        assertTrue(source.contains("onUpClick = { mid -> pushNavigation3Route(ScreenRoutes.Space.createRoute(mid)) }"))
     }
 
     private fun loadSource(path: String): String {

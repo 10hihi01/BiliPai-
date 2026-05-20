@@ -73,9 +73,7 @@ internal fun shouldInterceptSystemBackForAppAction(
     action: AppSystemBackAction
 ): Boolean {
     return action == AppSystemBackAction.RETURN_TO_HOME_TAB ||
-        shouldInterceptSystemBackForClassicMotion(
-            predictiveBackAnimationEnabled = predictiveBackAnimationEnabled
-        )
+        !predictiveBackAnimationEnabled
 }
 
 internal fun resolveBottomPagerPageForRoute(

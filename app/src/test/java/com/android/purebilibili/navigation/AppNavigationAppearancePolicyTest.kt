@@ -86,17 +86,17 @@ class AppNavigationAppearancePolicyTest {
     }
 
     @Test
-    fun bottomBarBackdropCapturesGlobalWallpaperBeforeNavHostContent() {
+    fun bottomBarBackdropCapturesGlobalWallpaperBeforeNavDisplayContent() {
         val source = loadSource("app/src/main/java/com/android/purebilibili/navigation/AppNavigation.kt")
         val capturedLayerSource = source
             .substringAfter(".layerBackdrop(bottomBarBackdrop)")
             .substringBefore("// ===== 全局底栏")
 
         val wallpaperIndex = capturedLayerSource.indexOf("HomeWallpaperBackdrop(")
-        val navHostIndex = capturedLayerSource.indexOf("NavHost(")
+        val navDisplayIndex = capturedLayerSource.indexOf("BiliPaiNavDisplayHost(")
 
         assertTrue(wallpaperIndex >= 0)
-        assertTrue(navHostIndex > wallpaperIndex)
+        assertTrue(navDisplayIndex > wallpaperIndex)
         assertTrue(capturedLayerSource.contains(".then(if (mainHazeState != null) Modifier.hazeSource(mainHazeState) else Modifier)"))
     }
 
