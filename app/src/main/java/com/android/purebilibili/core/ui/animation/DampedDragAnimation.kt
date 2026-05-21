@@ -179,17 +179,17 @@ internal class DampedDragAnimationState(
                 (itemCount - 1).toFloat() + motionSpec.drag.overscrollLimitItems
             )
         desiredValue = newValue
-        
-        positionJob?.cancel()
-        positionJob = scope.launch {
-            animatable.stop()
-            animatable.snapTo(newValue)
-        }
         // 累计偏移量 — 用于面板偏移
         desiredDragOffsetPx += dragAmountPx
+
+        // [P0] 拖拽逐帧只启动一个协程同步位置与偏移：
+        // 合并原先的 positionJob/offsetJob 两次 launch+cancel；
+        // snapTo 自身已抢占 MutatorMutex 并中止在跑动画，无需额外 stop()。
+        positionJob?.cancel()
         offsetJob?.cancel()
-        offsetJob = scope.launch {
-            offsetAnimation.stop()
+        offsetJob = null
+        positionJob = scope.launch {
+            animatable.snapTo(newValue)
             offsetAnimation.snapTo(desiredDragOffsetPx)
         }
     }

@@ -90,6 +90,7 @@ internal enum class SettingsIconRole {
     SETTINGS_SHARE,
     WEBDAV_BACKUP,
     DOWNLOAD_PATH,
+    IMAGE_SAVE_PATH,
     CLEAR_CACHE,
     PLUGINS,
     EXPORT_LOGS,
@@ -197,6 +198,7 @@ internal fun resolveSettingsSearchTargetIconRole(
     SettingsSearchTarget.SETTINGS_SHARE -> SettingsIconRole.SETTINGS_SHARE
     SettingsSearchTarget.WEBDAV_BACKUP -> SettingsIconRole.WEBDAV_BACKUP
     SettingsSearchTarget.DOWNLOAD_PATH -> SettingsIconRole.DOWNLOAD_PATH
+    SettingsSearchTarget.IMAGE_SAVE_PATH -> SettingsIconRole.IMAGE_SAVE_PATH
     SettingsSearchTarget.CLEAR_CACHE -> SettingsIconRole.CLEAR_CACHE
     SettingsSearchTarget.PLUGINS -> SettingsIconRole.PLUGINS
     SettingsSearchTarget.EXPORT_LOGS -> SettingsIconRole.EXPORT_LOGS
@@ -242,6 +244,7 @@ private fun resolveMd3SettingsSemanticIcon(role: SettingsIconRole): ImageVector 
     SettingsIconRole.SETTINGS_SHARE -> Icons.Outlined.Share
     SettingsIconRole.WEBDAV_BACKUP -> Icons.Outlined.Backup
     SettingsIconRole.DOWNLOAD_PATH -> Icons.Outlined.Folder
+    SettingsIconRole.IMAGE_SAVE_PATH -> Icons.Outlined.Folder
     SettingsIconRole.CLEAR_CACHE -> Icons.Outlined.DeleteOutline
     SettingsIconRole.PLUGINS -> Icons.Outlined.Extension
     SettingsIconRole.EXPORT_LOGS -> Icons.Outlined.Article
@@ -339,6 +342,7 @@ private fun resolveIosSettingsSemanticIcon(role: SettingsIconRole): ImageVector 
     SettingsIconRole.SETTINGS_SHARE -> CupertinoIcons.Outlined.ListBullet
     SettingsIconRole.WEBDAV_BACKUP -> CupertinoIcons.Outlined.DocOnDoc
     SettingsIconRole.DOWNLOAD_PATH -> CupertinoIcons.Outlined.Folder
+    SettingsIconRole.IMAGE_SAVE_PATH -> CupertinoIcons.Outlined.Folder
     SettingsIconRole.CLEAR_CACHE -> CupertinoIcons.Outlined.Trash
     SettingsIconRole.PLUGINS -> CupertinoIcons.Outlined.PuzzlepieceExtension
     SettingsIconRole.EXPORT_LOGS -> CupertinoIcons.Outlined.Terminal

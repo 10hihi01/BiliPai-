@@ -61,6 +61,12 @@ class DynamicLayoutPolicyTest {
     }
 
     @Test
+    fun `dynamic sidebar return header aligns with top tab row height`() {
+        assertEquals(52, resolveDynamicTopBarHeightDp())
+        assertEquals(resolveDynamicTopBarHeightDp(), resolveDynamicSidebarReturnHeaderHeightDp())
+    }
+
+    @Test
     fun `dynamic sidebar trims width without crowding avatar affordances`() {
         assertEquals(68.dp, resolveDynamicSidebarWidth(isExpanded = true))
         assertEquals(60.dp, resolveDynamicSidebarWidth(isExpanded = false))

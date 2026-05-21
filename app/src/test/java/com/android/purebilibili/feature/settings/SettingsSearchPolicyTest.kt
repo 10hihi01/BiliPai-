@@ -281,6 +281,13 @@ class SettingsSearchPolicyTest {
     }
 
     @Test
+    fun queryByImageSaveLocation_hitsImageSavePathEntry() {
+        val results = resolveSettingsSearchResults("图片保存位置")
+
+        assertTrue(results.any { it.target == SettingsSearchTarget.IMAGE_SAVE_PATH })
+    }
+
+    @Test
     fun queryByAppScreenshotGesture_hitsPlaybackEntry() {
         val results = resolveSettingsSearchResults("应用内干净截图")
 

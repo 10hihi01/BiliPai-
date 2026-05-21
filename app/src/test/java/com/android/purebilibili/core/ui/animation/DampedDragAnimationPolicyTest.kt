@@ -71,9 +71,7 @@ class DampedDragAnimationPolicyTest {
             .substringAfter("fun onDragEnd(")
             .substringBefore("fun updateIndex(index: Int)")
 
-        assertTrue(dragSource.contains("animatable.stop()"))
         assertTrue(dragSource.contains("animatable.snapTo(newValue)"))
-        assertTrue(dragSource.contains("offsetAnimation.stop()"))
         assertTrue(dragSource.contains("offsetAnimation.snapTo(desiredDragOffsetPx)"))
         assertTrue(dragSource.contains("dragVelocityItemsPerSecond = resolveDampedDragVelocityItemsPerSecond("))
         assertFalse(dragSource.contains("animatable.animateTo(\n                targetValue = newValue"))

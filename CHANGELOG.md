@@ -16,7 +16,12 @@
 - **迁移到 Navigation3 的 ViewModel 环境**：Navigation3 页面内容现在会继承应用级 `APPLICATION_KEY` extras，历史、动态、空间等入口创建 ViewModel 时不再因为缺少 Application 上下文而闪退。
 - **迁移到 Navigation3 的共享元素来源页**：首页、动态和 UP 主空间等高频视频卡片统一记录来源位置和共享元素 key，视频详情返回时能回到正确卡片，并带有轻微物理回弹收尾。
 - **迁移过程中的 UI 稳定性修复**：修复关闭预测式返回手势后，从视频详情返回首页出现 UI 错位的问题；开启首页顶部标签页下滑隐藏时，返回过程中也不再短暂闪出顶部标签页。
-- **首页底栏点击切换稳定性**：底栏一级 Tab 切换时接入真实转场预算和 Navigation3 无淡入淡出策略，指示器点击动效改为对齐 KernelSU 的 `DampedDragAnimation` 时序，避免页面切换期间叠加重折射、页面 fade 和额外指示器 pulse。
+- **首页底栏点击切换稳定性**：底栏一级 Tab 切换时接入真实转场预算和 Navigation3 无淡入淡出策略，指示器点击动效改为统一的 `DampedDragAnimation` 时序，避免页面切换期间叠加重折射、页面 fade 和额外指示器 pulse。
+- **首页底栏玻璃层稳定性**：底栏搜索胶囊、外壳、指示器和输入热区拆成独立渲染层；点击高光锚定到目标 Tab，拖拽时才跟随实时指示器；玻璃捕获层改为预热/常驻策略，避免切换瞬间采样到原始视频画面或出现短暂透底。
+- **首页顶部 Chrome 液态玻璃收敛**：移除旧的共用 Home Chrome renderer 和过时的实验液态玻璃容器，首页顶部 Chrome 直接在 `iOSHomeHeader` 内按 Backdrop / Haze / 普通模糊模式渲染，滚动耦合折射、暗色叠层和扁平玻璃策略更清晰。
+- **底栏拖拽动画性能整理**：`DampedDragAnimation` 的逐帧拖拽更新合并为单个协程同步位置和偏移，减少拖拽过程中的重复 launch / cancel，并保留 snap 抢占语义。
+- **图片保存目录自定义**：新增“图片保存位置”设置入口，可通过系统文件夹选择器授权自定义目录；动态图片、头像/背景预览保存和评论图片保存会优先写入用户选择目录，失败时回退原有系统相册保存逻辑。
+- **动态页顶栏对齐**：动态侧边栏返回区域与顶部标签栏统一使用 52dp 顶栏高度，侧边栏列表顶部预留同步跟随该高度，修复返回图标和顶部标签视觉中心不一致的问题。
 - **隐私内容解锁**：新增“进入隐私内容时验证”开关，进入搜索、历史、收藏、稍后再看、离线缓存和消息等隐私内容前可使用系统指纹、人脸或锁屏密码验证。
 - **设置页图标与隐私文案整理**：抽出统一语义图标策略，设置页与搜索结果的 iOS / MD3 图标语义更稳定；“隐私无痕模式”改为更直观的“不记录历史”，并补充隐私内容验证入口。
 - **首页卡片玻璃标签退役**：首页、搜索和通用列表的视频信息标签固定回普通样式，旧的封面/信息区玻璃标签偏好不再影响卡片渲染，减少小卡片上的玻璃层级干扰。
@@ -24,7 +29,15 @@
 
 ### 验证
 - `./gradlew :app:testDebugUnitTest` 的 Navigation3、共享元素、空间页和首页顶部标签页相关目标测试
-- `./gradlew --no-daemon --no-build-cache --rerun-tasks -Dkotlin.incremental=false -Dkotlin.incremental.useClasspathSnapshot=false -Pkotlin.incremental=false -Pkotlin.incremental.useClasspathSnapshot=false :app:testDebugUnitTest --tests 'com.android.purebilibili.core.ui.animation.DampedDragAnimationPolicyTest' --tests 'com.android.purebilibili.feature.home.components.BottomBarIndicatorPolicyTest' --tests 'com.android.purebilibili.feature.home.components.BottomBarMiuixStructureTest.android native floating branch renders through kernelsu aligned renderer'`
+- `./gradlew --no-daemon --no-build-cache --rerun-tasks -Dkotlin.incremental=false -Dkotlin.incremental.useClasspathSnapshot=false -Pkotlin.incremental=false -Pkotlin.incremental.useClasspathSnapshot=false :app:testDebugUnitTest --tests 'com.android.purebilibili.core.ui.animation.DampedDragAnimationPolicyTest' --tests 'com.android.purebilibili.feature.home.components.BottomBarIndicatorPolicyTest' --tests 'com.android.purebilibili.feature.home.components.BottomBarMiuixStructureTest'`
+- `./gradlew --no-daemon --max-workers=1 :app:testDebugUnitTest --tests 'com.android.purebilibili.core.ui.animation.DampedDragAnimationPolicyTest'`
+- `./gradlew --no-daemon --max-workers=1 :app:testDebugUnitTest --tests 'com.android.purebilibili.feature.home.components.BottomBarIndicatorPolicyTest'`
+- `./gradlew --no-daemon --max-workers=1 :app:testDebugUnitTest --tests 'com.android.purebilibili.feature.home.components.BottomBarMiuixStructureTest'`
+- `./gradlew --no-daemon --max-workers=1 :app:testDebugUnitTest --tests 'com.android.purebilibili.feature.home.components.HomeChromeLiquidSurfaceStructureTest'`
+- `./gradlew --no-daemon --max-workers=1 :app:testDebugUnitTest --tests 'com.android.purebilibili.feature.dynamic.DynamicLayoutPolicyTest'`
+- `./gradlew --no-daemon --max-workers=1 :app:testDebugUnitTest --tests 'com.android.purebilibili.feature.dynamic.components.ImagePreviewSaveLocationPolicyTest'`
+- `./gradlew --no-daemon --max-workers=1 :app:testDebugUnitTest --tests 'com.android.purebilibili.feature.dynamic.components.ImagePreviewFeedbackPolicyTest'`
+- `./gradlew --no-daemon --max-workers=1 :app:testDebugUnitTest --tests 'com.android.purebilibili.feature.settings.SettingsSearchPolicyTest'`
 - `./gradlew :app:compileDebugKotlin`
 - `git diff --check`
 
@@ -759,7 +772,7 @@
 
 ### 外观与主题
 - 主题色系统接入 Material Kolor，支持 `TonalSpot` 等色彩风格与 `SPEC_2021` / `SPEC_2025` / `Default` 色彩标准选择，动态取色和手动主题色都会走统一的 Material 3 配色生成链路。
-- 主题色调色板扩展到 25 个预设，新增炽焰红、绯樱粉、星云紫、暮影紫、晴空蓝、日光黄、琥珀金、雾霭蓝灰、晨曦粉等 KernelSU 风格种子色。
+- 主题色调色板扩展到 25 个预设，新增炽焰红、绯樱粉、星云紫、暮影紫、晴空蓝、日光黄、琥珀金、雾霭蓝灰、晨曦粉等高饱和风格种子色。
 - 外观设置页新增“色彩风格”和“色彩标准”下拉项，并把新主题配置纳入设置导入导出。
 - 动态页顶部“全部 / 投稿 / 番剧 / 专栏 / UP”选中态统一使用当前主题主色，避免深色表面下固定金色与用户主题不一致。
 

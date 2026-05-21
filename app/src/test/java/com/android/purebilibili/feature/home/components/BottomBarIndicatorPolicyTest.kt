@@ -887,6 +887,23 @@ class BottomBarIndicatorPolicyTest {
     }
 
     @Test
+    fun `sampled item scale follows press progress even before indicator covers the tab`() {
+        val notCoveredScale = resolveBottomBarSampledItemMotionScale(
+            coverage = 0f,
+            motionProgress = 1f,
+            pressProgress = 1f
+        )
+        val partiallyCoveredScale = resolveBottomBarSampledItemMotionScale(
+            coverage = 0.25f,
+            motionProgress = 1f,
+            pressProgress = 1f
+        )
+
+        assertEquals(1.2f, notCoveredScale, 0.001f)
+        assertEquals(1.2f, partiallyCoveredScale, 0.001f)
+    }
+
+    @Test
     fun `click pulse transform rebounds horizontally without vertical lift`() {
         val pressed = resolveBottomBarClickPulseTransform(progress = 0.18f)
         val overshoot = resolveBottomBarClickPulseTransform(progress = 0.46f)

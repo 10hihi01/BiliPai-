@@ -206,6 +206,7 @@ internal data class SettingsRootCategoryActions(
     val onSettingsShareClick: () -> Unit,
     val onWebDavBackupClick: () -> Unit,
     val onDownloadPathClick: () -> Unit,
+    val onImageSavePathClick: () -> Unit,
     val onClearCacheClick: () -> Unit,
     val onGithubClick: () -> Unit,
     val onTelegramClick: () -> Unit,
@@ -242,6 +243,7 @@ internal data class SettingsRootCategoryState(
     val analyticsEnabled: Boolean,
     val pluginCount: Int,
     val customDownloadPath: String?,
+    val customImageSavePath: String?,
     val cacheSize: String,
     val versionName: String,
     val easterEggEnabled: Boolean,
@@ -383,10 +385,12 @@ internal fun SettingsRootCategoryContent(
             )
             SettingsRootCategory.DATA_BACKUP -> DataStorageSection(
                 customDownloadPath = state.customDownloadPath,
+                customImageSavePath = state.customImageSavePath,
                 cacheSize = state.cacheSize,
                 onSettingsShareClick = actions.onSettingsShareClick,
                 onWebDavBackupClick = actions.onWebDavBackupClick,
                 onDownloadPathClick = actions.onDownloadPathClick,
+                onImageSavePathClick = actions.onImageSavePathClick,
                 onClearCacheClick = actions.onClearCacheClick
             )
             SettingsRootCategory.PRIVACY_PERMISSION -> PrivacySection(
@@ -991,16 +995,19 @@ fun PrivacySection(
 @Composable
 fun DataStorageSection(
     customDownloadPath: String?,
+    customImageSavePath: String?,
     cacheSize: String,
     onSettingsShareClick: () -> Unit,
     onWebDavBackupClick: () -> Unit,
     onDownloadPathClick: () -> Unit,
+    onImageSavePathClick: () -> Unit,
     onClearCacheClick: () -> Unit
 ) {
     val uiPreset = LocalUiPreset.current
     val settingsShareVisual = rememberSettingsEntryVisual(SettingsSearchTarget.SETTINGS_SHARE, uiPreset)
     val webDavVisual = rememberSettingsEntryVisual(SettingsSearchTarget.WEBDAV_BACKUP, uiPreset)
     val downloadPathVisual = rememberSettingsEntryVisual(SettingsSearchTarget.DOWNLOAD_PATH, uiPreset)
+    val imageSavePathVisual = rememberSettingsEntryVisual(SettingsSearchTarget.IMAGE_SAVE_PATH, uiPreset)
     val clearCacheVisual = rememberSettingsEntryVisual(SettingsSearchTarget.CLEAR_CACHE, uiPreset)
 
     SettingsCardGroup {
@@ -1030,6 +1037,15 @@ fun DataStorageSection(
             value = if (customDownloadPath != null) "自定义" else "默认",
             onClick = onDownloadPathClick,
             iconTint = downloadPathVisual.iconTint
+        )
+        SettingsDivider(startIndent = 66.dp)
+        SettingClickableItem(
+            icon = imageSavePathVisual.icon,
+            iconPainter = imageSavePathVisual.iconResId?.let { painterResource(id = it) },
+            title = "图片保存位置",
+            value = if (customImageSavePath != null) "已选择目录" else "默认",
+            onClick = onImageSavePathClick,
+            iconTint = imageSavePathVisual.iconTint
         )
         SettingsDivider(startIndent = 66.dp)
         SettingClickableItem(

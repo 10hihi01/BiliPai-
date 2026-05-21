@@ -22,6 +22,7 @@ enum class SettingsSearchTarget {
     SETTINGS_SHARE,
     WEBDAV_BACKUP,
     DOWNLOAD_PATH,
+    IMAGE_SAVE_PATH,
     CLEAR_CACHE,
     PLUGINS,
     EXPORT_LOGS,
@@ -377,6 +378,13 @@ private val SETTINGS_SEARCH_INDEX: List<SettingsSearchEntry> = listOf(
         subtitle = "设置导出目录",
         section = "数据与存储",
         aliases = listOf("下载", "目录", "路径", "导出目录", "下载目录", "存储位置", "文件夹")
+    ),
+    SettingsSearchEntry(
+        target = SettingsSearchTarget.IMAGE_SAVE_PATH,
+        title = "图片保存位置",
+        subtitle = "选择动态图片、头像和评论图片保存目录",
+        section = "数据与存储",
+        aliases = listOf("图片保存", "保存目录", "保存位置", "相册", "图片目录", "图片文件夹", "动态图片", "头像保存", "bili")
     ),
     SettingsSearchEntry(
         target = SettingsSearchTarget.CLEAR_CACHE,

@@ -65,6 +65,7 @@ import com.android.purebilibili.core.ui.blur.BlurStyles
 import com.android.purebilibili.core.ui.blur.BlurIntensity
 import com.android.purebilibili.core.ui.blur.currentUnifiedBlurIntensity
 import com.android.purebilibili.core.ui.blur.BlurSurfaceType
+import com.android.purebilibili.core.ui.effect.liquidGlassBackground
 import com.android.purebilibili.core.ui.adaptive.MotionTier
 import com.android.purebilibili.core.ui.AppShapes
 import com.android.purebilibili.core.ui.AppSurfaceTokens
@@ -87,7 +88,13 @@ import com.android.purebilibili.core.theme.AndroidNativeVariant
 import com.android.purebilibili.core.theme.LocalAndroidNativeVariant
 import com.android.purebilibili.core.theme.LocalUiPreset
 import com.android.purebilibili.core.theme.UiPreset
+import com.android.purebilibili.feature.home.LocalHomeScrollOffset
 import com.android.purebilibili.navigation.resolveAppNavigationAppearance
+import com.kyant.backdrop.drawBackdrop
+import com.kyant.backdrop.effects.blur
+import com.kyant.backdrop.effects.lens
+import dev.chrisbanes.haze.HazeStyle
+import dev.chrisbanes.haze.hazeEffect
 import java.io.File
 
 private const val HOME_HEADER_LIQUID_GLASS_ALPHA = 0.10f
@@ -1161,6 +1168,69 @@ internal fun resolveHomeTopChromeLensShape(shape: Shape): Shape? {
     }
 }
 
+private data class HomeTopChromeSurfaceStyle(
+    val blurSurfaceType: BlurSurfaceType,
+    val preferFlatGlass: Boolean,
+    val depthEffect: Boolean,
+    val refractionAmountScrollMultiplier: Float,
+    val refractionAmountScrollCap: Float,
+    val surfaceAlphaScrollMultiplier: Float,
+    val surfaceAlphaScrollCap: Float,
+    val darkThemeWhiteOverlayMultiplier: Float,
+    val useTuningSurfaceAlpha: Boolean,
+    val hazeBackgroundAlphaMultiplier: Float
+)
+
+private data class HomeTopChromeBackdropSpec(
+    val refractionAmount: Float,
+    val surfaceAlpha: Float,
+    val whiteOverlayAlpha: Float
+)
+
+private fun resolveHomeTopChromeBackdropSpec(
+    tuning: LiquidGlassTuning,
+    scrollOffset: Float,
+    isDarkTheme: Boolean,
+    style: HomeTopChromeSurfaceStyle
+): HomeTopChromeBackdropSpec {
+    val refractionAmount = if (tuning.scrollCoupledRefractionAmount > 0f) {
+        tuning.refractionAmount + (
+            scrollOffset * style.refractionAmountScrollMultiplier * tuning.scrollCoupledRefractionAmount
+        ).coerceIn(0f, style.refractionAmountScrollCap * tuning.scrollCoupledRefractionAmount)
+    } else {
+        tuning.refractionAmount
+    }
+    val surfaceAlpha = if (tuning.scrollCoupledRefractionAmount > 0f) {
+        tuning.surfaceAlpha + (
+            scrollOffset * style.surfaceAlphaScrollMultiplier * tuning.scrollCoupledRefractionAmount
+        ).coerceIn(0f, style.surfaceAlphaScrollCap * tuning.scrollCoupledRefractionAmount)
+    } else {
+        tuning.surfaceAlpha
+    }
+    val whiteOverlayAlpha = if (isDarkTheme) {
+        tuning.whiteOverlayAlpha * style.darkThemeWhiteOverlayMultiplier
+    } else {
+        tuning.whiteOverlayAlpha
+    }
+    return HomeTopChromeBackdropSpec(
+        refractionAmount = refractionAmount,
+        surfaceAlpha = surfaceAlpha,
+        whiteOverlayAlpha = whiteOverlayAlpha
+    )
+}
+
+private fun resolveHomeTopChromeSurfaceColor(
+    surfaceColor: Color,
+    backdropSpec: HomeTopChromeBackdropSpec,
+    style: HomeTopChromeSurfaceStyle
+): Color {
+    return if (style.useTuningSurfaceAlpha) {
+        surfaceColor.copy(alpha = backdropSpec.surfaceAlpha)
+    } else {
+        surfaceColor
+    }
+}
+
 internal fun Modifier.homeTopChromeSurface(
     renderMode: HomeTopChromeRenderMode,
     shape: Shape,
@@ -1176,74 +1246,170 @@ internal fun Modifier.homeTopChromeSurface(
     preferFlatGlass: Boolean = false,
     darkThemeWhiteOverlayMultiplier: Float = 0.86f
 ): Modifier = composed {
-    this.appChromeLiquidSurface(
-        renderMode = renderMode,
-        shape = shape,
-        surfaceColor = surfaceColor,
-        hazeState = hazeState,
-        backdrop = backdrop,
-        liquidStyle = liquidStyle,
-        liquidGlassTuning = liquidGlassTuning,
-        motionTier = motionTier,
-        isScrolling = isScrolling,
-        isTransitionRunning = isTransitionRunning,
-        forceLowBlurBudget = forceLowBlurBudget,
-        style = AppChromeLiquidSurfaceStyle(
-            blurSurfaceType = resolveHomeTopBlurSurfaceType(renderMode),
-            preferFlatGlass = preferFlatGlass,
-            depthEffect = liquidGlassTuning?.depthEffectEnabled != false,
-            refractionAmountScrollMultiplier = if (
-                renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_BACKDROP ||
-                renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_HAZE
-            ) {
-                0.016f
-            } else {
-                0f
-            },
-            refractionAmountScrollCap = if (
-                renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_BACKDROP ||
-                renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_HAZE
-            ) {
-                12f
-            } else {
-                0f
-            },
-            surfaceAlphaScrollMultiplier = if (
-                renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_BACKDROP ||
-                renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_HAZE
-            ) {
-                0.00012f
-            } else {
-                0f
-            },
-            surfaceAlphaScrollCap = if (
-                renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_BACKDROP ||
-                renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_HAZE
-            ) {
-                0.03f
-            } else {
-                0f
-            },
-            darkThemeWhiteOverlayMultiplier = if (
-                renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_BACKDROP ||
-                renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_HAZE
-            ) {
-                darkThemeWhiteOverlayMultiplier
-            } else {
-                1f
-            },
-            useTuningSurfaceAlpha = renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_BACKDROP ||
-                renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_HAZE,
-            hazeBackgroundAlphaMultiplier = if (
-                renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_BACKDROP ||
-                renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_HAZE
-            ) {
-                0.4f
-            } else {
-                1f
-            }
-        )
+    val isLiquidGlassMode = renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_BACKDROP ||
+        renderMode == HomeTopChromeRenderMode.LIQUID_GLASS_HAZE
+    val scrollState = LocalHomeScrollOffset.current
+    val resolvedTuning = remember(liquidStyle, liquidGlassTuning) {
+        liquidGlassTuning ?: resolveLiquidGlassTuning(liquidStyle)
+    }
+    val style = HomeTopChromeSurfaceStyle(
+        blurSurfaceType = resolveHomeTopBlurSurfaceType(renderMode),
+        preferFlatGlass = preferFlatGlass,
+        depthEffect = liquidGlassTuning?.depthEffectEnabled != false,
+        refractionAmountScrollMultiplier = if (isLiquidGlassMode) 0.016f else 0f,
+        refractionAmountScrollCap = if (isLiquidGlassMode) 12f else 0f,
+        surfaceAlphaScrollMultiplier = if (isLiquidGlassMode) 0.00012f else 0f,
+        surfaceAlphaScrollCap = if (isLiquidGlassMode) 0.03f else 0f,
+        darkThemeWhiteOverlayMultiplier = if (isLiquidGlassMode) {
+            darkThemeWhiteOverlayMultiplier
+        } else {
+            1f
+        },
+        useTuningSurfaceAlpha = isLiquidGlassMode,
+        hazeBackgroundAlphaMultiplier = if (isLiquidGlassMode) 0.4f else 1f
     )
+    val lensShape = resolveHomeTopChromeLensShape(shape)
+    val surfaceTreatment = resolveHomeTopChromeSurfaceTreatment(
+        renderMode = renderMode,
+        preferFlatGlass = style.preferFlatGlass
+    )
+    val scrollOffset = scrollState.floatValue * resolvedTuning.scrollCoupledRefractionAmount
+    val backdropSpec = resolveHomeTopChromeBackdropSpec(
+        tuning = resolvedTuning,
+        scrollOffset = scrollOffset,
+        isDarkTheme = isSystemInDarkTheme(),
+        style = style
+    )
+    val resolvedSurfaceColor = resolveHomeTopChromeSurfaceColor(surfaceColor, backdropSpec, style)
+
+    when (renderMode) {
+        HomeTopChromeRenderMode.LIQUID_GLASS_BACKDROP -> {
+            if (surfaceTreatment == HomeTopChromeSurfaceTreatment.FLAT_GLASS && backdrop != null) {
+                this.drawBackdrop(
+                    backdrop = backdrop,
+                    shape = { lensShape ?: shape },
+                    effects = {
+                        blur(
+                            resolvedTuning.backdropBlurRadius *
+                                (0.08f + resolvedTuning.progress * 0.92f)
+                        )
+                    },
+                    onDrawSurface = {
+                        drawRect(resolvedSurfaceColor)
+                        drawRect(Color.White.copy(alpha = backdropSpec.whiteOverlayAlpha))
+                    }
+                )
+            } else if (backdrop != null && lensShape != null) {
+                this.drawBackdrop(
+                    backdrop = backdrop,
+                    shape = { lensShape },
+                    effects = {
+                        blur(
+                            resolvedTuning.backdropBlurRadius *
+                                (0.08f + resolvedTuning.progress * 0.92f)
+                        )
+                        if (backdropSpec.refractionAmount > 0.5f) {
+                            lens(
+                                refractionHeight = resolvedTuning.refractionHeight,
+                                refractionAmount = backdropSpec.refractionAmount,
+                                depthEffect = style.depthEffect && resolvedTuning.depthEffectEnabled,
+                                chromaticAberration = resolvedTuning.chromaticAberrationAmount > 0.01f
+                            )
+                        }
+                    },
+                    onDrawSurface = {
+                        drawRect(resolvedSurfaceColor)
+                        drawRect(Color.White.copy(alpha = backdropSpec.whiteOverlayAlpha))
+                    }
+                )
+            } else if (backdrop != null) {
+                this.drawBackdrop(
+                    backdrop = backdrop,
+                    shape = { shape },
+                    effects = {
+                        blur(
+                            resolvedTuning.backdropBlurRadius *
+                                (0.08f + resolvedTuning.progress * 0.92f)
+                        )
+                    },
+                    onDrawSurface = {
+                        drawRect(resolvedSurfaceColor)
+                        drawRect(Color.White.copy(alpha = backdropSpec.whiteOverlayAlpha))
+                    }
+                )
+            } else {
+                this.background(surfaceColor)
+            }
+        }
+
+        HomeTopChromeRenderMode.LIQUID_GLASS_HAZE -> {
+            if (hazeState != null) {
+                if (surfaceTreatment == HomeTopChromeSurfaceTreatment.FLAT_GLASS) {
+                    this
+                        .hazeEffect(
+                            state = hazeState,
+                            style = HazeStyle(
+                                tint = null,
+                                blurRadius = 0.1.dp,
+                                noiseFactor = 0f
+                            )
+                        ) {
+                            blurredEdgeTreatment = resolveUnifiedBlurredEdgeTreatment(shape)
+                        }
+                        .background(resolvedSurfaceColor)
+                } else {
+                    this
+                        .hazeEffect(
+                            state = hazeState,
+                            style = HazeStyle(
+                                tint = null,
+                                blurRadius = 0.1.dp,
+                                noiseFactor = 0f
+                            )
+                        ) {
+                            blurredEdgeTreatment = resolveUnifiedBlurredEdgeTreatment(shape)
+                        }
+                        .liquidGlassBackground(
+                            refractIntensity = resolvedTuning.refractIntensity,
+                            scrollOffsetProvider = { scrollOffset },
+                            backgroundColor = resolvedSurfaceColor.copy(
+                                alpha = if (style.useTuningSurfaceAlpha) {
+                                    backdropSpec.surfaceAlpha * style.hazeBackgroundAlphaMultiplier
+                                } else {
+                                    surfaceColor.alpha * style.hazeBackgroundAlphaMultiplier
+                                }
+                            )
+                        )
+                }
+            } else {
+                this.background(surfaceColor)
+            }
+        }
+
+        HomeTopChromeRenderMode.BLUR -> {
+            this
+                .then(
+                    if (hazeState != null) {
+                        Modifier.unifiedBlur(
+                            hazeState = hazeState,
+                            shape = shape,
+                            surfaceType = style.blurSurfaceType,
+                            motionTier = motionTier,
+                            isScrolling = isScrolling,
+                            isTransitionRunning = isTransitionRunning,
+                            forceLowBudget = forceLowBlurBudget
+                        )
+                    } else {
+                        Modifier
+                    }
+                )
+                .background(surfaceColor)
+        }
+
+        HomeTopChromeRenderMode.PLAIN -> {
+            this.background(surfaceColor)
+        }
+    }
 }
 
 /**

@@ -26,22 +26,27 @@ class HomeChromeLiquidSurfaceStructureTest {
             "app/src/main/java/com/android/purebilibili/feature/home/components"
         )
 
-        val sharedRenderer = componentsDir.resolve("HomeChromeLiquidSurface.kt")
         val topHeader = componentsDir.resolve("iOSHomeHeader.kt")
         val topTabChrome = componentsDir.resolve("HomeTopTabChrome.kt")
         val topBar = componentsDir.resolve("TopBar.kt")
         val bottomBar = componentsDir.resolve("BottomBar.kt")
 
-        assertTrue(
-            "shared renderer file should exist",
-            Files.exists(sharedRenderer)
-        )
-        assertTrue(
-            "top header should delegate to the shared liquid surface renderer",
-            topHeader.readText().contains(".appChromeLiquidSurface(")
+        assertFalse(
+            "home chrome should not keep the old shared renderer file after migrating the only real dependency",
+            Files.exists(componentsDir.resolve("HomeChromeLiquidSurface.kt"))
         )
         val topHeaderSource = topHeader.readText()
         val topBarSource = topBar.readText()
+        assertTrue(
+            "top header should own the chrome surface renderer after removing the extra file",
+            topHeaderSource.contains("private data class HomeTopChromeSurfaceStyle(") &&
+                topHeaderSource.contains("private fun resolveHomeTopChromeBackdropSpec(")
+        )
+        assertFalse(
+            "top header should not delegate to the removed app chrome renderer",
+            topHeaderSource.contains(".appChromeLiquidSurface(") ||
+                topHeaderSource.contains("AppChromeLiquidSurfaceStyle")
+        )
         val topHeaderMatchedSurfaceCalls = Regex("""\.homeTopBottomBarMatchedSurface\(""")
             .findAll(topHeaderSource)
             .count()
@@ -62,7 +67,8 @@ class HomeChromeLiquidSurfaceStructureTest {
         )
         assertTrue(
             "home header should suppress the nested top tab chrome when the unified top panel already draws it",
-            topHeaderSource.contains("drawChromeSurface = !useUnifiedTopPanel && drawTopTabOuterChromeSurface") &&
+            topHeaderSource.contains("drawChromeSurface = !useUnifiedTopPanel &&") &&
+                topHeaderSource.contains("drawTopTabOuterChromeSurface") &&
                 topTabChrome.readText().contains("drawChromeSurface: Boolean = true")
         )
         assertTrue(

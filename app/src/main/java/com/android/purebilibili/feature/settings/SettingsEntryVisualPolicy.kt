@@ -109,6 +109,7 @@ private fun resolveMd3SettingsEntryTintRole(
     SettingsSearchTarget.SETTINGS_SHARE,
     SettingsSearchTarget.WEBDAV_BACKUP,
     SettingsSearchTarget.DOWNLOAD_PATH,
+    SettingsSearchTarget.IMAGE_SAVE_PATH,
     SettingsSearchTarget.EXPORT_LOGS,
     SettingsSearchTarget.OPEN_SOURCE_LICENSES,
     SettingsSearchTarget.VIEW_RELEASE_NOTES,
@@ -149,6 +150,7 @@ private fun resolveIosSettingsEntryTint(
     SettingsSearchTarget.SETTINGS_SHARE -> iOSGreen
     SettingsSearchTarget.WEBDAV_BACKUP -> iOSBlue
     SettingsSearchTarget.DOWNLOAD_PATH -> iOSBlue
+    SettingsSearchTarget.IMAGE_SAVE_PATH -> iOSTeal
     SettingsSearchTarget.CLEAR_CACHE -> iOSBlue
     SettingsSearchTarget.PLUGINS -> iOSPurple
     SettingsSearchTarget.EXPORT_LOGS -> iOSTeal

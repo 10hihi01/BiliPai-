@@ -1200,13 +1200,18 @@ suspend fun saveImageToGallery(context: android.content.Context, imageUrl: Strin
                     else -> "image/jpeg"
                 }
                 val fileName = "BiliPai_${System.currentTimeMillis()}.$extension"
+
+                if (saveBytesToCustomImageSaveDirectory(context, bytes, fileName, mimeType)) {
+                    Log.d("ImagePreview", "Image saved to custom directory: $fileName")
+                    return@withContext true
+                }
                 
                 // 使用 MediaStore 保存
                 val contentValues = ContentValues().apply {
                     put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
                     put(MediaStore.Images.Media.MIME_TYPE, mimeType)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/BiliPai")
+                        put(MediaStore.Images.Media.RELATIVE_PATH, resolveDefaultImageMediaStoreRelativePath())
                         put(MediaStore.Images.Media.IS_PENDING, 1)
                     }
                 }
@@ -1253,13 +1258,28 @@ suspend fun saveImageToGallery(context: android.content.Context, imageUrl: Strin
             val extension = if (isPng) "png" else "jpg"
             val mimeType = if (isPng) "image/png" else "image/jpeg"
             val fileName = "BiliPai_${System.currentTimeMillis()}.$extension"
+            val format = if (isPng) android.graphics.Bitmap.CompressFormat.PNG else android.graphics.Bitmap.CompressFormat.JPEG
+
+            if (
+                saveBitmapToCustomImageSaveDirectory(
+                    context = context,
+                    bitmap = bitmap,
+                    fileName = fileName,
+                    format = format,
+                    quality = 95,
+                    mimeType = mimeType
+                )
+            ) {
+                Log.d("ImagePreview", "Image saved to custom directory: $fileName")
+                return@withContext true
+            }
             
             // 使用 MediaStore 保存图片
             val contentValues = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
                 put(MediaStore.Images.Media.MIME_TYPE, mimeType)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/BiliPai")
+                    put(MediaStore.Images.Media.RELATIVE_PATH, resolveDefaultImageMediaStoreRelativePath())
                     put(MediaStore.Images.Media.IS_PENDING, 1)
                 }
             }
@@ -1270,7 +1290,6 @@ suspend fun saveImageToGallery(context: android.content.Context, imageUrl: Strin
             ) ?: return@withContext false
             
             context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-                val format = if (isPng) android.graphics.Bitmap.CompressFormat.PNG else android.graphics.Bitmap.CompressFormat.JPEG
                 bitmap.compress(format, 95, outputStream)
             }
             

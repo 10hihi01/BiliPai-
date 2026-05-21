@@ -96,6 +96,7 @@ internal fun resolveSettingsRootCategoryForSearchTarget(
     SettingsSearchTarget.SETTINGS_SHARE,
     SettingsSearchTarget.WEBDAV_BACKUP,
     SettingsSearchTarget.DOWNLOAD_PATH,
+    SettingsSearchTarget.IMAGE_SAVE_PATH,
     SettingsSearchTarget.CLEAR_CACHE -> SettingsRootCategory.DATA_BACKUP
 
     SettingsSearchTarget.PRIVACY_PERMISSION,

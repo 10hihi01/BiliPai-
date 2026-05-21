@@ -3997,6 +3997,7 @@ object SettingsManager {
     
     private val KEY_DOWNLOAD_PATH = stringPreferencesKey("download_path")
     private val KEY_DOWNLOAD_EXPORT_TREE_URI = stringPreferencesKey("download_export_tree_uri")
+    private val KEY_IMAGE_SAVE_TREE_URI = stringPreferencesKey("image_save_tree_uri")
     
     /**
      *  获取用户自定义下载路径
@@ -4052,6 +4053,28 @@ object SettingsManager {
 
     fun getDownloadExportTreeUriSync(context: Context): String? {
         return context.getSharedPreferences("download_prefs", Context.MODE_PRIVATE)
+            .getString("tree_uri", null)
+    }
+
+    fun getImageSaveTreeUri(context: Context): Flow<String?> = context.settingsDataStore.data
+        .map { preferences ->
+            preferences[KEY_IMAGE_SAVE_TREE_URI]
+        }
+
+    suspend fun setImageSaveTreeUri(context: Context, uri: String?) {
+        context.settingsDataStore.edit { preferences ->
+            if (uri != null) {
+                preferences[KEY_IMAGE_SAVE_TREE_URI] = uri
+            } else {
+                preferences.remove(KEY_IMAGE_SAVE_TREE_URI)
+            }
+        }
+        context.getSharedPreferences("image_save_prefs", Context.MODE_PRIVATE)
+            .edit().putString("tree_uri", uri).commit()
+    }
+
+    fun getImageSaveTreeUriSync(context: Context): String? {
+        return context.getSharedPreferences("image_save_prefs", Context.MODE_PRIVATE)
             .getString("tree_uri", null)
     }
     

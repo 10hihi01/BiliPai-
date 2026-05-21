@@ -158,6 +158,7 @@ internal fun resolveSettingsSceneDetailFocus(
     SettingsSearchTarget.SETTINGS_SHARE,
     SettingsSearchTarget.WEBDAV_BACKUP,
     SettingsSearchTarget.DOWNLOAD_PATH,
+    SettingsSearchTarget.IMAGE_SAVE_PATH,
     SettingsSearchTarget.CLEAR_CACHE,
     SettingsSearchTarget.PLUGINS,
     SettingsSearchTarget.EXPORT_LOGS,
