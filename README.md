@@ -111,13 +111,15 @@ BiliPai 的界面围绕“内容优先、控制轻量、动效克制”调整。
 
 | 形态 | 当前状态 | 文档 |
 | --- | --- | --- |
-| 内置插件 | 随主应用稳定分发，覆盖空降助手、去广告、弹幕增强、夜间护眼、今日推荐单、CDN 属地优选 | 应用内插件中心 |
+| 内置插件 | 随主应用稳定分发，覆盖空降助手、去广告、弹幕增强、夜间护眼、今日推荐单、CDN 属地优选、初见推荐 | 应用内插件中心 |
 | JSON / `.bp` 规则插件 | 支持 URL 导入，适合推荐流过滤、弹幕过滤与高亮 | [JSON 插件开发](docs/PLUGIN_DEVELOPMENT.md) |
 | 外部 `.bpplugin` 包 | SDK、包格式、manifest、签名校验已就绪；外部 Dex 执行仍处于预览阶段 | [Plugin SDK](plugins/sdk/README.md) |
 | 源码级原生插件 | 适合复杂播放器、推荐、弹幕能力，需要重新编译 APK | [原生插件开发](docs/NATIVE_PLUGIN_DEVELOPMENT.md) |
 
 > [!CAUTION]
 > 导入第三方插件前请审阅规则和能力声明，尤其是 `NETWORK`、`LOCAL_HISTORY_READ`、`LOCAL_FEEDBACK_READ`、`PLAYER_CONTROL` 等敏感能力。
+
+> 初见推荐的网络策略思路参考 [TabulaBili-Plus](https://github.com/tjsky/TabulaBili) 与 [TabulaBili](https://github.com/wangdaodaodao/TabulaBili)，BiliPai 仅实现 Android 端内置插件形态。
 
 ## 技术栈
 

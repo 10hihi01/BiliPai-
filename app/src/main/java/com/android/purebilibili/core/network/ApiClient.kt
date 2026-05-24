@@ -3,8 +3,10 @@ package com.android.purebilibili.core.network
 
 import android.content.Context
 import com.android.purebilibili.BuildConfig
+import com.android.purebilibili.core.network.policy.HomeFeedAnonymizerRuntime
 import com.android.purebilibili.core.network.policy.resolveHardcodedDnsFallback
 import com.android.purebilibili.core.network.policy.shouldEnableTrustAllCertificates
+import com.android.purebilibili.core.network.policy.shouldClearHomeFeedCookies
 import com.android.purebilibili.core.store.TokenManager
 import com.android.purebilibili.data.model.response.*
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -47,6 +49,19 @@ private class AppSessionCookieJar : okhttp3.CookieJar {
     }
 
     override fun loadForRequest(url: okhttp3.HttpUrl): List<okhttp3.Cookie> {
+        if (shouldClearHomeFeedCookies(
+                pluginEnabled = HomeFeedAnonymizerRuntime.enabled,
+                host = url.host,
+                encodedPath = url.encodedPath
+            )
+        ) {
+            com.android.purebilibili.core.util.Logger.d(
+                "CookieJar",
+                " 初见推荐匿名化首页推荐请求: ${url.encodedPath}"
+            )
+            return emptyList()
+        }
+
         val cookies = mutableListOf<okhttp3.Cookie>()
 
         synchronized(cookieLock) {

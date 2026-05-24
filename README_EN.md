@@ -19,7 +19,7 @@
   <img src="https://img.shields.io/badge/Platform-Android%208.0%2B%20(API%2026)-brightgreen?style=flat-square" alt="Platform">
   <img src="https://img.shields.io/badge/APK-Varies-orange?style=flat-square" alt="Size">
   <img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="License">
-  <img src="https://img.shields.io/badge/Plugins-6%20Built--in-blueviolet?style=flat-square" alt="Plugins">
+  <img src="https://img.shields.io/badge/Plugins-7%20Built--in-blueviolet?style=flat-square" alt="Plugins">
 </p>
 
 <p align="center">
@@ -71,7 +71,7 @@
 | **Comment Copy UX** | Long-press opens selectable-copy panel so users can drag-select exact comment text (including rich text scenarios) |
 | **Playback History** | Automatically resume playback, with a toggle and one-time prompt per target |
 | **TV Login** | Scan QR code to login as TV client to unlock high quality |
-| **Plugin System** | Built-in SponsorBlock, AdBlock, Danmaku Enhancement, Eye Protection, Today Watch, and CDN Region plugins |
+| **Plugin System** | Built-in SponsorBlock, AdBlock, Danmaku Enhancement, Eye Protection, Today Watch, CDN Region, and First Visit Recommendation plugins |
 
 ### 🔌 Plugin System
 
@@ -83,8 +83,11 @@
 | **Eye Protection** | Scheduled eye care, 3 presets + DIY tuning, real-time preview, warm filter, humane reminders with snooze |
 | **🆕 Today Watch** | Local recommendation plugin with Relax/Learn modes, collapse/expand, independent refresh, UP ranking, and reason tags |
 | **🆕 CDN Region** | Off by default; prioritizes same-region CDN candidates for normal video playback while preserving original URLs for fallback |
+| **🆕 First Visit Recommendation** | Off by default; removes cookies only from the Web home recommendation API so the feed is closer to public guest recommendations |
 | **Plugin Center** | Unified management for all plugins with independent configurations |
 | **🆕 External Plugins** | Support loading dynamic JSON rule plugins via URL |
+
+First Visit Recommendation is inspired by [TabulaBili-Plus](https://github.com/tjsky/TabulaBili) and [TabulaBili](https://github.com/wangdaodaodao/TabulaBili), adapted as a built-in Android plugin.
 
 #### Implemented Details (Supplement)
 
