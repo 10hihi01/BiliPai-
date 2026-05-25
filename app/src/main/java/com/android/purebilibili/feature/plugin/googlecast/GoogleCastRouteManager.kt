@@ -26,6 +26,8 @@ internal object GoogleCastRouteManager {
         )
     }
 
+    private val routeCache = mutableMapOf<String, MediaRouter.RouteInfo>()
+
     fun startDiscovery(context: Context) {
         if (isDiscovering) return
         val router = MediaRouter.getInstance(context)
@@ -62,8 +64,13 @@ internal object GoogleCastRouteManager {
         _routes.value = emptyList()
     }
 
+    fun getCachedRoute(routeId: String): MediaRouter.RouteInfo? {
+        return routeCache[routeId]
+    }
+
     private fun updateRoutes(router: MediaRouter) {
         val castRoutes = router.routes.mapNotNull { route ->
+            routeCache[route.id] = route
             toCastPluginRoute(
                 routeId = route.id,
                 name = route.name,

@@ -130,6 +130,22 @@ Verification ladder:
 .\gradlew.bat :app:compileDebugKotlin
 ```
 
+### Slice 5: Bugfix — SSDP Isolation And Cast Route Preservation
+
+Goal: fix two runtime bugs — (A) SSDP device profile fetch failures crashing the cast dialog, and (B) Google Cast route selection failing after dialog disposal clears discovery state.
+
+Status: verified and APK built.
+
+Result on 2026-05-26:
+
+- SSDP profile fetch now catches per-device exceptions (SocketTimeoutException, parse failures) so one broken device never crashes the dialog or blocks other results.
+- `DeviceListDialog.refreshSsdpDevices` wraps discovery in try/finally for `isSearching`; `associateNotNullBy` internally isolates per-device exceptions so one broken device never crashes the dialog.
+- `GoogleCastRouteManager` caches `MediaRouter.RouteInfo` in `routeCache` so `GoogleCastMediaLoader` can select the route even if the dialog disposes before `loadMedia` returns.
+- `VideoPlayerOverlay` plugin cast flow now dismisses the dialog AFTER `plugin.cast()` returns instead of before; URL-resolution failure still dismisses immediately.
+- Added regression tests: `parseDeviceProfile` blank/invalid XML null returns, `associateNotNullBy` with mixed successes/exceptions, and `shouldDismissCastDialogOnUrlFailure` policy wired into the plugin cast flow.
+- Verified with targeted regression tests for `SsdpDevicePresentationPolicyTest` and `VideoPlayerOverlayCastPolicyTest`, plus `.\gradlew.bat :app:testDebugUnitTest --tests "*Cast*" --no-daemon`, `.\gradlew.bat :app:compileDebugKotlin --no-daemon`, and `.\gradlew.bat :app:assembleDebug --no-daemon`; all returned BUILD SUCCESSFUL.
+- Debug APK for device testing: `app/build/outputs/apk/debug/BiliPai-debug-8.4.1-debug.apk`.
+
 ## Progress Log
 
 - 2026-05-26: Created isolated worktree `feature/google-cast-plugin`.
@@ -138,3 +154,4 @@ Verification ladder:
 - 2026-05-26: Completed Slice 1 Google Cast plugin shell, CAF wiring, and focused policy tests.
 - 2026-05-26: Completed Slice 2 Chromecast route discovery and device-list selection UI aligned with existing DLNA rows.
 - 2026-05-26: Corrected the plugin boundary so Google Cast discovery/loading lives behind `CastPluginApi`; completed Slice 3 Chromecast media loading.
+- 2026-05-26: Completed Slice 5 bugfix — SSDP per-device exception isolation, Google Cast route cache preservation, dialog dismissal timing fix, and debug APK build.

@@ -77,14 +77,17 @@ fun DeviceListDialog(
 
     suspend fun refreshSsdpDevices() {
         isSearching = true
-        val discovered = SsdpDiscovery.discover(context, 5000)
-        val profiles = discovered.associateNotNullBy(
-            keySelector = { it.location },
-            valueSelector = { device -> SsdpCastClient.fetchDeviceProfile(device) }
-        )
-        ssdpDevices = discovered
-        ssdpProfiles = profiles
-        isSearching = false
+        try {
+            val discovered = SsdpDiscovery.discover(context, 5000)
+            val profiles = discovered.associateNotNullBy(
+                keySelector = { it.location },
+                valueSelector = { SsdpCastClient.fetchDeviceProfile(it) }
+            )
+            ssdpDevices = discovered
+            ssdpProfiles = profiles
+        } finally {
+            isSearching = false
+        }
     }
 
     // 启动时同时进行 Cling 和手动 SSDP 搜索
@@ -201,13 +204,13 @@ fun DeviceListDialog(
     )
 }
 
-private inline fun <T, K, V> Iterable<T>.associateNotNullBy(
+internal inline fun <T, K, V> Iterable<T>.associateNotNullBy(
     keySelector: (T) -> K,
     valueSelector: (T) -> V?
 ): Map<K, V> {
     val result = LinkedHashMap<K, V>()
     for (item in this) {
-        val value = valueSelector(item) ?: continue
+        val value = runCatching { valueSelector(item) }.getOrNull() ?: continue
         result[keySelector(item)] = value
     }
     return result

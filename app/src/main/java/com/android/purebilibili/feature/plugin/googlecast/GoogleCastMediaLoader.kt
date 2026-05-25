@@ -63,7 +63,8 @@ internal object GoogleCastMediaLoader {
     ): Result<Unit> = withContext(Dispatchers.Main) {
         try {
             val router = MediaRouter.getInstance(context)
-            val mediaRoute = router.routes.firstOrNull { it.id == routeId }
+            val cachedRoute = GoogleCastRouteManager.getCachedRoute(routeId)
+            val mediaRoute = cachedRoute ?: router.routes.firstOrNull { it.id == routeId }
             if (mediaRoute == null) {
                 return@withContext Result.failure(
                     IllegalArgumentException("未找到 Google Cast 设备")

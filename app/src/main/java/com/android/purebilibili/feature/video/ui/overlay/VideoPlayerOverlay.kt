@@ -152,6 +152,8 @@ internal fun shouldConsumeBackgroundGesturesForEndDrawer(
     return endDrawerVisible
 }
 
+internal fun shouldDismissCastDialogOnUrlFailure(castUrl: String?): Boolean = castUrl.isNullOrBlank()
+
 internal fun shouldReleaseCastBindingAfterDialogVisibilityChange(
     previousVisible: Boolean,
     currentVisible: Boolean
@@ -1846,19 +1848,21 @@ fun VideoPlayerOverlay(
                     }
                 },
                 onPluginCastDeviceSelected = { plugin, route ->
-                    showCastDialog = false
                     scope.launch {
                         val castUrl = resolveCastUrlOrNull()
-                        if (castUrl == null) {
+                        if (shouldDismissCastDialogOnUrlFailure(castUrl)) {
+                            showCastDialog = false
                             android.widget.Toast.makeText(context, "投屏地址解析失败", android.widget.Toast.LENGTH_SHORT).show()
                             return@launch
                         }
+                        val pluginCastUrl = castUrl!!
                         val mediaRequest = CastPluginMediaRequest(
-                            url = castUrl,
+                            url = pluginCastUrl,
                             title = videoTitle,
                             creator = videoOwnerName
                         )
                         val result = plugin.cast(context, route, mediaRequest)
+                        showCastDialog = false
                         val message = if (result.isSuccess) {
                             "已发送投屏指令"
                         } else {

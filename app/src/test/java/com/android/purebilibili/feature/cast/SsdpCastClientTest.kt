@@ -74,6 +74,33 @@ class SsdpCastClientTest {
     }
 
     @Test
+    fun `parseDeviceProfile returns null for blank XML`() {
+        val profile = SsdpCastClient.parseDeviceProfile(
+            descriptionXml = "   ",
+            descriptionLocation = "http://192.168.31.8:8899/rootDesc.xml"
+        )
+        assertNull(profile)
+    }
+
+    @Test
+    fun `parseDeviceProfile returns null for empty string`() {
+        val profile = SsdpCastClient.parseDeviceProfile(
+            descriptionXml = "",
+            descriptionLocation = "http://192.168.31.8:8899/rootDesc.xml"
+        )
+        assertNull(profile)
+    }
+
+    @Test
+    fun `parseDeviceProfile returns null for non-xml garbage`() {
+        val profile = SsdpCastClient.parseDeviceProfile(
+            descriptionXml = "{not xml at all}",
+            descriptionLocation = "http://192.168.31.8:8899/rootDesc.xml"
+        )
+        assertNull(profile)
+    }
+
+    @Test
     fun `parseDeviceProfile extracts friendly name and avtransport endpoint`() {
         val descriptionXml = """
             <?xml version="1.0"?>

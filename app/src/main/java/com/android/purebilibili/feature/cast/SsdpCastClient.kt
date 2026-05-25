@@ -67,17 +67,22 @@ object SsdpCastClient {
     }
 
     private fun fetchDeviceProfile(descriptionLocation: String): SsdpDeviceProfile? {
-        val request = Request.Builder()
-            .url(descriptionLocation)
-            .get()
-            .build()
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                Logger.w(TAG, "📺 [SSDP] Fetch device description failed: ${response.code}")
-                return null
+        return runCatching {
+            val request = Request.Builder()
+                .url(descriptionLocation)
+                .get()
+                .build()
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    Logger.w(TAG, "📺 [SSDP] Fetch device description failed: ${response.code}")
+                    return null
+                }
+                val descriptionXml = response.body?.string().orEmpty()
+                return parseDeviceProfile(descriptionXml, descriptionLocation)
             }
-            val descriptionXml = response.body?.string().orEmpty()
-            return parseDeviceProfile(descriptionXml, descriptionLocation)
+        }.getOrElse { error ->
+            Logger.w(TAG, "📺 [SSDP] Fetch device profile exception: ${error.message}")
+            null
         }
     }
 
