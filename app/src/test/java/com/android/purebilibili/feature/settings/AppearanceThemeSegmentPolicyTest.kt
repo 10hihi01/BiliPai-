@@ -48,4 +48,18 @@ class AppearanceThemeSegmentPolicyTest {
         assertEquals(ColorSpec.SpecVersion.SPEC_2021, specOptions.first().value)
         assertEquals("SPEC_2021", specOptions.first().label)
     }
+
+    @Test
+    fun `color spec options should not expose duplicate labels`() {
+        val specOptions = resolveColorSpecOptions()
+
+        assertEquals(
+            specOptions.map { it.label },
+            specOptions.map { it.label }.distinct()
+        )
+        assertEquals(
+            listOf(ColorSpec.SpecVersion.SPEC_2021, ColorSpec.SpecVersion.SPEC_2025),
+            specOptions.map { it.value }
+        )
+    }
 }

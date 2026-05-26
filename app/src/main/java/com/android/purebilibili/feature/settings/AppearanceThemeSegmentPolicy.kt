@@ -25,8 +25,7 @@ internal fun resolveColorStyleOptions(): List<PlaybackSegmentOption<PaletteStyle
 internal fun resolveColorSpecOptions(): List<PlaybackSegmentOption<ColorSpec.SpecVersion>> {
     return listOf(
         ColorSpec.SpecVersion.SPEC_2021,
-        ColorSpec.SpecVersion.SPEC_2025,
-        ColorSpec.SpecVersion.Default
+        ColorSpec.SpecVersion.SPEC_2025
     ).map { spec ->
         PlaybackSegmentOption(spec, spec.name)
     }
