@@ -266,10 +266,10 @@ fun PlaybackSettingsContent(
                         else -> "未知"
                     }
                     IOSGroup {
-	                        IOSSwitchItem(
-	                            icon = rememberSettingsSemanticIcon(SettingsIconRole.HARDWARE_DECODER),
+                        IOSSwitchItem(
+                            icon = rememberSettingsSemanticIcon(SettingsIconRole.HARDWARE_DECODER),
                             title = "启用硬件解码",
-                            subtitle = "减少发热和耗电 (推荐开启)",
+                            subtitle = "关闭后可尝试规避模拟器或特定设备绿屏，但可能更耗电/更卡顿",
                             checked = state.hwDecode,
                             onCheckedChange = {
                                 viewModel.toggleHwDecode(it)

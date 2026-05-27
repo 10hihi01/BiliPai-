@@ -1217,9 +1217,8 @@ object SettingsManager {
 
     suspend fun setHwDecode(context: Context, value: Boolean) {
         context.settingsDataStore.edit { preferences -> preferences[KEY_HW_DECODE] = value }
-        //  同步到 SharedPreferences，供同步读取使用
-        context.getSharedPreferences("hw_decode_cache", Context.MODE_PRIVATE)
-            .edit().putBoolean("hw_decode_enabled", value).apply()
+        // 同步播放器创建路径的内存/SharedPreferences 缓存，避免切换后仍按旧解码设置建播放器。
+        PlayerSettingsCache.setHwDecodeEnabled(context, value)
     }
 
     // --- Theme Mode ---
