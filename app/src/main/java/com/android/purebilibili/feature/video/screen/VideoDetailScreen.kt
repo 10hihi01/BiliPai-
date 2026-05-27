@@ -84,6 +84,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.ui.layout.ContentScale
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.android.purebilibili.EXTRA_PENDING_NAVIGATION_ROUTE
 import com.android.purebilibili.resolveMainActivityVideoRoute
 import com.android.purebilibili.data.model.response.BgmInfo
@@ -301,6 +302,21 @@ internal data class VideoDetailSystemBarsVisibilityPolicy(
     val hideNavigationBars: Boolean
 )
 
+internal enum class VideoDetailHiddenSystemBars {
+    NONE,
+    STATUS_BARS,
+    SYSTEM_BARS
+}
+
+internal data class VideoDetailSystemBarsApplySpec(
+    val hiddenBars: VideoDetailHiddenSystemBars,
+    val systemBarsBehavior: Int,
+    val statusBarColor: Int,
+    val navigationBarColor: Int,
+    val lightStatusBars: Boolean,
+    val lightNavigationBars: Boolean
+)
+
 internal fun resolveVideoDetailSystemBarsVisibilityPolicy(
     isFullscreenMode: Boolean,
     hideVideoPageStatusBar: Boolean,
@@ -323,6 +339,52 @@ internal fun resolveVideoDetailSystemBarsVisibilityPolicy(
         hideStatusBars = hideVideoPageStatusBar,
         hideNavigationBars = false
     )
+}
+
+internal fun resolveVideoDetailSystemBarsApplySpec(
+    visibilityPolicy: VideoDetailSystemBarsVisibilityPolicy,
+    useTabletLayout: Boolean,
+    isLightBackground: Boolean,
+    backgroundColor: Int,
+    transparentColor: Int,
+    blackColor: Int,
+    transientBarsBehavior: Int
+): VideoDetailSystemBarsApplySpec {
+    if (visibilityPolicy.hideNavigationBars) {
+        return VideoDetailSystemBarsApplySpec(
+            hiddenBars = VideoDetailHiddenSystemBars.SYSTEM_BARS,
+            systemBarsBehavior = transientBarsBehavior,
+            statusBarColor = blackColor,
+            navigationBarColor = blackColor,
+            lightStatusBars = false,
+            lightNavigationBars = false
+        )
+    }
+
+    val hiddenBars = if (visibilityPolicy.hideStatusBars) {
+        VideoDetailHiddenSystemBars.STATUS_BARS
+    } else {
+        VideoDetailHiddenSystemBars.NONE
+    }
+    return if (useTabletLayout) {
+        VideoDetailSystemBarsApplySpec(
+            hiddenBars = hiddenBars,
+            systemBarsBehavior = transientBarsBehavior,
+            statusBarColor = backgroundColor,
+            navigationBarColor = backgroundColor,
+            lightStatusBars = isLightBackground,
+            lightNavigationBars = isLightBackground
+        )
+    } else {
+        VideoDetailSystemBarsApplySpec(
+            hiddenBars = hiddenBars,
+            systemBarsBehavior = transientBarsBehavior,
+            statusBarColor = transparentColor,
+            navigationBarColor = transparentColor,
+            lightStatusBars = false,
+            lightNavigationBars = false
+        )
+    }
 }
 
 internal fun resolveVideoDetailStableStatusBarHeightDp(
@@ -350,6 +412,30 @@ internal fun shouldRestoreSystemBarsDuringVideoDetailExitTransition(
     if (!isExitTransitionInProgress) return false
     if (isActuallyLeaving) return false
     return true
+}
+
+private fun applyVideoDetailSystemBarsSpec(
+    window: Window,
+    insetsController: WindowInsetsControllerCompat,
+    spec: VideoDetailSystemBarsApplySpec
+) {
+    when (spec.hiddenBars) {
+        VideoDetailHiddenSystemBars.SYSTEM_BARS -> {
+            insetsController.hide(WindowInsetsCompat.Type.systemBars())
+        }
+        VideoDetailHiddenSystemBars.STATUS_BARS -> {
+            insetsController.hide(WindowInsetsCompat.Type.statusBars())
+            insetsController.show(WindowInsetsCompat.Type.navigationBars())
+        }
+        VideoDetailHiddenSystemBars.NONE -> {
+            insetsController.show(WindowInsetsCompat.Type.systemBars())
+        }
+    }
+    insetsController.systemBarsBehavior = spec.systemBarsBehavior
+    insetsController.isAppearanceLightStatusBars = spec.lightStatusBars
+    insetsController.isAppearanceLightNavigationBars = spec.lightNavigationBars
+    window.statusBarColor = spec.statusBarColor
+    window.navigationBarColor = spec.navigationBarColor
 }
 
 internal fun shouldShowExternalPlaylistQueueBarByPolicy(
@@ -1285,7 +1371,8 @@ fun VideoDetailScreen(
     val hideVideoPageStatusBar by com.android.purebilibili.core.store.SettingsManager
         .getHideVideoPageStatusBar(context)
         .collectAsStateWithLifecycle(
-            initialValue = false,
+            initialValue = com.android.purebilibili.core.store.SettingsManager
+                .getHideVideoPageStatusBarSync(context),
             lifecycle = lifecycleOwner.lifecycle
         )
     val useTabletLayout = shouldUseTabletVideoLayout(
@@ -2666,42 +2753,34 @@ fun VideoDetailScreen(
             isScreenActive = isScreenActive
         )
     }
+    val systemBarsApplySpec = remember(
+        systemBarsVisibilityPolicy,
+        useTabletLayout,
+        isLightBackground,
+        backgroundColor
+    ) {
+        resolveVideoDetailSystemBarsApplySpec(
+            visibilityPolicy = systemBarsVisibilityPolicy,
+            useTabletLayout = useTabletLayout,
+            isLightBackground = isLightBackground,
+            backgroundColor = backgroundColor.toArgb(),
+            transparentColor = Color.Transparent.toArgb(),
+            blackColor = Color.Black.toArgb(),
+            transientBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        )
+    }
 
     //  iOS风格：竖屏时状态栏黑色背景（与播放器融为一体）
     //  只在页面活跃时修改状态栏，避免退出时覆盖恢复操作
-    if (!view.isInEditMode && isScreenActive) {
-        SideEffect {
-            val window = (view.context.findActivity())?.window ?: return@SideEffect
-            val insetsController = WindowCompat.getInsetsController(window, view)
-
-            if (systemBarsVisibilityPolicy.hideNavigationBars) {
-                // 📱 手机全屏隐藏状态栏
-                insetsController.hide(WindowInsetsCompat.Type.systemBars())
-                insetsController.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                window.statusBarColor = Color.Black.toArgb()
-                window.navigationBarColor = Color.Black.toArgb()
-            } else {
-                //  [沉浸式] 非全屏模式：手机保持透明沉浸，平板使用实体状态栏提升可读性
-                if (systemBarsVisibilityPolicy.hideStatusBars) {
-                    insetsController.hide(WindowInsetsCompat.Type.statusBars())
-                    insetsController.show(WindowInsetsCompat.Type.navigationBars())
-                    insetsController.systemBarsBehavior =
-                        androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                } else {
-                    insetsController.show(WindowInsetsCompat.Type.systemBars())
-                }
-                if (useTabletLayout) {
-                    insetsController.isAppearanceLightStatusBars = isLightBackground
-                    insetsController.isAppearanceLightNavigationBars = isLightBackground
-                    window.statusBarColor = backgroundColor.toArgb()
-                    window.navigationBarColor = backgroundColor.toArgb()
-                } else {
-                    insetsController.isAppearanceLightStatusBars = false  // 白色图标（视频区域是深色的）
-                    window.statusBarColor = Color.Transparent.toArgb()  // 透明状态栏
-                    window.navigationBarColor = Color.Transparent.toArgb()
-                }
-            }
+    LaunchedEffect(view, window, insetsController, isScreenActive, systemBarsApplySpec) {
+        if (view.isInEditMode || !isScreenActive || window == null || insetsController == null) {
+            return@LaunchedEffect
         }
+        applyVideoDetailSystemBarsSpec(
+            window = window,
+            insetsController = insetsController,
+            spec = systemBarsApplySpec
+        )
     }
 
     val uiSuccessState = uiState as? PlayerUiState.Success

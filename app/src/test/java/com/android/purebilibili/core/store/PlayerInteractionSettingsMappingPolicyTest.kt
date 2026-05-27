@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.mutablePreferencesOf
 import com.android.purebilibili.feature.video.subtitle.SubtitleAutoPreference
+import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -71,6 +72,19 @@ class PlayerInteractionSettingsMappingPolicyTest {
         assertEquals(-0.30f, result.subtitleVerticalOffsetFraction)
         assertTrue(result.twoFingerVerticalSpeedEnabled)
         assertTrue(result.hiResLongPressCompatHintShown)
+    }
+
+    @Test
+    fun hideVideoPageStatusBar_hasSyncCacheForInitialValue() {
+        val source = File("src/main/java/com/android/purebilibili/core/store/SettingsManager.kt")
+            .takeIf { it.exists() }
+            ?: File("app/src/main/java/com/android/purebilibili/core/store/SettingsManager.kt")
+        val text = source.readText()
+
+        assertTrue(text.contains("fun getHideVideoPageStatusBarSync(context: Context): Boolean"))
+        assertTrue(text.contains("CACHE_KEY_HIDE_VIDEO_PAGE_STATUS_BAR"))
+        assertTrue(text.contains("putBoolean(CACHE_KEY_HIDE_VIDEO_PAGE_STATUS_BAR, enabled)"))
+        assertTrue(text.contains("putBoolean(CACHE_KEY_HIDE_VIDEO_PAGE_STATUS_BAR, enabledFromDataStore)"))
     }
 
     @Test

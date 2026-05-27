@@ -104,6 +104,103 @@ class VideoDetailSystemBarsPolicyTest {
     }
 
     @Test
+    fun applySpec_ordinaryHiddenStatusBarOnlyHidesStatusBars() {
+        val spec = resolveVideoDetailSystemBarsApplySpec(
+            visibilityPolicy = VideoDetailSystemBarsVisibilityPolicy(
+                hideStatusBars = true,
+                hideNavigationBars = false
+            ),
+            useTabletLayout = false,
+            isLightBackground = true,
+            backgroundColor = 0x12345678,
+            transparentColor = 0x00000000,
+            blackColor = 0xFF000000.toInt(),
+            transientBarsBehavior = 2
+        )
+
+        assertEquals(VideoDetailHiddenSystemBars.STATUS_BARS, spec.hiddenBars)
+        assertEquals(2, spec.systemBarsBehavior)
+        assertEquals(0x00000000, spec.statusBarColor)
+        assertEquals(0x00000000, spec.navigationBarColor)
+        assertEquals(false, spec.lightStatusBars)
+        assertEquals(false, spec.lightNavigationBars)
+    }
+
+    @Test
+    fun applySpec_fullscreenHidesAllSystemBarsWithBlackBars() {
+        val spec = resolveVideoDetailSystemBarsApplySpec(
+            visibilityPolicy = VideoDetailSystemBarsVisibilityPolicy(
+                hideStatusBars = true,
+                hideNavigationBars = true
+            ),
+            useTabletLayout = false,
+            isLightBackground = true,
+            backgroundColor = 0x12345678,
+            transparentColor = 0x00000000,
+            blackColor = 0xFF000000.toInt(),
+            transientBarsBehavior = 2
+        )
+
+        assertEquals(VideoDetailHiddenSystemBars.SYSTEM_BARS, spec.hiddenBars)
+        assertEquals(0xFF000000.toInt(), spec.statusBarColor)
+        assertEquals(0xFF000000.toInt(), spec.navigationBarColor)
+        assertEquals(false, spec.lightStatusBars)
+        assertEquals(false, spec.lightNavigationBars)
+    }
+
+    @Test
+    fun applySpec_tabletVisibleSystemBarsUseBackgroundAndLightFlags() {
+        val spec = resolveVideoDetailSystemBarsApplySpec(
+            visibilityPolicy = VideoDetailSystemBarsVisibilityPolicy(
+                hideStatusBars = false,
+                hideNavigationBars = false
+            ),
+            useTabletLayout = true,
+            isLightBackground = true,
+            backgroundColor = 0x12345678,
+            transparentColor = 0x00000000,
+            blackColor = 0xFF000000.toInt(),
+            transientBarsBehavior = 2
+        )
+
+        assertEquals(VideoDetailHiddenSystemBars.NONE, spec.hiddenBars)
+        assertEquals(0x12345678, spec.statusBarColor)
+        assertEquals(0x12345678, spec.navigationBarColor)
+        assertEquals(true, spec.lightStatusBars)
+        assertEquals(true, spec.lightNavigationBars)
+    }
+
+    @Test
+    fun applySpec_sameInputsProduceEqualStableSpec() {
+        val first = resolveVideoDetailSystemBarsApplySpec(
+            visibilityPolicy = VideoDetailSystemBarsVisibilityPolicy(
+                hideStatusBars = true,
+                hideNavigationBars = false
+            ),
+            useTabletLayout = false,
+            isLightBackground = false,
+            backgroundColor = 0x12345678,
+            transparentColor = 0x00000000,
+            blackColor = 0xFF000000.toInt(),
+            transientBarsBehavior = 2
+        )
+        val second = resolveVideoDetailSystemBarsApplySpec(
+            visibilityPolicy = VideoDetailSystemBarsVisibilityPolicy(
+                hideStatusBars = true,
+                hideNavigationBars = false
+            ),
+            useTabletLayout = false,
+            isLightBackground = false,
+            backgroundColor = 0x12345678,
+            transparentColor = 0x00000000,
+            blackColor = 0xFF000000.toInt(),
+            transientBarsBehavior = 2
+        )
+
+        assertEquals(first, second)
+    }
+
+    @Test
     fun statusBarInset_usesVisibleInsetWhenStatusBarRemainsVisible() {
         assertEquals(
             24f,
