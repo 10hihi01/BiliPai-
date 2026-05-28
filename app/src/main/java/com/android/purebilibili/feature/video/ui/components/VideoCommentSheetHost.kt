@@ -557,6 +557,7 @@ fun VideoCommentSheetHost(
                                 }
                             enter togetherWith exit using SizeTransform(clip = false)
                         },
+                        modifier = Modifier.fillMaxSize(),
                         label = "video_comment_host_content"
                     ) { targetContent ->
                         when (targetContent) {
