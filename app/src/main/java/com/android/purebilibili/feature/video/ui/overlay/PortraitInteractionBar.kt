@@ -1,6 +1,7 @@
 package com.android.purebilibili.feature.video.ui.overlay
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,6 +52,7 @@ fun PortraitInteractionBar(
     commentCount: Int,
     shareCount: Int,
     onLikeClick: () -> Unit,
+    onLikeLongClick: () -> Unit = {},
     onFavoriteClick: () -> Unit,
     onCommentClick: () -> Unit,
     onShareClick: () -> Unit,
@@ -80,7 +82,8 @@ fun PortraitInteractionBar(
             isActive = isLiked,
             activeColor = BiliPink,
             layoutPolicy = layoutPolicy,
-            onClick = onLikeClick
+            onClick = onLikeClick,
+            onLongClick = onLikeLongClick
         )
         
         // 评论
@@ -123,14 +126,25 @@ private fun InteractionButton(
     isActive: Boolean,
     activeColor: Color = BiliPink,
     layoutPolicy: PortraitInteractionBarLayoutPolicy,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(
-            indication = null,
-            interactionSource = remember { MutableInteractionSource() }
-        ) { onClick() }
+        modifier = if (onLongClick != null) {
+            Modifier.combinedClickable(
+                indication = null,
+                interactionSource = interactionSource,
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
+        } else {
+            Modifier.clickable(
+                indication = null,
+                interactionSource = interactionSource
+            ) { onClick() }
+        }
     ) {
         Box(
             modifier = Modifier

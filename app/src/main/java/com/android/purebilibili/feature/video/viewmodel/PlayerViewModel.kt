@@ -5446,24 +5446,46 @@ class PlayerViewModel : ViewModel() {
     
     fun doTripleAction() {
         val current = _uiState.value as? PlayerUiState.Success ?: return
+        doTripleActionForVideo(
+            aid = current.info.aid,
+            bvid = current.info.bvid,
+            currentLiked = current.isLiked,
+            currentCoinCount = current.coinCount,
+            currentFavorited = current.isFavorited
+        )
+    }
+
+    fun doTripleActionForVideo(
+        aid: Long,
+        bvid: String,
+        currentLiked: Boolean,
+        currentCoinCount: Int,
+        currentFavorited: Boolean,
+        onResult: ((TripleActionResult) -> Unit)? = null
+    ) {
+        if (aid <= 0L || bvid.isBlank()) return
         viewModelScope.launch {
             toast("正在三连")
-            interactionUseCase.doTripleAction(current.info.aid)
+            interactionUseCase.doTripleAction(aid)
                 .onSuccess { result ->
                     val visualState = resolveTripleActionVisualState(
-                        currentLiked = current.isLiked,
-                        currentCoinCount = current.coinCount,
-                        currentFavorited = current.isFavorited,
+                        currentLiked = currentLiked,
+                        currentCoinCount = currentCoinCount,
+                        currentFavorited = currentFavorited,
                         likeSuccess = result.likeSuccess,
                         coinSuccess = result.coinSuccess,
                         coinFailureMessage = result.coinMessage,
                         favoriteSuccess = result.favoriteSuccess
                     )
-                    _uiState.value = current.copy(
-                        isLiked = visualState.isLiked,
-                        coinCount = visualState.coinCount,
-                        isFavorited = visualState.isFavorited
-                    )
+                    val current = _uiState.value as? PlayerUiState.Success
+                    if (current != null && current.info.aid == aid && current.info.bvid == bvid) {
+                        _uiState.value = current.copy(
+                            isLiked = visualState.isLiked,
+                            coinCount = visualState.coinCount,
+                            isFavorited = visualState.isFavorited
+                        )
+                    }
+                    onResult?.invoke(result)
                     if (result.allSuccess) _tripleCelebrationVisible.value = true
                     toast(
                         resolveTripleActionFeedbackMessage(
@@ -5478,7 +5500,7 @@ class PlayerViewModel : ViewModel() {
                     viewModelScope.launch {
                         val context = appContext ?: return@launch
                         val isJumpEnabled = com.android.purebilibili.core.store.SettingsManager.getTripleJumpEnabled(context).first()
-                        if (result.allSuccess && isJumpEnabled) {
+                        if (result.allSuccess && isJumpEnabled && current?.info?.bvid == bvid) {
                              // Wait a bit for the celebration to show
                             delay(2000)
                             loadVideo("BV1JsK5eyEuB", autoPlay = true)

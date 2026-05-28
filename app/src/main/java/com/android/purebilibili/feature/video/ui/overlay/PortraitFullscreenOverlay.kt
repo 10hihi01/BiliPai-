@@ -89,6 +89,7 @@ fun PortraitFullscreenOverlay(
     isCoined: Boolean,
     isFavorited: Boolean,
     onLikeClick: () -> Unit,
+    onLikeLongClick: () -> Unit = {},
     onCoinClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     onCommentClick: () -> Unit = {},
@@ -211,6 +212,7 @@ fun PortraitFullscreenOverlay(
                     commentCount = statReply.takeIf { it > 0 } ?: statDanmaku, // 优先用评论数，没有则用弹幕数代替展示
                     shareCount = statShare,
                     onLikeClick = onLikeClick,
+                    onLikeLongClick = onLikeLongClick,
                     onFavoriteClick = onFavoriteClick,
                     onCommentClick = onCommentClick,
                     onShareClick = onShareClick,

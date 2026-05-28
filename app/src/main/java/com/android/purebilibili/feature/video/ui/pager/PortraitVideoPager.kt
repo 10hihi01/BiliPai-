@@ -2029,6 +2029,24 @@ private fun VideoPageItem(
                     }
                 }
             },
+            onLikeLongClick = {
+                if (canHandlePortraitInteraction) {
+                    val currentInteractionState = resolvedInteractionState
+                    viewModel.doTripleActionForVideo(
+                        aid = aid,
+                        bvid = bvid,
+                        currentLiked = currentInteractionState.isLiked,
+                        currentCoinCount = currentSuccess?.coinCount ?: 0,
+                        currentFavorited = currentInteractionState.isFavorited
+                    ) { result ->
+                        portraitInteractionOverride = resolvePortraitTripleActionOverride(
+                            currentState = currentInteractionState,
+                            likeSuccess = result.likeSuccess,
+                            favoriteSuccess = result.favoriteSuccess
+                        )
+                    }
+                }
+            },
             onCoinClick = { },
             onFavoriteClick = {
                 if (canHandlePortraitInteraction) {
@@ -2310,6 +2328,23 @@ internal fun resolvePortraitVideoInteractionUiState(
             favoriteCount = localOverride?.favoriteCount ?: fallbackStat.favorite
         )
     }
+}
+
+internal fun resolvePortraitTripleActionOverride(
+    currentState: PortraitVideoInteractionUiState,
+    likeSuccess: Boolean,
+    favoriteSuccess: Boolean
+): PortraitVideoInteractionOverride {
+    val nextLiked = currentState.isLiked || likeSuccess
+    val nextFavorited = currentState.isFavorited || favoriteSuccess
+    val likeDelta = if (!currentState.isLiked && nextLiked) 1 else 0
+    val favoriteDelta = if (!currentState.isFavorited && nextFavorited) 1 else 0
+    return PortraitVideoInteractionOverride(
+        isLiked = nextLiked,
+        isFavorited = nextFavorited,
+        likeCount = (currentState.likeCount + likeDelta).coerceAtLeast(0),
+        favoriteCount = (currentState.favoriteCount + favoriteDelta).coerceAtLeast(0)
+    )
 }
 
 @Composable

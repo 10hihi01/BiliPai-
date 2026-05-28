@@ -363,6 +363,25 @@ class PortraitVideoPagerPolicyTest {
     }
 
     @Test
+    fun portraitTripleActionOverride_updatesLocalLikeAndFavoriteCounts() {
+        val resolved = resolvePortraitTripleActionOverride(
+            currentState = PortraitVideoInteractionUiState(
+                isLiked = false,
+                isFavorited = false,
+                likeCount = 8,
+                favoriteCount = 3
+            ),
+            likeSuccess = true,
+            favoriteSuccess = true
+        )
+
+        assertTrue(resolved.isLiked == true)
+        assertTrue(resolved.isFavorited == true)
+        assertEquals(9, resolved.likeCount)
+        assertEquals(4, resolved.favoriteCount)
+    }
+
+    @Test
     fun portraitRecommendationSnapshot_extractsStableBvidSetFromMixedPageItems() {
         assertEquals(
             setOf("BV_INFO", "BV_RELATED"),
