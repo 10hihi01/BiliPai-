@@ -50,6 +50,16 @@ import com.android.purebilibili.feature.dynamic.resolveDynamicSidebarDividerTopO
 import com.android.purebilibili.feature.dynamic.resolveDynamicSidebarReturnHeaderHeightDp
 import com.android.purebilibili.feature.dynamic.shouldShowDynamicUserLiveBadge
 import com.android.purebilibili.feature.dynamic.SidebarUser
+import com.android.purebilibili.core.util.HapticType
+import com.android.purebilibili.core.util.rememberHapticFeedback
+
+internal fun performDynamicSidebarUserAvatarClick(
+    haptic: (HapticType) -> Unit,
+    onClick: () -> Unit
+) {
+    haptic(HapticType.LIGHT)
+    onClick()
+}
 
 /**
  *  动态侧边栏 - 显示关注的UP主（支持展开/收起、在线状态）
@@ -296,6 +306,7 @@ fun SidebarUserItem(
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val displayName = if (user.isHidden) "${user.name}(隐)" else user.name
+    val haptic = rememberHapticFeedback()
 
     Box {
         Column(
@@ -309,7 +320,12 @@ fun SidebarUserItem(
                     else Modifier
                 )
                 .combinedClickable(
-                    onClick = onClick,
+                    onClick = {
+                        performDynamicSidebarUserAvatarClick(
+                            haptic = haptic,
+                            onClick = onClick
+                        )
+                    },
                     onLongClick = { showMenu = true }
                 )
                 .padding(vertical = 8.dp) // 内部间距

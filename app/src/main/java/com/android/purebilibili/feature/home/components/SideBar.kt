@@ -39,6 +39,14 @@ import io.github.alexzhirkevich.cupertino.icons.filled.*
 /**
  * 平板端侧边导航栏 - 垂直版本的 FrostedBottomBar
  */
+internal fun performHomeSideBarItemTap(
+    haptic: (HapticType) -> Unit,
+    onClick: () -> Unit
+) {
+    haptic(HapticType.LIGHT)
+    onClick()
+}
+
 @Composable
 fun FrostedSideBar(
     currentItem: BottomNavItem = BottomNavItem.HOME,
@@ -150,9 +158,11 @@ fun FrostedSideBar(
                 }
                 val triggerItemClick = {
                     isPending = true
-                    haptic(HapticType.LIGHT)
+                    performHomeSideBarItemTap(
+                        haptic = haptic,
+                        onClick = { onItemClick(item) }
+                    )
                     wobbleAngle = 8f
-                    onItemClick(item)
                     scope.launch {
                         kotlinx.coroutines.delay(90)
                         isPending = false
