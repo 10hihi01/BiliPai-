@@ -20,12 +20,8 @@ private const val HOME_SHARED_TRANSITION_PLAYER_CORNER_DP = 12
 private val VIDEO_CARD_IOS_LIKE_EASE_OUT = CubicBezierEasing(0.16f, 1f, 0.3f, 1f)
 
 internal data class VideoSharedTransitionOwnership(
-    val useCardShellSharedBounds: Boolean,
     val useCoverSharedBounds: Boolean,
-    val useTitleSharedBounds: Boolean,
-    val useAvatarSharedBounds: Boolean,
-    val useUpNameSharedBounds: Boolean,
-    val useStatsSharedBounds: Boolean
+    val useMetadataSharedBounds: Boolean
 )
 
 internal data class VideoSharedTransitionMotionSpec(
@@ -91,42 +87,21 @@ internal fun resolveVideoSharedTransitionOwnership(
 ): VideoSharedTransitionOwnership {
     if (!coverSharedEnabled) {
         return VideoSharedTransitionOwnership(
-            useCardShellSharedBounds = false,
             useCoverSharedBounds = false,
-            useTitleSharedBounds = false,
-            useAvatarSharedBounds = false,
-            useUpNameSharedBounds = false,
-            useStatsSharedBounds = false
+            useMetadataSharedBounds = false
         )
     }
 
     val isHomeSource = sourceRoute?.substringBefore("?") == HOME_SOURCE_ROUTE
-    if (isHomeSource) {
-        // 首页：子元素匹配模型。不再用整卡 shell（详情侧无对应 key、且会与子元素共享嵌套抢变换），
-        // 改为封面（↔播放器封面）、标题、头像、UP 名各自独立 1:1 morph；播放量/统计、关注按钮等跟随缩放渐隐。
-        return VideoSharedTransitionOwnership(
-            useCardShellSharedBounds = false,
-            useCoverSharedBounds = true,
-            useTitleSharedBounds = true,
-            useAvatarSharedBounds = true,
-            useUpNameSharedBounds = true,
-            useStatsSharedBounds = false
-        )
-    }
-
-    // 非首页：维持原「整卡 shell + 元数据」行为不变，封面由 shell 承载、不独立共享。
-    val metadataShared = shouldEnableVideoMetadataSharedTransition(
-        coverSharedEnabled = true,
-        isQuickReturnLimited = isQuickReturnLimited,
-        profile = resolveVideoSharedTransitionProfile(sourceRoute)
-    )
     return VideoSharedTransitionOwnership(
-        useCardShellSharedBounds = true,
-        useCoverSharedBounds = false,
-        useTitleSharedBounds = metadataShared,
-        useAvatarSharedBounds = metadataShared,
-        useUpNameSharedBounds = metadataShared,
-        useStatsSharedBounds = metadataShared
+        useCoverSharedBounds = true,
+        // 首页进入详情时封面是主锚点，元数据跟随普通内容入场，避免多个 sharedBounds 抢焦点。
+        useMetadataSharedBounds = !isHomeSource &&
+            shouldEnableVideoMetadataSharedTransition(
+                coverSharedEnabled = true,
+                isQuickReturnLimited = isQuickReturnLimited,
+                profile = resolveVideoSharedTransitionProfile(sourceRoute)
+            )
     )
 }
 

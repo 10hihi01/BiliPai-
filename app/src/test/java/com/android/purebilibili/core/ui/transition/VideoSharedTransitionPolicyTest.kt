@@ -58,37 +58,15 @@ class VideoSharedTransitionPolicyTest {
     }
 
     @Test
-    fun homeVideoTransition_usesSubElementMatchingWithoutCardShell() {
+    fun homeVideoTransition_usesCoverAsPrimaryAnchor() {
         val policy = resolveVideoSharedTransitionOwnership(
             sourceRoute = "home",
             coverSharedEnabled = true,
             isQuickReturnLimited = false
         )
 
-        // 首页：子元素匹配模型——封面/标题/头像/UP名各自独立 1:1 morph，避免整卡 shell 嵌套。
-        assertFalse(policy.useCardShellSharedBounds)
         assertTrue(policy.useCoverSharedBounds)
-        assertTrue(policy.useTitleSharedBounds)
-        assertTrue(policy.useAvatarSharedBounds)
-        assertTrue(policy.useUpNameSharedBounds)
-        // 播放量/统计、关注按钮等“其余”跟随缩放渐隐，不独立共享。
-        assertFalse(policy.useStatsSharedBounds)
-    }
-
-    @Test
-    fun ownership_allDisabled_whenCoverSharedDisabled() {
-        val policy = resolveVideoSharedTransitionOwnership(
-            sourceRoute = "home",
-            coverSharedEnabled = false,
-            isQuickReturnLimited = false
-        )
-
-        assertFalse(policy.useCardShellSharedBounds)
-        assertFalse(policy.useCoverSharedBounds)
-        assertFalse(policy.useTitleSharedBounds)
-        assertFalse(policy.useAvatarSharedBounds)
-        assertFalse(policy.useUpNameSharedBounds)
-        assertFalse(policy.useStatsSharedBounds)
+        assertFalse(policy.useMetadataSharedBounds)
     }
 
     @Test
@@ -108,20 +86,15 @@ class VideoSharedTransitionPolicyTest {
     }
 
     @Test
-    fun nonHomeVideoTransition_keepsCardShellAndMetadataSharedBounds() {
+    fun nonHomeVideoTransition_keepsMetadataSharedBoundsWhenAvailable() {
         val policy = resolveVideoSharedTransitionOwnership(
             sourceRoute = "search",
             coverSharedEnabled = true,
             isQuickReturnLimited = false
         )
 
-        // 非首页：维持原「整卡 shell + 元数据」行为，封面由 shell 承载、不独立共享。
-        assertTrue(policy.useCardShellSharedBounds)
-        assertFalse(policy.useCoverSharedBounds)
-        assertTrue(policy.useTitleSharedBounds)
-        assertTrue(policy.useAvatarSharedBounds)
-        assertTrue(policy.useUpNameSharedBounds)
-        assertTrue(policy.useStatsSharedBounds)
+        assertTrue(policy.useCoverSharedBounds)
+        assertTrue(policy.useMetadataSharedBounds)
     }
 
     @Test
