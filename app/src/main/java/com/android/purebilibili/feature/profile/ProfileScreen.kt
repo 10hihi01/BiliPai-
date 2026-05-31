@@ -22,6 +22,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -64,6 +65,8 @@ import com.android.purebilibili.core.theme.DarkSurface
 import com.android.purebilibili.core.theme.DarkSurfaceVariant
 import com.android.purebilibili.core.util.FormatUtils
 import com.android.purebilibili.feature.home.UserState
+import com.android.purebilibili.feature.dynamic.components.ImagePreviewDialog
+import com.android.purebilibili.feature.dynamic.components.ImagePreviewTextContent
 import com.android.purebilibili.core.ui.LoadingAnimation
 import com.android.purebilibili.core.ui.BiliGradientButton
 import com.android.purebilibili.core.ui.AdaptiveScaffold
@@ -1730,6 +1733,8 @@ private fun ProfileDynamicCard(item: SpaceDynamicItem, onVideoClick: (String) ->
     val bodyText = resolveProfileDynamicText(item)
     val orig = item.orig
     val moreIcon = rememberAppMoreIcon()
+    val context = LocalContext.current
+    var showMoreMenu by remember(item.id_str) { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -1765,12 +1770,42 @@ private fun ProfileDynamicCard(item: SpaceDynamicItem, onVideoClick: (String) ->
                     )
                 }
             }
-            Icon(
-                imageVector = moreIcon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(22.dp)
-            )
+            Box {
+                IconButton(onClick = { showMoreMenu = true }, modifier = Modifier.size(40.dp)) {
+                    Icon(
+                        imageVector = moreIcon,
+                        contentDescription = "更多",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+                DropdownMenu(
+                    expanded = showMoreMenu,
+                    onDismissRequest = { showMoreMenu = false },
+                    modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("复制链接") },
+                        leadingIcon = {
+                            Icon(
+                                CupertinoIcons.Default.Link,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        },
+                        onClick = {
+                            showMoreMenu = false
+                            val dynamicUrl = "https://t.bilibili.com/${item.id_str}"
+                            val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+                                as android.content.ClipboardManager
+                            clipboard.setPrimaryClip(
+                                android.content.ClipData.newPlainText("动态链接", dynamicUrl)
+                            )
+                            Toast.makeText(context, "已复制链接", Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                }
+            }
         }
 
         if (bodyText.isNotBlank()) {
@@ -1839,11 +1874,19 @@ private fun ProfileDynamicMajorContent(item: SpaceDynamicItem, onVideoClick: (St
     val dynamic = item.modules.module_dynamic
     val major = dynamic?.major
     val cover = resolveProfileDynamicCover(item)
+    val imageUrls = remember(item) { resolveProfileDynamicImageUrls(item) }
     val title = major?.archive?.title
         ?.takeIf { it.isNotBlank() }
         ?: major?.opus?.title?.takeIf { it.isNotBlank() }
         ?: major?.article?.title?.takeIf { it.isNotBlank() }
     val clickableBvid = major?.archive?.bvid?.takeIf { it.isNotBlank() }
+    var selectedImageIndex by remember(item.id_str, imageUrls) { mutableIntStateOf(-1) }
+    val previewText = remember(item, title) {
+        ImagePreviewTextContent(
+            headline = resolveProfileDynamicAuthorName(item),
+            body = resolveProfileDynamicText(item).ifBlank { title.orEmpty() }
+        )
+    }
 
     if (cover.isBlank() && title.isNullOrBlank()) return
 
@@ -1875,9 +1918,25 @@ private fun ProfileDynamicMajorContent(item: SpaceDynamicItem, onVideoClick: (St
                     .fillMaxWidth(0.72f)
                     .aspectRatio(1f)
                     .clip(RoundedCornerShape(6.dp))
+                    .then(
+                        if (clickableBvid == null && imageUrls.isNotEmpty()) {
+                            Modifier.clickable { selectedImageIndex = 0 }
+                        } else {
+                            Modifier
+                        }
+                    )
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             )
         }
+    }
+
+    if (selectedImageIndex >= 0 && imageUrls.isNotEmpty()) {
+        ImagePreviewDialog(
+            images = imageUrls,
+            initialIndex = selectedImageIndex.coerceIn(imageUrls.indices),
+            textContent = previewText,
+            onDismiss = { selectedImageIndex = -1 }
+        )
     }
 }
 

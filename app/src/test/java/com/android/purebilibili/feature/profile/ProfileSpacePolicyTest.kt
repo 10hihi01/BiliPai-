@@ -14,6 +14,7 @@ import com.android.purebilibili.data.model.response.SpaceDynamicDrawItem
 import com.android.purebilibili.data.model.response.SpaceDynamicItem
 import com.android.purebilibili.data.model.response.SpaceDynamicMajor
 import com.android.purebilibili.data.model.response.SpaceDynamicModules
+import com.android.purebilibili.data.model.response.SpaceDynamicOpus
 import com.android.purebilibili.data.model.response.SpaceDynamicRichText
 import com.android.purebilibili.data.model.response.SpaceVideoItem
 import kotlin.test.Test
@@ -132,6 +133,58 @@ class ProfileSpacePolicyTest {
         )
 
         assertEquals("https://i0.hdslb.com/bfs/draw.jpg", resolveProfileDynamicCover(item))
+    }
+
+    @Test
+    fun `dynamic image urls include all draw pictures for preview`() {
+        val item = SpaceDynamicItem(
+            modules = SpaceDynamicModules(
+                module_dynamic = SpaceDynamicContent(
+                    major = SpaceDynamicMajor(
+                        draw = SpaceDynamicDraw(
+                            items = listOf(
+                                SpaceDynamicDrawItem(src = "https://i0.hdslb.com/bfs/draw-a.jpg"),
+                                SpaceDynamicDrawItem(src = "https://i0.hdslb.com/bfs/draw-b.jpg")
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        assertEquals(
+            listOf(
+                "https://i0.hdslb.com/bfs/draw-a.jpg",
+                "https://i0.hdslb.com/bfs/draw-b.jpg"
+            ),
+            resolveProfileDynamicImageUrls(item)
+        )
+    }
+
+    @Test
+    fun `dynamic image urls include opus pictures for preview`() {
+        val item = SpaceDynamicItem(
+            modules = SpaceDynamicModules(
+                module_dynamic = SpaceDynamicContent(
+                    major = SpaceDynamicMajor(
+                        opus = SpaceDynamicOpus(
+                            pics = listOf(
+                                SpaceDynamicDrawItem(src = "https://i0.hdslb.com/bfs/opus-a.jpg"),
+                                SpaceDynamicDrawItem(src = "https://i0.hdslb.com/bfs/opus-b.jpg")
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        assertEquals(
+            listOf(
+                "https://i0.hdslb.com/bfs/opus-a.jpg",
+                "https://i0.hdslb.com/bfs/opus-b.jpg"
+            ),
+            resolveProfileDynamicImageUrls(item)
+        )
     }
 
     @Test

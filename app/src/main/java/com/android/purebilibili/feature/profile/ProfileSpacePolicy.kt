@@ -168,6 +168,16 @@ fun resolveProfileDynamicCover(item: SpaceDynamicItem): String {
         ?: ""
 }
 
+fun resolveProfileDynamicImageUrls(item: SpaceDynamicItem): List<String> {
+    val major = item.modules.module_dynamic?.major
+    return when {
+        major?.draw?.items?.isNotEmpty() == true -> major.draw.items.mapNotNull { it.src.takeIf(String::isNotBlank) }
+        major?.opus?.pics?.isNotEmpty() == true -> major.opus.pics.mapNotNull { it.src.takeIf(String::isNotBlank) }
+        major?.article?.covers?.isNotEmpty() == true -> major.article.covers.mapNotNull { it.takeIf(String::isNotBlank) }
+        else -> emptyList()
+    }
+}
+
 fun resolveProfileDynamicText(item: SpaceDynamicItem): String {
     val dynamic = item.modules.module_dynamic
     val major = dynamic?.major
