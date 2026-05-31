@@ -273,6 +273,49 @@ class TopTabMotionVelocityTest {
     }
 
     @Test
+    fun `capsule top tabs suppress rectangular item click indication`() {
+        assertFalse(
+            shouldUseLightweightTopTabItemClickIndication(
+                renderer = HomeTopTabRenderer.IOS,
+                skinPlainStyle = false,
+                usesCapsuleIndicator = true
+            )
+        )
+        assertFalse(
+            shouldUseLightweightTopTabItemClickIndication(
+                renderer = HomeTopTabRenderer.MD3,
+                skinPlainStyle = false,
+                usesCapsuleIndicator = true
+            )
+        )
+        assertFalse(
+            shouldUseLightweightTopTabItemClickIndication(
+                renderer = HomeTopTabRenderer.MIUIX,
+                skinPlainStyle = false,
+                usesCapsuleIndicator = true
+            )
+        )
+    }
+
+    @Test
+    fun `plain md3 top tabs keep item click indication`() {
+        assertTrue(
+            shouldUseLightweightTopTabItemClickIndication(
+                renderer = HomeTopTabRenderer.MD3,
+                skinPlainStyle = false,
+                usesCapsuleIndicator = false
+            )
+        )
+        assertTrue(
+            shouldUseLightweightTopTabItemClickIndication(
+                renderer = HomeTopTabRenderer.IOS,
+                skinPlainStyle = true,
+                usesCapsuleIndicator = true
+            )
+        )
+    }
+
+    @Test
     fun `follow scroll centers selected item on item boundaries while moving right`() {
         val target = resolveTopTabFollowScrollTarget(
             indicatorPosition = 4.2f,

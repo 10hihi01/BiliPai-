@@ -1377,7 +1377,8 @@ fun HomeScreen(
                                 shouldSnapPullOffsetToFinger(
                                     distanceFraction = pullDistanceFraction,
                                     isRefreshing = isPageRefreshing,
-                                    isStateAnimating = pullRefreshState.isAnimating
+                                    isStateAnimating = pullRefreshState.isAnimating,
+                                    indicatorStyle = pullRefreshIndicatorStyle
                                 )
                             ) {
                                 androidx.compose.animation.core.snap()
@@ -1436,6 +1437,10 @@ fun HomeScreen(
                                             progress = pullDistanceFraction,
                                             isRefreshing = isPageRefreshing
                                         ).dp
+                                        val indicatorTotalHeight = resolveMd3ScreenshotRefreshIndicatorTotalHeightDp(
+                                            indicatorHeightDp = indicatorHeight.value,
+                                            hasHintText = pullDistanceFraction > 0f || isPageRefreshing
+                                        ).dp
                                         Md3ScreenshotRefreshIndicator(
                                             state = pullRefreshState,
                                             isRefreshing = isPageRefreshing,
@@ -1443,12 +1448,12 @@ fun HomeScreen(
                                             modifier = Modifier
                                                 .align(Alignment.TopCenter)
                                                 .padding(top = listTopPadding)
+                                                .zIndex(1f)
                                                 .graphicsLayer {
                                                     val currentDragOffset = calculateDragOffset()
-                                                    val totalHeight = indicatorHeight.toPx() + 36.dp.toPx()
                                                     translationY = resolveMd3ScreenshotRefreshIndicatorTranslationY(
                                                         dragOffsetPx = currentDragOffset,
-                                                        indicatorTotalHeightPx = totalHeight,
+                                                        indicatorTotalHeightPx = indicatorTotalHeight.toPx(),
                                                         minGapPx = 8.dp.toPx()
                                                     )
                                                 }
@@ -1462,6 +1467,7 @@ fun HomeScreen(
                                             modifier = Modifier
                                                 .align(Alignment.TopCenter)
                                                 .padding(top = listTopPadding)
+                                                .zIndex(1f)
                                                 .graphicsLayer {
                                                     val currentDragOffset = calculateDragOffset()
                                                     val indicatorHeight = 40.dp.toPx()
@@ -1483,6 +1489,7 @@ fun HomeScreen(
                              Box(
                                  modifier = Modifier
                                      .fillMaxSize()
+                                     .zIndex(0f)
                                      .graphicsLayer {
                                          translationY = calculateDragOffset()
                                      }

@@ -257,7 +257,28 @@ class HomePullRefreshUiPolicyTest {
 
         assertTrue(lightPull > 0f)
         assertTrue(heavyPull > lightPull)
-        assertTrue(heavyPull <= 1.08f)
+        assertTrue(heavyPull <= 1.12f)
+    }
+
+    @Test
+    fun `md3 screenshot pull offset reserves room for indicator at refresh threshold`() {
+        val indicatorHeight = resolveMd3ScreenshotRefreshIndicatorHeightDp(
+            progress = 1f,
+            isRefreshing = false
+        )
+        val indicatorTotalHeight = resolveMd3ScreenshotRefreshIndicatorTotalHeightDp(
+            indicatorHeightDp = indicatorHeight,
+            hasHintText = true
+        )
+        val contentOffset = resolvePullContentMaxOffsetDp(HomePullRefreshIndicatorStyle.MD3_SCREENSHOT_HANDLE) *
+            resolvePullContentOffsetFraction(
+                distanceFraction = 1f,
+                isRefreshing = false,
+                motionStyle = HomePullRefreshMotionStyle.MD3,
+                indicatorStyle = HomePullRefreshIndicatorStyle.MD3_SCREENSHOT_HANDLE
+            )
+
+        assertTrue(contentOffset >= indicatorTotalHeight + 8f)
     }
 
     @Test
@@ -279,7 +300,7 @@ class HomePullRefreshUiPolicyTest {
     @Test
     fun `stable md3 screenshot pull offset follows finger back toward top`() {
         assertEquals(
-            0.41f,
+            0.5f,
             resolveStablePullContentOffsetFraction(
                 distanceFraction = 0.5f,
                 isRefreshing = false,
@@ -306,6 +327,26 @@ class HomePullRefreshUiPolicyTest {
         assertEquals(44f, initialHeight, 0.001f)
         assertTrue(releaseHeight > initialHeight)
         assertEquals(42f, resolveMd3ScreenshotRefreshIndicatorHeightDp(progress = 1f, isRefreshing = true), 0.001f)
+    }
+
+    @Test
+    fun `md3 screenshot pull indicator total height includes hint row`() {
+        assertEquals(
+            132f,
+            resolveMd3ScreenshotRefreshIndicatorTotalHeightDp(
+                indicatorHeightDp = 86f,
+                hasHintText = true
+            ),
+            0.001f
+        )
+        assertEquals(
+            102f,
+            resolveMd3ScreenshotRefreshIndicatorTotalHeightDp(
+                indicatorHeightDp = 86f,
+                hasHintText = false
+            ),
+            0.001f
+        )
     }
 
     @Test
@@ -411,6 +452,18 @@ class HomePullRefreshUiPolicyTest {
                 distanceFraction = 0.6f,
                 isRefreshing = true,
                 isStateAnimating = false
+            )
+        )
+    }
+
+    @Test
+    fun `md3 screenshot pull offset stays finger driven while material state animates`() {
+        assertTrue(
+            shouldSnapPullOffsetToFinger(
+                distanceFraction = 0.6f,
+                isRefreshing = false,
+                isStateAnimating = true,
+                indicatorStyle = HomePullRefreshIndicatorStyle.MD3_SCREENSHOT_HANDLE
             )
         )
     }

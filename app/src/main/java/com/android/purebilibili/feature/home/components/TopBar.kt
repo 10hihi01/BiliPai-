@@ -1274,6 +1274,13 @@ private fun LightweightHomeTopTabs(
                             drawContainer = drawItemContainer,
                             skinIconPaths = topTabSkinIconPaths[categoryKey.trim().uppercase()],
                             hasSkinStickerIcon = hasSkinStickerIcons,
+                            useClickIndication = shouldUseLightweightTopTabItemClickIndication(
+                                renderer = effectiveRenderer,
+                                skinPlainStyle = skinPlainStyle,
+                                usesCapsuleIndicator = shouldUseMovingIosCapsule ||
+                                    shouldUseMd3LiquidCapsule ||
+                                    shouldUseMd3DockBackedCapsule
+                            ),
                             modifier = gestureItemModifier,
                             onClick = {
                                 performHomeTopBarTap(haptic = haptic, onClick = {
@@ -1407,6 +1414,7 @@ private fun LightweightTopTabItem(
     drawContainer: Boolean = true,
     skinIconPaths: TopTabSkinIconPaths? = null,
     hasSkinStickerIcon: Boolean = false,
+    useClickIndication: Boolean = true,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -1476,7 +1484,7 @@ private fun LightweightTopTabItem(
             .background(containerColor, itemShape)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = LocalIndication.current,
+                indication = if (useClickIndication) LocalIndication.current else null,
                 onClick = onClick
             ),
         contentAlignment = Alignment.Center

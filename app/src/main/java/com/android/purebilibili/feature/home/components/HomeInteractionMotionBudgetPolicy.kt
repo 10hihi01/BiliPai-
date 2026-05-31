@@ -235,3 +235,13 @@ internal fun shouldDrawLightweightTopTabItemContainer(
 ): Boolean {
     return renderer != HomeTopTabRenderer.IOS || skinPlainStyle || hasSkinStickerIcon
 }
+
+internal fun shouldUseLightweightTopTabItemClickIndication(
+    renderer: HomeTopTabRenderer,
+    skinPlainStyle: Boolean,
+    usesCapsuleIndicator: Boolean
+): Boolean {
+    if (skinPlainStyle) return true
+    if (usesCapsuleIndicator) return false
+    return renderer == HomeTopTabRenderer.MD3
+}

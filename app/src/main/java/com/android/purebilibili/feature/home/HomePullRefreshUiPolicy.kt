@@ -2,6 +2,7 @@ package com.android.purebilibili.feature.home
 
 import com.android.purebilibili.core.theme.AndroidNativeVariant
 import com.android.purebilibili.core.theme.UiPreset
+import kotlin.math.max
 import kotlin.math.min
 
 internal fun resolvePullRefreshThresholdDp(): Float = 56f
@@ -126,7 +127,7 @@ internal fun resolvePullContentMaxOffsetDp(
     indicatorStyle: HomePullRefreshIndicatorStyle
 ): Float {
     return when (indicatorStyle) {
-        HomePullRefreshIndicatorStyle.MD3_SCREENSHOT_HANDLE -> 168f
+        HomePullRefreshIndicatorStyle.MD3_SCREENSHOT_HANDLE -> 196f
         else -> 140f
     }
 }
@@ -139,8 +140,8 @@ internal fun resolvePullContentOffsetFraction(
 ): Float {
     if (isRefreshing) return 0f
     if (indicatorStyle == HomePullRefreshIndicatorStyle.MD3_SCREENSHOT_HANDLE) {
-        val clampedDistance = distanceFraction.coerceIn(0f, 1.32f)
-        return (clampedDistance * 0.82f).coerceAtMost(1.08f)
+        val clampedDistance = distanceFraction.coerceIn(0f, 1.12f)
+        return clampedDistance
     }
     if (motionStyle == HomePullRefreshMotionStyle.MD3) return 0f
     val clampedDistance = distanceFraction.coerceAtMost(2f).coerceAtLeast(0f)
@@ -178,9 +179,13 @@ internal fun resolveStablePullContentOffsetFraction(
 internal fun shouldSnapPullOffsetToFinger(
     distanceFraction: Float,
     isRefreshing: Boolean,
-    isStateAnimating: Boolean
+    isStateAnimating: Boolean,
+    indicatorStyle: HomePullRefreshIndicatorStyle = HomePullRefreshIndicatorStyle.IOS
 ): Boolean {
     if (isRefreshing) return false
+    if (indicatorStyle == HomePullRefreshIndicatorStyle.MD3_SCREENSHOT_HANDLE) {
+        return distanceFraction > 0f
+    }
     if (isStateAnimating) return false
     return distanceFraction > 0f
 }
@@ -192,6 +197,15 @@ internal fun resolveMd3ScreenshotRefreshIndicatorHeightDp(
     if (isRefreshing) return 42f
     val clampedProgress = progress.coerceIn(0f, 1.35f)
     return 44f + (clampedProgress * 42f)
+}
+
+internal fun resolveMd3ScreenshotRefreshIndicatorTotalHeightDp(
+    indicatorHeightDp: Float,
+    hasHintText: Boolean
+): Float {
+    val verticalPaddingDp = 16f
+    val hintBlockDp = if (hasHintText) 30f else 0f
+    return max(0f, indicatorHeightDp) + verticalPaddingDp + hintBlockDp
 }
 
 internal fun resolveMd3ScreenshotRefreshIndicatorTranslationY(
