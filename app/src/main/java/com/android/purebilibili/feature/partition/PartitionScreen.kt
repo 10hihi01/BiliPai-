@@ -1,13 +1,14 @@
 // 文件路径: feature/partition/PartitionScreen.kt
 package com.android.purebilibili.feature.partition
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 //  Cupertino Icons - iOS SF Symbols 风格图标
 import io.github.alexzhirkevich.cupertino.icons.CupertinoIcons
 import io.github.alexzhirkevich.cupertino.icons.outlined.*
@@ -17,19 +18,36 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.android.purebilibili.core.ui.AdaptiveScaffold
 import com.android.purebilibili.core.ui.AdaptiveTopAppBar
+import com.android.purebilibili.core.ui.AppShapes
+import com.android.purebilibili.core.ui.AppSurfaceTokens
+import com.android.purebilibili.core.ui.ContainerLevel
+import com.android.purebilibili.core.ui.CutePersonLoadingIndicator
 import com.android.purebilibili.core.ui.globalWallpaperAwareBackground
 import com.android.purebilibili.core.util.responsiveContentWidth
 import com.android.purebilibili.core.ui.rememberAppBackIcon
+import com.android.purebilibili.core.util.FormatUtils
+import com.android.purebilibili.data.model.response.VideoItem
+import com.android.purebilibili.data.repository.VideoRepository
+import com.android.purebilibili.feature.common.resolveIndexedVideoLazyKey
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 import com.android.purebilibili.core.ui.blur.unifiedBlur
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /**
  *  分区数据类
@@ -72,6 +90,89 @@ val allPartitions = listOf(
     PartitionCategory(181, "影视", "🎦", Color(0xFFC7A4FF))      // 特殊分区
 )
 
+private val partitionTabs = listOf(
+    PartitionCategory(0, "全站", "⌂", Color(0xFFFFA15F))
+) + allPartitions
+
+data class PartitionFeedUiState(
+    val selectedPartition: PartitionCategory = partitionTabs.first(),
+    val videos: List<VideoItem> = emptyList(),
+    val isLoading: Boolean = false,
+    val error: String? = null
+)
+
+class PartitionFeedViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(PartitionFeedUiState())
+    val uiState = _uiState.asStateFlow()
+
+    private var currentPage = 1
+    private var hasMore = true
+    private var requestGeneration = 0
+
+    init {
+        loadSelectedPartition(reset = true)
+    }
+
+    fun selectPartition(partition: PartitionCategory) {
+        if (_uiState.value.selectedPartition.id == partition.id) return
+        _uiState.update {
+            it.copy(
+                selectedPartition = partition,
+                videos = emptyList(),
+                error = null
+            )
+        }
+        loadSelectedPartition(reset = true)
+    }
+
+    fun loadMore() {
+        loadSelectedPartition(reset = false)
+    }
+
+    private fun loadSelectedPartition(reset: Boolean) {
+        if (_uiState.value.isLoading && !reset) return
+        if (!reset && !hasMore) return
+
+        if (reset) {
+            currentPage = 1
+            hasMore = true
+            requestGeneration++
+        }
+        val generation = requestGeneration
+        val partition = _uiState.value.selectedPartition
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            val result = if (partition.id == 0) {
+                VideoRepository.getPopularVideos(page = currentPage)
+            } else {
+                VideoRepository.getRegionVideos(tid = partition.id, page = currentPage)
+            }
+            if (generation != requestGeneration) return@launch
+
+            result
+                .onSuccess { newVideos ->
+                    hasMore = newVideos.isNotEmpty()
+                    _uiState.update { state ->
+                        state.copy(
+                            videos = if (reset) newVideos else state.videos + newVideos,
+                            isLoading = false
+                        )
+                    }
+                    if (newVideos.isNotEmpty()) currentPage++
+                }
+                .onFailure { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = error.message ?: "加载失败"
+                        )
+                    }
+                }
+        }
+    }
+}
+
 /**
  *  分区页面
  */
@@ -79,7 +180,7 @@ val allPartitions = listOf(
 @Composable
 fun PartitionScreen(
     onBack: () -> Unit,
-    onPartitionClick: (Int, String) -> Unit = { _, _ -> }  // 分区ID + 分区名
+    onVideoClick: (String, Long, String) -> Unit = { _, _, _ -> }
 ) {
     val hazeState = com.android.purebilibili.core.ui.blur.rememberRecoverableHazeState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -112,7 +213,7 @@ fun PartitionScreen(
                 end = 16.dp
             ),
             hazeState = hazeState,
-            onPartitionClick = onPartitionClick
+            onVideoClick = { video -> onVideoClick(video.bvid, video.cid, video.pic) }
         )
     }
 }
@@ -130,21 +231,38 @@ fun PartitionContent(
         end = 16.dp
     ),
     hazeState: HazeState? = null,
-    onPartitionClick: (Int, String) -> Unit = { _, _ -> }
+    onVideoClick: (VideoItem) -> Unit = {},
+    viewModel: PartitionFeedViewModel = viewModel()
 ) {
+    val state by viewModel.uiState.collectAsState()
+    val listState = rememberLazyListState()
+    val layoutDirection = LocalLayoutDirection.current
+    val startPadding = contentPadding.calculateStartPadding(layoutDirection)
+    val endPadding = contentPadding.calculateEndPadding(layoutDirection)
+    val topPadding = contentPadding.calculateTopPadding()
+    val bottomPadding = contentPadding.calculateBottomPadding()
+
+    val shouldLoadMore by remember(state.videos.size, state.isLoading) {
+        derivedStateOf {
+            val lastVisibleIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            lastVisibleIndex != null && lastVisibleIndex >= state.videos.lastIndex - 4
+        }
+    }
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore && !state.isLoading && state.videos.isNotEmpty()) {
+            viewModel.loadMore()
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .globalWallpaperAwareBackground()
             .responsiveContentWidth(maxWidth = 1000.dp)
     ) {
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 80.dp),
-            contentPadding = contentPadding,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+        Row(
             modifier = Modifier
-                .weight(1f)
+                .fillMaxSize()
                 .then(
                     if (hazeState != null) {
                         Modifier.hazeSource(state = hazeState)
@@ -153,85 +271,244 @@ fun PartitionContent(
                     }
                 )
         ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Column {
-                    Text(
-                        text = "快捷访问",
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
+            PartitionSideRail(
+                partitions = partitionTabs,
+                selectedId = state.selectedPartition.id,
+                modifier = Modifier.width(92.dp),
+                contentPadding = PaddingValues(
+                    start = startPadding,
+                    top = topPadding + 8.dp,
+                    bottom = bottomPadding,
+                    end = 4.dp
+                ),
+                onPartitionSelected = viewModel::selectPartition
+            )
 
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { /* TODO: 编辑快捷访问 */ },
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                    ) {
+            PartitionVideoList(
+                state = state,
+                listState = listState,
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(
+                    start = 8.dp,
+                    top = topPadding + 8.dp,
+                    end = endPadding,
+                    bottom = bottomPadding
+                ),
+                onVideoClick = onVideoClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun PartitionSideRail(
+    partitions: List<PartitionCategory>,
+    selectedId: Int,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues,
+    onPartitionSelected: (PartitionCategory) -> Unit
+) {
+    LazyColumn(
+        modifier = modifier.fillMaxHeight(),
+        contentPadding = contentPadding,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        itemsIndexed(
+            items = partitions,
+            key = { _, partition -> partition.id }
+        ) { _, partition ->
+            PartitionSideRailItem(
+                partition = partition,
+                selected = partition.id == selectedId,
+                onClick = { onPartitionSelected(partition) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun PartitionSideRailItem(
+    partition: PartitionCategory,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    val selectedColor = MaterialTheme.colorScheme.primary
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .clip(AppShapes.container(ContainerLevel.Pill))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 4.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .width(4.dp)
+                .height(36.dp)
+                .clip(AppShapes.container(ContainerLevel.Pill))
+                .background(if (selected) selectedColor else Color.Transparent)
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = partition.name,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontSize = 16.sp,
+            lineHeight = 20.sp,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+            color = if (selected) selectedColor else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun PartitionVideoList(
+    state: PartitionFeedUiState,
+    listState: androidx.compose.foundation.lazy.LazyListState,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues,
+    onVideoClick: (VideoItem) -> Unit
+) {
+    when {
+        state.videos.isEmpty() && state.isLoading -> {
+            Box(modifier = modifier.fillMaxHeight()) {
+                CutePersonLoadingIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+        }
+        state.videos.isEmpty() && state.error != null -> {
+            Box(modifier = modifier.fillMaxHeight()) {
+                Text(
+                    text = state.error,
+                    modifier = Modifier.align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+        else -> {
+            LazyColumn(
+                state = listState,
+                modifier = modifier.fillMaxHeight(),
+                contentPadding = contentPadding,
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                itemsIndexed(
+                    items = state.videos,
+                    key = { index, video ->
+                        resolveIndexedVideoLazyKey(
+                            namespace = "partition_feed",
+                            index = index,
+                            bvid = video.bvid,
+                            id = video.id,
+                            aid = video.aid,
+                            cid = video.cid
+                        )
+                    }
+                ) { _, video ->
+                    PartitionVideoRow(
+                        video = video,
+                        onClick = { onVideoClick(video) }
+                    )
+                }
+
+                if (state.isLoading) {
+                    item(key = "partition_loading_more") {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = "+ 编辑",
-                                textAlign = TextAlign.Center,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            CutePersonLoadingIndicator(modifier = Modifier.size(24.dp))
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = "全部分区",
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
                 }
-            }
-
-            items(allPartitions) { partition ->
-                PartitionItem(
-                    partition = partition,
-                    onClick = { onPartitionClick(partition.id, partition.name) }
-                )
             }
         }
     }
 }
 
 /**
- *  分区项目
+ *  分区视频条目
  */
 @Composable
-private fun PartitionItem(
-    partition: PartitionCategory,
+private fun PartitionVideoRow(
+    video: VideoItem,
     onClick: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(onClick = onClick)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.Top
     ) {
-        // 图标
-        Text(
-            text = partition.emoji,
-            fontSize = 28.sp
-        )
-        
-        Spacer(modifier = Modifier.height(6.dp))
-        
-        // 名称
-        Text(
-            text = partition.name,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Normal,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        Box(
+            modifier = Modifier
+                .width(146.dp)
+                .aspectRatio(16f / 9f)
+                .clip(RoundedCornerShape(10.dp))
+                .background(AppSurfaceTokens.cardContainer())
+        ) {
+            AsyncImage(
+                model = FormatUtils.resolveVideoCoverUrl(video.pic, useLowQuality = true),
+                contentDescription = video.title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            if (video.duration > 0) {
+                Text(
+                    text = FormatUtils.formatDuration(video.duration),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(6.dp)
+                        .clip(AppShapes.container(ContainerLevel.Pill))
+                        .background(Color.Black.copy(alpha = 0.56f))
+                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    lineHeight = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .heightIn(min = 82.dp)
+                .padding(vertical = 2.dp)
+        ) {
+            Text(
+                text = video.title,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 16.sp,
+                lineHeight = 22.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = buildPartitionVideoMeta(video),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 13.sp,
+                lineHeight = 18.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
+}
+
+private fun buildPartitionVideoMeta(video: VideoItem): String {
+    val publishTime = FormatUtils.formatPublishTime(video.pubdate)
+    val ownerName = video.owner.name.ifBlank { video.tname }
+    val primaryStat = video.stat.view.takeIf { it > 0 }?.let { "播放 ${FormatUtils.formatStat(it.toLong())}" }
+    val secondaryStat = video.stat.danmaku.takeIf { it > 0 }?.let { "弹幕 ${FormatUtils.formatStat(it.toLong())}" }
+    return listOf(publishTime, ownerName, primaryStat, secondaryStat)
+        .filter { !it.isNullOrBlank() }
+        .joinToString("  ")
 }

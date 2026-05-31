@@ -1240,7 +1240,17 @@ fun HomeScreen(
                                         start = 16.dp,
                                         end = 16.dp
                                     ),
-                                    onPartitionClick = onCategoryClick
+                                    onVideoClick = { video ->
+                                        wrappedOnVideoClick(
+                                            HomeVideoClickRequest(
+                                                bvid = video.bvid,
+                                                cid = video.cid,
+                                                coverUrl = video.pic,
+                                                isVerticalVideo = video.isVertical,
+                                                source = HomeVideoClickSource.GRID
+                                            )
+                                        )
+                                    }
                                 )
                             }
                             is HomeTopTabEntry.Category -> {

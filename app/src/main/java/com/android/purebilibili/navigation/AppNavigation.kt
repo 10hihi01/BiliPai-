@@ -1918,8 +1918,8 @@ fun AppNavigation(
                             }
                         BiliPaiNavEntryContentRole.PARTITION -> com.android.purebilibili.feature.partition.PartitionScreen(
                                 onBack = { performSystemBackAction() },
-                                onPartitionClick = { id, name ->
-                                    pushNavigation3Key(BiliPaiNavKey.Category(tid = id, name = name))
+                                onVideoClick = { bvid, cid, cover ->
+                                    navigateToVideoInNavigation3(bvid, cid, cover)
                                 }
                             )
                         BiliPaiNavEntryContentRole.CATEGORY -> {
