@@ -970,7 +970,7 @@ private fun PortraitInlineVideoPlayerHost(
 
     Box(
         modifier = modifier
-            .width(animatedViewportWidth)
+            .fillMaxWidth()
             .height(animatedViewportHeight)
             .alpha(inlinePlayerAlpha)
             .graphicsLayer {

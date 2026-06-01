@@ -412,15 +412,11 @@ class BottomBarIndicatorPolicyTest {
         assertTrue(profile.exportPanelOffsetFraction > 0f)
         assertTrue(profile.indicatorPanelOffsetFraction > profile.exportPanelOffsetFraction)
         assertTrue(profile.visiblePanelOffsetFraction > 0f)
-        assertTrue(profile.forceChromaticAberration)
         assertTrue(profile.visibleSelectionEmphasis > 0.22f)
         assertTrue(profile.visibleSelectionEmphasis < 0.52f)
         assertTrue(profile.exportSelectionEmphasis > 0.45f)
         assertTrue(profile.exportSelectionEmphasis < 0.72f)
         assertTrue(profile.exportCaptureWidthScale > 1f)
-        assertTrue(profile.indicatorLensAmountScale > 1f)
-        assertTrue(profile.indicatorLensHeightScale > 1f)
-        assertTrue(profile.chromaticBoostScale > 1.4f)
     }
 
     @Test
@@ -442,10 +438,6 @@ class BottomBarIndicatorPolicyTest {
         assertEquals(profile.visibleSelectionEmphasis, effectiveProfile.visibleSelectionEmphasis, 0.001f)
         assertEquals(profile.exportSelectionEmphasis, effectiveProfile.exportSelectionEmphasis, 0.001f)
         assertEquals(profile.exportCaptureWidthScale, effectiveProfile.exportCaptureWidthScale, 0.001f)
-        assertEquals(profile.forceChromaticAberration, effectiveProfile.forceChromaticAberration)
-        assertEquals(profile.indicatorLensAmountScale, effectiveProfile.indicatorLensAmountScale, 0.001f)
-        assertEquals(profile.indicatorLensHeightScale, effectiveProfile.indicatorLensHeightScale, 0.001f)
-        assertEquals(profile.chromaticBoostScale, effectiveProfile.chromaticBoostScale, 0.001f)
     }
 
     @Test
@@ -661,8 +653,8 @@ class BottomBarIndicatorPolicyTest {
             motionSpec = resolveBottomBarMotionSpec(BottomBarMotionProfile.ANDROID_NATIVE_FLOATING)
         )
 
-        assertEquals(78f / 56f, transform.scaleX, 0.001f)
-        assertEquals(78f / 56f, transform.scaleY, 0.001f)
+        assertEquals(88f / 56f, transform.scaleX, 0.001f)
+        assertEquals(88f / 56f, transform.scaleY, 0.001f)
     }
 
     @Test
@@ -688,8 +680,8 @@ class BottomBarIndicatorPolicyTest {
 
         assertEquals(full.scaleX, partial.scaleX, 0.001f)
         assertEquals(full.scaleY, partial.scaleY, 0.001f)
-        assertEquals(78f / 56f, partial.scaleX, 0.001f)
-        assertEquals(78f / 56f, partial.scaleY, 0.001f)
+        assertEquals(88f / 56f, partial.scaleX, 0.001f)
+        assertEquals(88f / 56f, partial.scaleY, 0.001f)
         assertTrue(deformed.scaleX > partial.scaleX)
         assertTrue(deformed.scaleY < partial.scaleY)
     }
@@ -740,7 +732,7 @@ class BottomBarIndicatorPolicyTest {
 
     @Test
     fun `indicator velocity deformation follows KernelSU constants without changing drag scale target`() {
-        val baseScale = 78f / 56f
+        val baseScale = 88f / 56f
         val transform = resolveBottomBarIndicatorLayerTransform(
             motionProgress = 1f,
             velocityItemsPerSecond = 2f,
@@ -840,13 +832,9 @@ class BottomBarIndicatorPolicyTest {
         assertEquals(0f, profile.exportPanelOffsetFraction)
         assertEquals(0f, profile.indicatorPanelOffsetFraction)
         assertEquals(0f, profile.visiblePanelOffsetFraction)
-        assertFalse(profile.forceChromaticAberration)
         assertEquals(1f, profile.visibleSelectionEmphasis)
         assertEquals(1f, profile.exportSelectionEmphasis)
         assertEquals(1f, profile.exportCaptureWidthScale)
-        assertEquals(1f, profile.indicatorLensAmountScale)
-        assertEquals(1f, profile.indicatorLensHeightScale)
-        assertEquals(1f, profile.chromaticBoostScale)
     }
 
     @Test

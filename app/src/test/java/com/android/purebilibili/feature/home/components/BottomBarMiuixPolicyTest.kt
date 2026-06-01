@@ -78,13 +78,11 @@ class BottomBarMiuixPolicyTest {
     fun `android native floating branch uses sukisu three layer backdrop structure`() {
         val source = loadSource("app/src/main/java/com/android/purebilibili/feature/home/components/BottomBar.kt")
 
-        assertTrue(source.contains("val tabsBackdrop = rememberLayerBackdrop()"))
-        assertTrue(source.contains(".layerBackdrop(tabsBackdrop)"))
-        assertTrue(source.contains("rememberCombinedBackdrop(backdrop, tabsBackdrop)"))
+        assertTrue(source.contains("val tabsBackdrop = rememberMiuixLayerBackdrop()"))
+        assertTrue(source.contains(".miuixLayerBackdrop(tabsBackdrop)"))
+        assertTrue(source.contains("rememberMiuixCombinedBackdrop(miuixBackdrop, tabsBackdrop)"))
         assertTrue(source.contains("refractionHeight = materialSpec.shellRefractionHeightDp.dp.toPx()"))
         assertTrue(source.contains("refractionAmount = materialSpec.shellRefractionAmountDp.dp.toPx()"))
-        assertTrue(source.contains("depthEffect = true"))
-        assertTrue(source.contains("chromaticAberration = materialSpec.shellChromaticAberration"))
     }
 
     @Test
@@ -93,7 +91,7 @@ class BottomBarMiuixPolicyTest {
 
         assertTrue(
             Regex(
-                """rememberCombinedBackdrop\(backdrop, tabsBackdrop\)[\s\S]*?drawBackdrop\([\s\S]*?effects = \{[\s\S]*?lens\([\s\S]*?chromaticAberration = materialSpec\.shellChromaticAberration""",
+                """rememberMiuixCombinedBackdrop\(miuixBackdrop, tabsBackdrop\)[\s\S]*?miuixDrawBackdrop\([\s\S]*?effects = \{[\s\S]*?miuixLens\(""",
                 RegexOption.MULTILINE
             ).containsMatchIn(source)
         )

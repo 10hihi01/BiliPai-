@@ -15,7 +15,7 @@
 </p>
 
 <p>
-  <img src="https://img.shields.io/badge/Version-9.0.1-007AFF?style=flat-square&labelColor=ffffff" alt="Version 9.0.1" />
+  <img src="https://img.shields.io/badge/Version-9.0.2-007AFF?style=flat-square&labelColor=ffffff" alt="Version 9.0.2" />
   <img src="https://img.shields.io/badge/Android-8.0%2B-34C759?style=flat-square&logo=android&logoColor=white" alt="Android 8.0+" />
   <img src="https://img.shields.io/badge/Kotlin-100%25-7F52FF?style=flat-square&logo=kotlin&logoColor=white" alt="Kotlin" />
   <img src="https://img.shields.io/badge/License-GPL--3.0-FF3B30?style=flat-square" alt="GPL-3.0" />
@@ -182,8 +182,9 @@ cd BiliPai
 
 ## 最近更新
 
-当前仓库版本号已更新到 `9.0.1 / versionCode 214`。公开发布说明请以 [CHANGELOG.md](CHANGELOG.md) 为准；最新完整记录为 `v9.0.1`：
+当前仓库版本号已更新到 `9.0.2 / versionCode 215`。公开发布说明请以 [CHANGELOG.md](CHANGELOG.md) 为准；最新完整记录为 `v9.0.2`：
 
+- 应用打包版本、README 和更新日志同步到 `9.0.2 / versionCode 215`。
 - 视频卡片进入/退出详情页的共享元素动画统一走视觉策略，减少卡片、封面和播放器之间的形态跳变。
 - 分区、动态、稍后再看、空间、相关视频和首页视频卡片统一记录来源圆角，返回收尾时圆角不再突然弹回。
 - 手动封面、立即播放、普通横屏播放器、横屏全屏和竖屏/autoPortrait 场景各自使用稳定目标。

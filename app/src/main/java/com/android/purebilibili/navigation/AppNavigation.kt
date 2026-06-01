@@ -96,9 +96,9 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.CompositionLocalProvider
-// [LayerBackdrop] AndroidLiquidGlass for real background refraction
-import com.kyant.backdrop.backdrops.rememberLayerBackdrop
-import com.kyant.backdrop.backdrops.layerBackdrop
+// [LayerBackdrop] miuix-blur 用于全局底栏真实背景折射。
+import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop as rememberMiuixLayerBackdrop
+import top.yukonga.miuix.kmp.blur.layerBackdrop as miuixLayerBackdrop
 import com.android.purebilibili.core.ui.LocalSetBottomBarVisible
 import com.android.purebilibili.core.ui.LocalBottomBarVisible
 import com.android.purebilibili.core.ui.LocalGlobalWallpaperBackdropVisible
@@ -1013,7 +1013,7 @@ fun AppNavigation(
         // [LayerBackdrop] Create backdrop for bottom bar refraction effect.
         // Capture the wallpaper and navigation content together so transparent wallpaper-aware
         // pages feed the same background into the floating dock as Home.
-        val bottomBarBackdrop = rememberLayerBackdrop()
+        val bottomBarBackdrop = rememberMiuixLayerBackdrop()
 
         CompositionLocalProvider(
             LocalSetBottomBarVisible provides setBottomBarVisible,
@@ -1093,7 +1093,7 @@ fun AppNavigation(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .layerBackdrop(bottomBarBackdrop)
+                        .miuixLayerBackdrop(bottomBarBackdrop)
                         // [Fix] 将内容标记为全局底栏模糊的源
                         // 必须添加 hazeSource，否则底栏的 hazeEffect 无法获取背景内容，导致模糊失效
                         .then(if (mainHazeState != null) Modifier.hazeSource(mainHazeState) else Modifier)
@@ -2285,7 +2285,7 @@ fun AppNavigation(
                                     dynamicUnreadCount = dynamicUnreadCount,
                                     homeSettings = effectiveHomeSettings,
                                     scrollOffset = scrollOffsetState.floatValue,
-                                    backdrop = bottomBarBackdrop, // [LayerBackdrop] Real background refraction
+                                    miuixBackdrop = bottomBarBackdrop, // [LayerBackdrop] Real background refraction
                                     motionTier = com.android.purebilibili.core.ui.adaptive.MotionTier.Normal,
                                     isTransitionRunning = bottomPagerRenderBudget.isTransitionRunning,
                                     forceLowBlurBudget = bottomPagerRenderBudget.forceLowBlurBudget,
@@ -2318,7 +2318,7 @@ fun AppNavigation(
                                 dynamicUnreadCount = dynamicUnreadCount,
                                 homeSettings = effectiveHomeSettings,
                                 scrollOffset = scrollOffsetState.floatValue,
-                                backdrop = bottomBarBackdrop, // [LayerBackdrop] Real background refraction
+                                miuixBackdrop = bottomBarBackdrop, // [LayerBackdrop] Real background refraction
                                 motionTier = com.android.purebilibili.core.ui.adaptive.MotionTier.Normal,
                                 isTransitionRunning = bottomPagerRenderBudget.isTransitionRunning,
                                 forceLowBlurBudget = bottomPagerRenderBudget.forceLowBlurBudget,

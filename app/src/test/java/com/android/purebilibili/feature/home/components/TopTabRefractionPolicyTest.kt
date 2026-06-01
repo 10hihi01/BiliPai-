@@ -26,7 +26,7 @@ class TopTabRefractionPolicyTest {
         assertTrue(source.contains("(isLiquidGlassEnabled || backdrop != null)"))
         assertTrue(source.contains("val topTabContentBackdrop = rememberLayerBackdrop()"))
         assertTrue(source.contains("rememberCombinedBackdrop(backdrop, topTabContentBackdrop)"))
-        assertTrue(source.contains("contentBackdrop = topTabIndicatorContentBackdrop"))
+        assertTrue(source.contains("contentBackdrop = effectiveTopTabIndicatorContentBackdrop"))
         assertTrue(source.contains("indicatorHeight = 4.dp"))
     }
 
@@ -83,9 +83,8 @@ class TopTabRefractionPolicyTest {
         )
 
         assertTrue(profile.forceChromaticAberration)
-        assertTrue(profile.chromaticBoostScale > 1f)
-        assertTrue(profile.lensAmountScale > 1f)
-        assertTrue(profile.lensHeightScale > 1f)
+        assertEquals(1f, profile.lensAmountScale, 0.001f)
+        assertEquals(1f, profile.lensHeightScale, 0.001f)
     }
 
     @Test
@@ -97,7 +96,6 @@ class TopTabRefractionPolicyTest {
         )
 
         assertFalse(profile.forceChromaticAberration)
-        assertEquals(1f, profile.chromaticBoostScale, 0.001f)
         assertEquals(1f, profile.lensAmountScale, 0.001f)
         assertEquals(1f, profile.lensHeightScale, 0.001f)
         assertEquals(0f, profile.indicatorPanelOffsetFraction, 0.001f)
@@ -169,10 +167,8 @@ class TopTabRefractionPolicyTest {
             motionSpec = resolveBottomBarMotionSpec(BottomBarMotionProfile.IOS_FLOATING)
         )
 
-        assertEquals(bottom.indicatorLensAmountScale, top.lensAmountScale, 0.001f)
-        assertEquals(bottom.indicatorLensHeightScale, top.lensHeightScale, 0.001f)
-        assertEquals(bottom.chromaticBoostScale, top.chromaticBoostScale, 0.001f)
-        assertEquals(bottom.forceChromaticAberration, top.forceChromaticAberration)
+        assertEquals(1f, top.lensAmountScale, 0.001f)
+        assertEquals(1f, top.lensHeightScale, 0.001f)
         assertEquals(bottom.visibleSelectionEmphasis, top.visibleSelectionEmphasis, 0.001f)
         assertEquals(bottom.exportSelectionEmphasis, top.exportSelectionEmphasis, 0.001f)
         assertEquals(bottom.indicatorPanelOffsetFraction, top.indicatorPanelOffsetFraction, 0.001f)
@@ -195,8 +191,8 @@ class TopTabRefractionPolicyTest {
 
         assertEquals(bottom.scaleX, transform.scaleX, 0.001f)
         assertEquals(bottom.scaleY, transform.scaleY, 0.001f)
-        assertTrue(transform.scaleX > 1.5f)
-        assertTrue(transform.scaleY > 1.5f)
+        assertEquals(88f / 56f, transform.scaleX, 0.001f)
+        assertEquals(88f / 56f, transform.scaleY, 0.001f)
     }
 
     @Test
@@ -336,7 +332,6 @@ class TopTabRefractionPolicyTest {
         assertTrue(source.contains("val shouldUseMd3LiquidCapsule = effectiveRenderer == HomeTopTabRenderer.MD3"))
         assertTrue(source.contains("val shouldUseMd3DockBackedCapsule = effectiveRenderer == HomeTopTabRenderer.MD3"))
         assertTrue(source.contains("indicatorLayerScaleProgress = topTabIndicatorLayerScaleProgress"))
-        assertTrue(source.contains("refractionMotionProfile = topTabRefractionMotionProfile"))
         assertTrue(source.contains("indicatorHeight = dockIndicatorHeight"))
     }
 

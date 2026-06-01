@@ -1168,9 +1168,6 @@ private fun LightweightHomeTopTabs(
                             contentBackdrop = effectiveTopTabIndicatorContentBackdrop,
                             backdrop = effectiveTopTabIndicatorBackdrop,
                             indicatorLensSpec = topTabIndicatorLensSpec,
-                            refractionMotionProfile = topTabRefractionMotionProfile,
-                            indicatorHighlightAlpha = topTabIndicatorHighlightAlpha,
-                            indicatorGlowAlpha = topTabIndicatorGlowAlpha,
                             effectivePressProgress = topTabPressProgress,
                             indicatorIdleSurfaceColor = resolveIosTopTabCapsuleContainerColor(
                                 isDarkTheme = isDarkTheme,
@@ -1226,9 +1223,6 @@ private fun LightweightHomeTopTabs(
                         contentBackdrop = effectiveTopTabIndicatorContentBackdrop,
                         backdrop = effectiveTopTabIndicatorBackdrop,
                         indicatorLensSpec = topTabIndicatorLensSpec,
-                        refractionMotionProfile = topTabRefractionMotionProfile,
-                        indicatorHighlightAlpha = topTabIndicatorHighlightAlpha,
-                        indicatorGlowAlpha = topTabIndicatorGlowAlpha,
                         effectivePressProgress = topTabPressProgress,
                         indicatorIdleSurfaceColor = resolveAndroidNativeIdleIndicatorSurfaceColor(
                             darkTheme = isDarkTheme
@@ -1258,9 +1252,6 @@ private fun LightweightHomeTopTabs(
                         contentBackdrop = effectiveTopTabIndicatorContentBackdrop,
                         backdrop = effectiveTopTabIndicatorBackdrop,
                         indicatorLensSpec = topTabIndicatorLensSpec,
-                        refractionMotionProfile = topTabRefractionMotionProfile,
-                        indicatorHighlightAlpha = topTabIndicatorHighlightAlpha,
-                        indicatorGlowAlpha = topTabIndicatorGlowAlpha,
                         effectivePressProgress = topTabPressProgress,
                         indicatorIdleSurfaceColor = if (isDarkTheme) {
                             Color.White.copy(alpha = 0.1f)
@@ -1384,9 +1375,6 @@ private fun LightweightHomeTopTabs(
                             contentBackdrop = effectiveTopTabIndicatorContentBackdrop,
                             backdrop = effectiveTopTabIndicatorBackdrop,
                             indicatorLensSpec = topTabIndicatorLensSpec,
-                            refractionMotionProfile = topTabRefractionMotionProfile,
-                            indicatorHighlightAlpha = topTabIndicatorHighlightAlpha,
-                            indicatorGlowAlpha = topTabIndicatorGlowAlpha,
                             effectivePressProgress = topTabPressProgress,
                             indicatorIdleSurfaceColor = indicatorColor.copy(alpha = 0.42f),
                             glassEnabled = true,
@@ -2074,10 +2062,10 @@ internal fun resolveTopTabRefractionMotionProfile(
         motionSpec = bottomMotionSpec
     )
     return TopTabRefractionMotionProfile(
-        lensAmountScale = bottomProfile.indicatorLensAmountScale,
-        lensHeightScale = bottomProfile.indicatorLensHeightScale,
-        chromaticBoostScale = bottomProfile.chromaticBoostScale,
-        forceChromaticAberration = bottomProfile.forceChromaticAberration,
+        lensAmountScale = 1f,
+        lensHeightScale = 1f,
+        chromaticBoostScale = 1f,
+        forceChromaticAberration = bottomProfile.progress > 0.02f,
         visibleSelectionEmphasis = bottomProfile.visibleSelectionEmphasis,
         exportSelectionEmphasis = bottomProfile.exportSelectionEmphasis,
         indicatorPanelOffsetFraction = bottomProfile.indicatorPanelOffsetFraction,

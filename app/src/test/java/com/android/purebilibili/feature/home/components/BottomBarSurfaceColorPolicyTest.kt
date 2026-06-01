@@ -478,9 +478,6 @@ class BottomBarSurfaceColorPolicyTest {
         assertTrue(profile.visiblePanelOffsetFraction < profile.indicatorPanelOffsetFraction)
         assertTrue(profile.visibleSelectionEmphasis < 1f)
         assertTrue(profile.exportSelectionEmphasis < 1f)
-        assertTrue(profile.forceChromaticAberration)
-        assertTrue(profile.indicatorLensAmountScale > 1f)
-        assertTrue(profile.indicatorLensHeightScale > 1f)
     }
 
     @Test

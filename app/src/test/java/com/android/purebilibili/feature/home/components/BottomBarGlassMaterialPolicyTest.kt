@@ -71,11 +71,11 @@ class BottomBarGlassMaterialPolicyTest {
             pressProgress = 0f
         )
 
-        assertEquals(null, spec.blurRadiusDp)
+        assertEquals(4f, spec.blurRadiusDp)
         assertTrue(spec.vibrancy)
         assertEquals(24f, spec.shellRefractionHeightDp)
         assertEquals(24f, spec.shellRefractionAmountDp)
-        assertTrue(spec.shellChromaticAberration)
+        assertEquals(0f, spec.shellChromaticAberration)
         assertEquals(Color.Transparent, spec.foregroundTint)
         assertEquals(1f, spec.highlightWidthScale)
         assertEquals(1f, spec.shadowAlphaScale)
@@ -104,7 +104,7 @@ class BottomBarGlassMaterialPolicyTest {
         assertEquals(0f, light.shellRefractionHeightDp)
         assertEquals(0f, light.shellRefractionAmountDp)
         assertFalse(light.vibrancy)
-        assertFalse(light.shellChromaticAberration)
+        assertEquals(0f, light.shellChromaticAberration)
         val shader = light.shellShader
         assertNotNull(shader)
         assertEquals(11f, shader.thicknessDp)
