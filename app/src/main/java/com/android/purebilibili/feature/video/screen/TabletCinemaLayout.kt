@@ -63,7 +63,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -175,15 +175,11 @@ fun TabletCinemaLayout(
     val appContext = LocalContext.current
     val tabletCommentPanelWidthPreset by SettingsManager
         .getTabletCommentPanelWidthPreset(appContext)
-        .collectAsState(
-            initial = TabletCommentPanelWidthPreset.STANDARD,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = TabletCommentPanelWidthPreset.STANDARD
         )
     val commentMemberDecorationsEnabled by SettingsManager
         .getCommentMemberDecorationsEnabled(appContext)
-        .collectAsState(
-            initial = false,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = false
         )
     val policy = remember(configuration.screenWidthDp, tabletCommentPanelWidthPreset) {
         resolveTabletCinemaLayoutPolicy(
@@ -192,7 +188,7 @@ fun TabletCinemaLayout(
         )
     }
     val success = uiState as? PlayerUiState.Success
-    val downloadProgress by viewModel.downloadProgress.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val downloadProgress by viewModel.downloadProgress.collectAsStateWithLifecycle()
     val initialCurtainState = remember(configuration.screenWidthDp) {
         resolveInitialCurtainState(configuration.screenWidthDp).name
     }
@@ -822,9 +818,7 @@ private fun CinemaVideoIntroSection(
     val isDarkTheme = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     val videoAiSummaryEntryEnabled by com.android.purebilibili.core.store.SettingsManager
         .getVideoAiSummaryEntryEnabled(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
 
     Column(
@@ -868,9 +862,9 @@ private fun CinemaVideoIntroSection(
             )
         }
         val videoNoteEnabled by SettingsManager.getVideoNoteEnabled(context)
-            .collectAsState(initial = true)
+            .collectAsStateWithLifecycle(initialValue = true)
         val videoNoteDefaultCollapsed by SettingsManager.getVideoNoteDefaultCollapsed(context)
-            .collectAsState(initial = false)
+            .collectAsStateWithLifecycle(initialValue = false)
         if (shouldShowVideoNoteCard(videoNoteEnabled)) {
             VideoNoteCard(
                 noteState = success.videoNoteState,
@@ -907,7 +901,7 @@ private fun CinemaSideCurtain(
     onSearchKeywordClick: (String) -> Unit,
     onOpenBilibiliLink: ((String) -> Unit)?
 ) {
-    val subReplyState by commentViewModel.subReplyState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val subReplyState by commentViewModel.subReplyState.collectAsStateWithLifecycle()
     val transition = updateTransition(targetState = state, label = "SideCurtainAnimation")
     LaunchedEffect(subReplyState.visible) {
         if (subReplyState.visible) {

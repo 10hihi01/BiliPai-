@@ -204,8 +204,7 @@ fun AudioModeScreen(
     val sleepTimerMinutes by viewModel.sleepTimerMinutes.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val uiPreset = LocalUiPreset.current
-    val homeSettings by SettingsManager.getHomeSettings(context).collectAsState(
-        initial = HomeSettings(),
+    val homeSettings by SettingsManager.getHomeSettings(context).collectAsStateWithLifecycle(initialValue = HomeSettings(),
         context = kotlin.coroutines.EmptyCoroutineContext
     )
     val useLiquidPlayModeControl = remember(uiPreset, homeSettings.androidNativeLiquidGlassEnabled) {
@@ -221,7 +220,7 @@ fun AudioModeScreen(
     }
     
     //  投币对话框状态
-    val coinDialogVisible by viewModel.coinDialogVisible.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val coinDialogVisible by viewModel.coinDialogVisible.collectAsStateWithLifecycle()
     val currentCoinCount = (uiState as? PlayerUiState.Success)?.coinCount ?: 0
     
     //  缓存最后一次成功的状态，在加载时继续显示
@@ -309,9 +308,9 @@ fun AudioModeScreen(
                 val successState = displayState
                 
                 // ==================== 共享状态逻辑 ====================
-                val playlist by PlaylistManager.playlist.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-                val currentIndex by PlaylistManager.currentIndex.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-                val currentPlayMode by PlaylistManager.playMode.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+                val playlist by PlaylistManager.playlist.collectAsStateWithLifecycle()
+                val currentIndex by PlaylistManager.currentIndex.collectAsStateWithLifecycle()
+                val currentPlayMode by PlaylistManager.playMode.collectAsStateWithLifecycle()
                 
                 // 预加载相邻封面 - 使用 Coil 单例
                 val imageLoader = coil.Coil.imageLoader(context)
@@ -765,7 +764,7 @@ fun AudioModeScreen(
     }
     
     //  投币对话框
-    val userBalance by viewModel.userCoinBalance.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val userBalance by viewModel.userCoinBalance.collectAsStateWithLifecycle()
     CoinDialog(
         visible = coinDialogVisible,
         currentCoinCount = currentCoinCount,

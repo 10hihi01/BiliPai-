@@ -137,6 +137,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import com.android.purebilibili.data.model.response.VideoItem // [Fix] Import VideoItem
 import com.android.purebilibili.feature.home.components.VideoPreviewDialog // [Fix] Import VideoPreviewDialog
 import com.android.purebilibili.feature.partition.PartitionContent
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 // [新增] 全局回顶事件通道
 val LocalHomeScrollChannel = compositionLocalOf<Channel<Unit>?> { null }
@@ -194,8 +195,8 @@ fun HomeScreen(
     isQuickReturningFromVideoDetail: Boolean = false,
     onVideoDetailReturnAnimationConsumed: () -> Unit = {}
 ) {
-    val state by viewModel.uiState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-    val isRefreshing by viewModel.isRefreshing.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 // val pullRefreshState = rememberPullToRefreshState() // [Removed] Moved inside HorizontalPager
     val context = LocalContext.current
     val uiSkinState by rememberUiSkinState(context)
@@ -308,8 +309,7 @@ fun HomeScreen(
         }
     }
 
-    val homeTopTabSettings by SettingsManager.getHomeTopTabSettings(context).collectAsState(
-        initial = com.android.purebilibili.core.store.HomeTopTabSettings(),
+    val homeTopTabSettings by SettingsManager.getHomeTopTabSettings(context).collectAsStateWithLifecycle(initialValue = com.android.purebilibili.core.store.HomeTopTabSettings(),
         context = kotlin.coroutines.EmptyCoroutineContext
     )
     // 顶部标签顺序和可见项交给设置页控制；默认仍是六项。
@@ -448,7 +448,7 @@ fun HomeScreen(
 
     //  [新增] JSON 插件过滤提示
     val snackbarHostState = remember { SnackbarHostState() }
-    val lastFilteredCount by com.android.purebilibili.core.plugin.json.JsonPluginManager.lastFilteredCount.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val lastFilteredCount by com.android.purebilibili.core.plugin.json.JsonPluginManager.lastFilteredCount.collectAsStateWithLifecycle()
     
     //  当有视频被过滤时显示提示
     LaunchedEffect(lastFilteredCount) {
@@ -477,8 +477,7 @@ fun HomeScreen(
     // Create the state here and provide it
 
     //  [性能优化] 合并首页设置为单一 Flow，减少 6 个 collectAsState → 1 个
-    val homeSettings by SettingsManager.getHomeSettings(context).collectAsState(
-        initial = com.android.purebilibili.core.store.HomeSettings(),
+    val homeSettings by SettingsManager.getHomeSettings(context).collectAsStateWithLifecycle(initialValue = com.android.purebilibili.core.store.HomeSettings(),
         context = kotlin.coroutines.EmptyCoroutineContext
     )
     val uiPreset = LocalUiPreset.current
@@ -679,14 +678,10 @@ fun HomeScreen(
     val isLiquidGlassEnabled = homePerformanceConfig.isAnyLiquidGlassEnabled
     val isDataSaverActive = homePerformanceConfig.isDataSaverActive
     val preloadAheadCount = homePerformanceConfig.preloadAheadCount
-    val configuredHomeWallpaperUri by SettingsManager.getHomeWallpaperUri(context).collectAsState(
-        initial = "",
-        context = kotlin.coroutines.EmptyCoroutineContext
-    )
-    val splashWallpaperUri by SettingsManager.getSplashWallpaperUri(context).collectAsState(
-        initial = "",
-        context = kotlin.coroutines.EmptyCoroutineContext
-    )
+    val configuredHomeWallpaperUri by SettingsManager.getHomeWallpaperUri(context).collectAsStateWithLifecycle(initialValue = ""
+        )
+    val splashWallpaperUri by SettingsManager.getSplashWallpaperUri(context).collectAsStateWithLifecycle(initialValue = ""
+        )
     val homeWallpaperUri = remember(configuredHomeWallpaperUri, splashWallpaperUri) {
         resolveHomeWallpaperUri(
             homeWallpaperUri = configuredHomeWallpaperUri,
@@ -694,8 +689,7 @@ fun HomeScreen(
         )
     }
 
-    val appNavigationSettings by SettingsManager.getAppNavigationSettings(context).collectAsState(
-        initial = AppNavigationSettings(),
+    val appNavigationSettings by SettingsManager.getAppNavigationSettings(context).collectAsStateWithLifecycle(initialValue = AppNavigationSettings(),
         context = kotlin.coroutines.EmptyCoroutineContext
     )
     // 将字符串 ID 转换为 BottomNavItem 枚举
@@ -1491,6 +1485,7 @@ fun HomeScreen(
                                      val skeletonItemCount = gridColumns * 5
                                      items(
                                          count = skeletonItemCount,
+                                         key = { it },
                                          contentType = { "home_feed_skeleton_card" }
                                      ) {
                                          HomeFeedSkeletonCard(

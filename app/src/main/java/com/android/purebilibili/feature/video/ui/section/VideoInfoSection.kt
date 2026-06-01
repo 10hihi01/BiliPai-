@@ -76,6 +76,7 @@ import com.android.purebilibili.feature.home.components.cards.ElegantVideoCard
 import com.android.purebilibili.feature.video.ui.components.ShimmerContainer
 import com.android.purebilibili.feature.video.ui.components.SkeletonBox
 import kotlinx.coroutines.delay
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 internal const val VIDEO_DESCRIPTION_URL_TAG = "VIDEO_DESCRIPTION_URL"
 private val VIDEO_DESCRIPTION_URL_PATTERN =
@@ -281,9 +282,7 @@ fun VideoTitleWithDesc(
     val context = LocalContext.current
     val defaultExpanded by com.android.purebilibili.core.store.SettingsManager
         .getVideoInfoDefaultExpanded(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     var expanded by remember(info.bvid, info.desc, videoTags.size, defaultExpanded) {
         mutableStateOf(

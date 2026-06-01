@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 // Enums
 enum class LoginMethod {
@@ -39,7 +40,7 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onClose: () -> Unit
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     // Handle navigation when login is successful
     LaunchedEffect(state) {

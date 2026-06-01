@@ -62,6 +62,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 
 private const val NOTIFICATION_ID = 1001
@@ -887,9 +888,7 @@ fun rememberVideoPlayerState(
     }
     val playbackCompletionBehavior by SettingsManager
         .getPlaybackCompletionBehavior(context)
-        .collectAsState(
-            initial = PlaybackCompletionBehavior.CONTINUE_CURRENT_LOGIC,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = PlaybackCompletionBehavior.CONTINUE_CURRENT_LOGIC
         )
     LaunchedEffect(player, playbackCompletionBehavior) {
         player.repeatMode = resolvePlaybackCompletionRepeatMode(playbackCompletionBehavior)
@@ -915,7 +914,7 @@ fun rememberVideoPlayerState(
         VideoPlayerState(context, player, scope)
     }
 
-    val uiState by viewModel.uiState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(uiState) {
         if (uiState is PlayerUiState.Success) {
             val info = (uiState as PlayerUiState.Success).info

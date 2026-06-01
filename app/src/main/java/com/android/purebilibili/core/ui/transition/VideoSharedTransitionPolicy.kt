@@ -23,6 +23,7 @@ internal enum class VideoSharedTransitionTargetMode {
 internal const val VIDEO_SHARED_COVER_ASPECT_RATIO = 16f / 10f
 private const val HOME_SOURCE_ROUTE = "home"
 private const val HOME_SHARED_TRANSITION_DURATION_MILLIS = 360
+internal const val FULLSCREEN_SHARED_TRANSITION_DURATION_MILLIS = 420
 private const val HOME_DETAIL_REVEAL_DELAY_MILLIS = 40
 private const val HOME_DETAIL_REVEAL_DURATION_MILLIS = 220
 private const val HOME_DETAIL_REVEAL_SLIDE_OFFSET_DP = 14
@@ -34,6 +35,8 @@ private const val DEFAULT_VIDEO_PLAYER_CORNER_DP = 12
 private const val DYNAMIC_VIDEO_CARD_CORNER_DP = 10
 private const val WATCH_LATER_VIDEO_CARD_CORNER_DP = 8
 private val VIDEO_CARD_IOS_LIKE_EASE_OUT = CubicBezierEasing(0.16f, 1f, 0.3f, 1f)
+internal val VIDEO_RETURN_CROSSFADE_EASING: Easing = CubicBezierEasing(0.22f, 1f, 0.36f, 1f)
+internal val VIDEO_RETURN_FADE_OUT_EASING: Easing = CubicBezierEasing(0.32f, 0f, 0.67f, 0f)
 
 internal data class VideoSharedTransitionOwnership(
     val useCoverSharedBounds: Boolean,

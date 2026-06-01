@@ -27,7 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -396,8 +396,7 @@ fun BottomBarLiquidSegmentedControl(
     val uiPreset = LocalUiPreset.current
     val homeSettings by SettingsManager
         .getHomeSettings(context)
-        .collectAsState(
-            initial = HomeSettings(),
+        .collectAsStateWithLifecycle(initialValue = HomeSettings(),
             context = kotlin.coroutines.EmptyCoroutineContext
         )
     val effectiveAndroidNativeLiquidGlassEnabled =

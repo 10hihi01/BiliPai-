@@ -30,7 +30,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,7 +66,7 @@ fun TopicDetailScreen(
     onLiveClick: (Long, String, String) -> Unit,
     onDynamicDetailClick: (String) -> Unit
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val context = LocalContext.current
 
@@ -122,7 +122,7 @@ fun TopicDetailScreen(
                         item {
                             TopicHeaderCard(details = state.details)
                         }
-                        itemsIndexed(state.items) { index, item ->
+                        itemsIndexed(state.items, key = { _, item -> item.id_str }) { index, item ->
                             DynamicCardV2(
                                 item = item,
                                 onVideoClick = onVideoClick,

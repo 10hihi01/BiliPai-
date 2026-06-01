@@ -99,7 +99,7 @@ private fun TimelineView(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(days.size) { index ->
+            items(days.size, key = { index -> days[index].date }) { index ->
                 val day = days[index]
                 DayChip(
                     day = day,

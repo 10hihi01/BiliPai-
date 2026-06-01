@@ -35,6 +35,7 @@ import com.android.purebilibili.feature.video.ui.components.resolveVisibleSubRep
 import com.android.purebilibili.feature.video.ui.components.shouldShowInlineSubReplyToggle
 import io.github.alexzhirkevich.cupertino.icons.CupertinoIcons
 import io.github.alexzhirkevich.cupertino.icons.outlined.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun DynamicCommentOverlayHost(
@@ -43,11 +44,11 @@ fun DynamicCommentOverlayHost(
     secondaryItems: List<DynamicItem> = emptyList(),
     toastContext: Context
 ) {
-    val selectedDynamicId by viewModel.selectedDynamicId.collectAsState()
-    val comments by viewModel.comments.collectAsState()
-    val commentsLoading by viewModel.commentsLoading.collectAsState()
-    val subReplyState by viewModel.subReplyState.collectAsState()
-    val liveCommentCount by viewModel.commentTotalCount.collectAsState()
+    val selectedDynamicId by viewModel.selectedDynamicId.collectAsStateWithLifecycle()
+    val comments by viewModel.comments.collectAsStateWithLifecycle()
+    val commentsLoading by viewModel.commentsLoading.collectAsStateWithLifecycle()
+    val subReplyState by viewModel.subReplyState.collectAsStateWithLifecycle()
+    val liveCommentCount by viewModel.commentTotalCount.collectAsStateWithLifecycle()
     val inspectionMode = LocalInspectionMode.current
 
     if (!selectedDynamicId.isNullOrBlank()) {
@@ -177,7 +178,7 @@ fun DynamicCommentSheet(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(comments) { reply ->
+                    items(comments, key = { it.rpid }) { reply ->
                         CommentItem(
                             reply = reply,
                             onViewReplies = onViewReplies

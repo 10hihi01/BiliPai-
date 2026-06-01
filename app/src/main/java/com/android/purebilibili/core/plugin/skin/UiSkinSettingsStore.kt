@@ -3,7 +3,7 @@ package com.android.purebilibili.core.plugin.skin
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -65,5 +65,5 @@ object UiSkinSettingsStore {
 
 @Composable
 fun rememberUiSkinState(context: Context): State<UiSkinState> {
-    return UiSkinSettingsStore.observe(context).collectAsState(initial = UiSkinState())
+    return UiSkinSettingsStore.observe(context).collectAsStateWithLifecycle(initialValue = UiSkinState())
 }

@@ -4,7 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -75,7 +75,7 @@ fun rememberEffectiveEntranceMotionSpec(): EntranceMotionSpec {
         resolveDeviceUiProfile(widthSizeClass).motionTier
     }
     val appEnabled by SettingsManager.getUiEntranceAnimationEnabled(context)
-        .collectAsState(initial = true)
+        .collectAsStateWithLifecycle(initialValue = true)
     val reduceMotion = rememberSystemReduceMotion()
     return remember(deviceTier, appEnabled, reduceMotion) {
         resolveEffectiveEntranceMotionSpec(

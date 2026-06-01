@@ -43,6 +43,7 @@ import com.android.purebilibili.core.ui.rememberAppBackIcon
 import io.github.alexzhirkevich.cupertino.icons.CupertinoIcons
 import io.github.alexzhirkevich.cupertino.icons.outlined.Info
 import io.github.alexzhirkevich.cupertino.icons.filled.CheckmarkCircle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  *  应用图标设置二级页面
@@ -106,7 +107,7 @@ fun IconSettingsScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val screenTitle = stringResource(R.string.icon_settings_title)
     val backLabel = stringResource(R.string.common_back)
     
@@ -224,7 +225,7 @@ fun IconSettingsContent(
                     )
                 }
 
-                items(group.icons) { option ->
+                items(group.icons, key = { it.key }) { option ->
                     val isSelected = state.appIcon == option.key
                     
                     Column(

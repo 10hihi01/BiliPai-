@@ -29,7 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -73,7 +73,7 @@ fun SettingsShareScreen(
     val importConfirmLabel = stringResource(R.string.settings_share_import_confirm)
     val viewSkippedLabel = stringResource(R.string.settings_share_view_skipped)
     val cancelLabel = stringResource(R.string.common_cancel)
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val hazeState = com.android.purebilibili.core.ui.blur.rememberRecoverableHazeState()
     val scrollOffset by remember {

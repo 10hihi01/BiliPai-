@@ -35,7 +35,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,7 +59,7 @@ fun SearchTrendingScreen(
     onKeywordClick: (String) -> Unit,
     viewModel: SearchTrendingViewModel = viewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullToRefreshState()
 
     Scaffold(
@@ -128,7 +128,7 @@ fun SearchTrendingScreen(
                     item {
                         SearchTrendingHero()
                     }
-                    itemsIndexed(state.items) { index, item ->
+                    itemsIndexed(state.items, key = { index, item -> "${index}_${item.keyword}" }) { index, item ->
                         SearchTrendingRow(
                             index = index,
                             item = item,

@@ -38,6 +38,7 @@ import com.android.purebilibili.feature.video.viewmodel.VideoCommentViewModel
 import com.android.purebilibili.feature.bangumi.ui.player.BangumiPlayerView
 import com.android.purebilibili.feature.bangumi.ui.player.BangumiPlayerContent
 import com.android.purebilibili.feature.bangumi.ui.player.BangumiErrorContent
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  * 番剧播放页面
@@ -58,9 +59,9 @@ fun BangumiPlayerScreen(
     val context = LocalContext.current
     val view = LocalView.current
     val configuration = LocalConfiguration.current
-    val uiState by viewModel.uiState.collectAsState()
-    val coinDialogVisible by viewModel.coinDialogVisible.collectAsState()
-    val userCoinBalance by viewModel.userCoinBalance.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val coinDialogVisible by viewModel.coinDialogVisible.collectAsStateWithLifecycle()
+    val userCoinBalance by viewModel.userCoinBalance.collectAsStateWithLifecycle()
     val successState = uiState as? BangumiPlayerState.Success
     val currentEpisodeIdForDebug = successState?.currentEpisode?.id ?: epId
     val currentCidForDebug = successState?.currentEpisode?.cid ?: 0L
@@ -77,11 +78,11 @@ fun BangumiPlayerScreen(
     val latestPlaybackDebugSnapshot by rememberUpdatedState(playbackDebugSnapshot)
     
     //  空降助手状态
-    val sponsorSegment by viewModel.currentSponsorSegment.collectAsState()
-    val showSponsorSkipButton by viewModel.showSkipButton.collectAsState()
+    val sponsorSegment by viewModel.currentSponsorSegment.collectAsStateWithLifecycle()
+    val showSponsorSkipButton by viewModel.showSkipButton.collectAsStateWithLifecycle()
     val sponsorBlockEnabled by com.android.purebilibili.core.store.SettingsManager
         .getSponsorBlockEnabled(context)
-        .collectAsState(initial = false)
+        .collectAsStateWithLifecycle(initialValue = false)
     
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     val statusBarsInsetTop = WindowInsets.statusBars
@@ -227,7 +228,7 @@ fun BangumiPlayerScreen(
     val scope = rememberCoroutineScope()  //  用于弹幕开关和设置保存
     val danmakuSettings by com.android.purebilibili.core.store.SettingsManager
         .getDanmakuSettings(context, activeDanmakuScope)
-        .collectAsState(initial = com.android.purebilibili.core.store.DanmakuSettings())
+        .collectAsStateWithLifecycle(initialValue = com.android.purebilibili.core.store.DanmakuSettings())
     val danmakuEnabled = danmakuSettings.enabled
     
     //  倍速状态
@@ -288,8 +289,7 @@ fun BangumiPlayerScreen(
     val currentAid = (uiState as? BangumiPlayerState.Success)?.currentEpisode?.aid ?: 0L
     val defaultCommentSortMode by com.android.purebilibili.core.store.SettingsManager
         .getCommentDefaultSortMode(context)
-        .collectAsState(
-            initial = com.android.purebilibili.core.store.SettingsManager.getCommentDefaultSortModeSync(context),
+        .collectAsStateWithLifecycle(initialValue = com.android.purebilibili.core.store.SettingsManager.getCommentDefaultSortModeSync(context),
             context = kotlin.coroutines.EmptyCoroutineContext
         )
     val preferredCommentSortMode = remember(defaultCommentSortMode) {

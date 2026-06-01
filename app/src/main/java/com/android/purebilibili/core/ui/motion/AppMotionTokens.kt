@@ -86,11 +86,11 @@ object AppMotionTokens {
 
     private const val IOS_STANDARD_DAMPING = 0.86f
     private const val IOS_STANDARD_STIFFNESS = 380f
-    private const val SPATIAL_DAMPING = 0.82f
-    private const val SPATIAL_STIFFNESS = 380f
     private const val IOS_EMPHASIZED_STIFFNESS = 280f
     private const val IOS_EXPRESSIVE_DAMPING = 0.72f
     private const val IOS_EXPRESSIVE_STIFFNESS = 520f
+    private const val SHARED_TRANSITION_DURATION_MILLIS = 360
+    private val SHARED_TRANSITION_EASING: Easing = CubicBezierEasing(0.16f, 1f, 0.3f, 1f)
 
     fun <T> resolveStandardSpec(
         uiPreset: UiPreset,
@@ -146,13 +146,13 @@ object AppMotionTokens {
         )
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun <T> resolveSpatialSpec(
         uiPreset: UiPreset,
         androidNativeVariant: AndroidNativeVariant
-    ): FiniteAnimationSpec<T> = spring(
-        // 共享元素空间变换先保持旧空间弹簧参数，避免 token 收敛改变返回手感。
-        dampingRatio = SPATIAL_DAMPING,
-        stiffness = SPATIAL_STIFFNESS
+    ): FiniteAnimationSpec<T> = tween(
+        durationMillis = SHARED_TRANSITION_DURATION_MILLIS,
+        easing = SHARED_TRANSITION_EASING
     )
 
     @Composable
@@ -173,8 +173,8 @@ object AppMotionTokens {
         androidNativeVariant = LocalAndroidNativeVariant.current
     )
 
-    fun <T> spatialSpec(): FiniteAnimationSpec<T> = resolveSpatialSpec(
-        uiPreset = UiPreset.IOS,
-        androidNativeVariant = AndroidNativeVariant.MATERIAL3
+    fun <T> spatialSpec(): FiniteAnimationSpec<T> = tween(
+        durationMillis = SHARED_TRANSITION_DURATION_MILLIS,
+        easing = SHARED_TRANSITION_EASING
     )
 }

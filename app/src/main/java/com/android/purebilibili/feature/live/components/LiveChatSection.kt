@@ -46,6 +46,7 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  * 直播聊天区域组件
@@ -245,7 +246,7 @@ private fun ChatMessageItem(
         palette.primaryText.copy(alpha = tokens.nameAlpha)
     }
     val bodyColor = if (isOverlay) Color.White else palette.primaryText
-    val emoticonMap by DanmakuEmoticonMapper.emoticonMap.collectAsState()
+    val emoticonMap by DanmakuEmoticonMapper.emoticonMap.collectAsStateWithLifecycle()
     val replyColor = if (isOverlay) Color(0xFF8FD5FF) else palette.accent
 
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {

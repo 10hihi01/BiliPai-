@@ -376,7 +376,7 @@ fun BangumiGrid(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier.fillMaxSize()
     ) {
-        items(items) { item ->
+        items(items, key = { it.seasonId }) { item ->
             BangumiCard(
                 item = item,
                 onClick = { onItemClick(item) }

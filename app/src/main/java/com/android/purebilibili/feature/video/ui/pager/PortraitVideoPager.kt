@@ -38,7 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -235,23 +235,17 @@ fun PortraitVideoPager(
     val danmakuSmartOcclusion = danmakuSettings.smartOcclusion
     val autoPlayEnabled by SettingsManager
         .getAutoPlay(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     val externalPlaylistAutoContinueEnabled by SettingsManager
         .getExternalPlaylistAutoContinue(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     val playbackCompletionBehavior by SettingsManager
         .getPlaybackCompletionBehavior(context)
-        .collectAsState(
-            initial = PlaybackCompletionBehavior.CONTINUE_CURRENT_LOGIC,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = PlaybackCompletionBehavior.CONTINUE_CURRENT_LOGIC
         )
-    val isExternalPlaylist by PlaylistManager.isExternalPlaylist.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val isExternalPlaylist by PlaylistManager.isExternalPlaylist.collectAsStateWithLifecycle()
     val recommendationShuffleSeed = remember(initialInfo.bvid, initialInfo.aid) {
         resolvePortraitRecommendationShuffleSeed(
             initialBvid = initialInfo.bvid,
@@ -1023,14 +1017,10 @@ private fun VideoPageItem(
     var playerViewRef by remember { mutableStateOf<PlayerView?>(null) }
     val longPressSpeed by SettingsManager
         .getLongPressSpeed(context)
-        .collectAsState(
-            initial = 2.0f,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = 2.0f
         )
-    val currentAudioQuality by viewModel.audioQualityPreference.collectAsState(
-        initial = -1,
-        context = kotlin.coroutines.EmptyCoroutineContext
-    )
+    val currentAudioQuality by viewModel.audioQualityPreference.collectAsStateWithLifecycle(initialValue = -1
+        )
     val bvid = if (item is ViewInfo) item.bvid else (item as RelatedVideo).bvid
     val aid = if (item is ViewInfo) item.aid else (item as RelatedVideo).aid
     
@@ -1863,13 +1853,13 @@ private fun VideoPageItem(
         }
 
         // Overlay & Interaction
-    val currentUiState = viewModel.uiState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext).value
+    val currentUiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val isCurrentModelVideo = (currentUiState as? PlayerUiState.Success)?.info?.bvid == bvid
     val currentSuccess = currentUiState as? PlayerUiState.Success
     var portraitInteractionOverride by remember(bvid) {
         mutableStateOf(PortraitVideoInteractionOverride())
     }
-    val favoriteSaveEvent by viewModel.favoriteFolderSaveEvent.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val favoriteSaveEvent by viewModel.favoriteFolderSaveEvent.collectAsStateWithLifecycle()
     var consumedFavoriteSaveEventVersion by remember(bvid) { mutableLongStateOf(0L) }
     val stat = if (item is ViewInfo) item.stat else (item as RelatedVideo).stat
     val resolvedInteractionState = resolvePortraitVideoInteractionUiState(
@@ -2213,18 +2203,16 @@ private fun VideoPageItem(
         )
 
         if (isCurrentPage) {
-            val showCommentInput by viewModel.showCommentDialog.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-            val isSendingComment by viewModel.isSendingComment.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-            val replyingToComment by viewModel.replyingToComment.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-            val emotePackages by viewModel.emotePackages.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-            val mentionSearchState by viewModel.commentMentionSearchState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-            val commentState by commentViewModel.commentState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+            val showCommentInput by viewModel.showCommentDialog.collectAsStateWithLifecycle()
+            val isSendingComment by viewModel.isSendingComment.collectAsStateWithLifecycle()
+            val replyingToComment by viewModel.replyingToComment.collectAsStateWithLifecycle()
+            val emotePackages by viewModel.emotePackages.collectAsStateWithLifecycle()
+            val mentionSearchState by viewModel.commentMentionSearchState.collectAsStateWithLifecycle()
+            val commentState by commentViewModel.commentState.collectAsStateWithLifecycle()
             val commentFraudDetectionEnabled by com.android.purebilibili.core.store.SettingsManager
                 .getCommentFraudDetectionEnabled(context)
-                .collectAsState(
-                    initial = true,
-                    context = kotlin.coroutines.EmptyCoroutineContext
-                )
+                .collectAsStateWithLifecycle(initialValue = true
+        )
 
             LaunchedEffect(aid, commentFraudDetectionEnabled) {
                 viewModel.commentSentEvent.collect { reply ->

@@ -23,6 +23,7 @@ import com.android.purebilibili.data.model.response.UgcSeason
 import io.github.alexzhirkevich.cupertino.icons.CupertinoIcons
 import io.github.alexzhirkevich.cupertino.icons.outlined.ChevronForward
 import io.github.alexzhirkevich.cupertino.icons.outlined.Folder
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  *  视频合集展示行
@@ -49,9 +50,7 @@ fun CollectionRow(
     }
     val sortMode by SettingsManager
         .getCollectionSortMode(context, collectionSubscriptionId)
-        .collectAsState(
-            initial = CollectionSortMode.ASCENDING,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = CollectionSortMode.ASCENDING
         )
 
     // 计算当前视频在合集中的位置

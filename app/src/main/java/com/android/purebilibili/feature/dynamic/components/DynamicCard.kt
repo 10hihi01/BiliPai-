@@ -54,6 +54,7 @@ import com.android.purebilibili.data.model.response.OpusContentBlock
 import com.android.purebilibili.feature.dynamic.DynamicDeleteAction
 import com.android.purebilibili.feature.dynamic.resolveDynamicDeleteAction
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  *  动态卡片V2 - 官方风格
@@ -84,7 +85,7 @@ fun DynamicCardV2(
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
     val dynamicPreviewTextVisible by SettingsManager.getDynamicImagePreviewTextVisible(context)
-        .collectAsState(initial = true)
+        .collectAsStateWithLifecycle(initialValue = true)
     val authorTimeText = remember(author?.pub_time, author?.pub_ts) {
         author?.let {
             resolveDynamicAuthorTimeText(

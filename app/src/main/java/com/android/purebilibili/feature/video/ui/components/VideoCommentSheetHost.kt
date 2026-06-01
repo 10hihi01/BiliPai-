@@ -44,7 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -251,19 +251,16 @@ fun VideoCommentSheetHost(
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
-    val commentState by commentViewModel.commentState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-    val subReplyState by commentViewModel.subReplyState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val commentState by commentViewModel.commentState.collectAsStateWithLifecycle()
+    val subReplyState by commentViewModel.subReplyState.collectAsStateWithLifecycle()
     val defaultSortMode by com.android.purebilibili.core.store.SettingsManager
         .getCommentDefaultSortMode(context)
-        .collectAsState(
-            initial = com.android.purebilibili.core.store.SettingsManager.getCommentDefaultSortModeSync(context),
+        .collectAsStateWithLifecycle(initialValue = com.android.purebilibili.core.store.SettingsManager.getCommentDefaultSortModeSync(context),
             context = kotlin.coroutines.EmptyCoroutineContext
         )
     val commentMemberDecorationsEnabled by com.android.purebilibili.core.store.SettingsManager
         .getCommentMemberDecorationsEnabled(context)
-        .collectAsState(
-            initial = false,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = false
         )
     val preferredSortMode = remember(defaultSortMode) {
         CommentSortMode.fromApiMode(defaultSortMode)
@@ -672,7 +669,7 @@ internal fun VideoCommentMainList(
     maxTimestampMs: Long?,
     onImagePreview: (List<String>, Int, Rect?, ImagePreviewTextContent?) -> Unit
 ) {
-    val state by viewModel.commentState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val state by viewModel.commentState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val appearance = rememberVideoCommentAppearance()

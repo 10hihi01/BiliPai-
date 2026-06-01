@@ -869,7 +869,7 @@ fun PagesSelector(
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(pages.size) { index ->
+                items(pages.size, key = { index -> pages[index].cid }) { index ->
                     val page = pages[index]
                     val isSelected = index == currentPageIndex
                     

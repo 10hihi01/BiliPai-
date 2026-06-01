@@ -242,7 +242,7 @@ fun SeasonSelector(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(seasons) { season ->
+            items(seasons, key = { it.seasonId }) { season ->
                 val isCurrentSeason = season.seasonId == currentSeasonId
                 Surface(
                     modifier = Modifier.clickable {
@@ -381,7 +381,7 @@ fun EpisodePreviewRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
     ) {
-        items(previewEpisodes) { episode ->
+        items(previewEpisodes, key = { it.id }) { episode ->
             EpisodeChip(
                 episode = episode,
                 onClick = { onEpisodeClick(episode) }

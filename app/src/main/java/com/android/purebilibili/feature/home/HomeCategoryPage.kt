@@ -55,6 +55,7 @@ import androidx.compose.ui.Alignment
 import coil.compose.AsyncImage
 import java.io.File
 import kotlinx.coroutines.yield
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 internal fun resolveHomeCategoryVideoGridKey(
     video: VideoItem,
@@ -159,9 +160,7 @@ internal fun HomeCategoryPageContent(
     val context = LocalContext.current
     val showOnlineCount by SettingsManager
         .getShowOnlineCount(context)
-        .collectAsState(
-            initial = false,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = false
         )
     TrackScrollJank(
         scrollableState = gridState,

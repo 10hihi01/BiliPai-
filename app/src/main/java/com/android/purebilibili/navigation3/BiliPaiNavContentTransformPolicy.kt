@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import com.android.purebilibili.core.ui.motion.AppMotionEasing
 
 private const val NAV3_FALLBACK_FADE_MILLIS = 180
 private const val NAV3_DISABLED_VIDEO_DIRECTION_MILLIS = 220
@@ -53,18 +54,18 @@ internal fun resolveBiliPaiNavPopContentTransform(
 private fun disabledVideoDirectionForwardTransform(directionSign: Int): ContentTransform {
     return (
         slideInHorizontally(
-            animationSpec = tween(NAV3_DISABLED_VIDEO_DIRECTION_MILLIS),
+            animationSpec = tween(NAV3_DISABLED_VIDEO_DIRECTION_MILLIS, easing = AppMotionEasing.EmphasizedEnter),
             initialOffsetX = { width -> directionSign * width / 4 }
-        ) + fadeIn(animationSpec = tween(NAV3_DISABLED_VIDEO_DIRECTION_MILLIS))
+        ) + fadeIn(animationSpec = tween(NAV3_DISABLED_VIDEO_DIRECTION_MILLIS, easing = AppMotionEasing.EmphasizedEnter))
     ) togetherWith fadeOut(animationSpec = tween(NAV3_DISABLED_VIDEO_DIRECTION_MILLIS))
 }
 
 private fun spaceForwardTransform(): ContentTransform {
     return (
         slideInHorizontally(
-            animationSpec = tween(NAV3_SPACE_FORWARD_MILLIS),
+            animationSpec = tween(NAV3_SPACE_FORWARD_MILLIS, easing = AppMotionEasing.EmphasizedEnter),
             initialOffsetX = { width -> width / 8 }
-        ) + fadeIn(animationSpec = tween(NAV3_SPACE_FORWARD_MILLIS))
+        ) + fadeIn(animationSpec = tween(NAV3_SPACE_FORWARD_MILLIS, easing = AppMotionEasing.EmphasizedEnter))
     ) togetherWith fadeOut(animationSpec = tween(NAV3_FALLBACK_FADE_MILLIS))
 }
 

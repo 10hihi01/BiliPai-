@@ -58,6 +58,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +71,7 @@ fun ChatScreen(
     onOpenBilibiliLink: (String) -> Unit = {},
     viewModel: ChatViewModel = viewModel(factory = ChatViewModel.Factory(talkerId, sessionType))
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var inputText by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
     var pendingWithdrawMessage by remember { mutableStateOf<PrivateMessageItem?>(null) }

@@ -71,6 +71,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.Request
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 internal suspend fun dispatchBuiltInPluginToggle(
     pluginId: String,
@@ -118,8 +119,8 @@ fun PluginsScreen(
     initialImportUrl: String? = null
 ) {
     // Top-level state for managing plugins and editing
-    val plugins by PluginManager.pluginsFlow.collectAsState()
-    val jsonPlugins by com.android.purebilibili.core.plugin.json.JsonPluginManager.plugins.collectAsState()
+    val plugins by PluginManager.pluginsFlow.collectAsStateWithLifecycle()
+    val jsonPlugins by com.android.purebilibili.core.plugin.json.JsonPluginManager.plugins.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val screenTitle = stringResource(R.string.plugins_center_title)
     val backLabel = stringResource(R.string.common_back)
@@ -772,7 +773,7 @@ fun PluginsContent(
                 }
                 item {
                     Spacer(modifier = Modifier.height(12.dp))
-                    val filterStats by com.android.purebilibili.core.plugin.json.JsonPluginManager.filterStats.collectAsState()
+                    val filterStats by com.android.purebilibili.core.plugin.json.JsonPluginManager.filterStats.collectAsStateWithLifecycle()
                     
                     Surface(
                         modifier = Modifier

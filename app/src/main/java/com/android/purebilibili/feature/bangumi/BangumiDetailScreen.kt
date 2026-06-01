@@ -46,6 +46,7 @@ import com.android.purebilibili.core.util.responsiveContentWidth
 import com.android.purebilibili.feature.bangumi.ui.detail.RatingRow
 import com.android.purebilibili.feature.bangumi.ui.detail.FollowButton
 import com.android.purebilibili.feature.bangumi.ui.detail.SeasonSelector
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  * 番剧详情页面
@@ -60,7 +61,7 @@ fun BangumiDetailScreen(
     onSeasonClick: (Long) -> Unit = {},        //  点击切换季度
     viewModel: BangumiViewModel = viewModel()
 ) {
-    val detailState by viewModel.detailState.collectAsState()
+    val detailState by viewModel.detailState.collectAsStateWithLifecycle()
     
     // 加载详情
     LaunchedEffect(seasonId, epId) {
@@ -338,7 +339,7 @@ private fun TabletBangumiDetailContent(
                         }
                      }
                      
-                     items(detail.episodes) { episode ->
+                     items(detail.episodes, key = { it.id }) { episode ->
                          EpisodeChip(
                                 episode = episode,
                                 onClick = { onEpisodeClick(episode) }
@@ -358,7 +359,7 @@ private fun TabletBangumiDetailContent(
                              )
                          }
 
-                         items(section.episodes.orEmpty()) { episode ->
+                         items(section.episodes.orEmpty(), key = { it.id }) { episode ->
                              EpisodeChip(
                                  episode = episode,
                                  onClick = { onEpisodeClick(episode) }
@@ -377,7 +378,7 @@ private fun TabletBangumiDetailContent(
                         )
                      }
                      
-                     items(detail.seasons) { season ->
+                     items(detail.seasons, key = { it.seasonId }) { season ->
                          val isCurrentSeason = season.seasonId == detail.seasonId
                          Surface(
                             onClick = { if (!isCurrentSeason) onSeasonClick(season.seasonId) },
@@ -738,7 +739,7 @@ private fun MobileBangumiDetailContent(
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
                             modifier = Modifier.padding(bottom = 8.dp)
                         ) {
-                            items(totalPages) { page ->
+                            items(totalPages, key = { it }) { page ->
                                 val start = page * episodesPerPage + 1
                                 val end = minOf((page + 1) * episodesPerPage, detail.episodes.size)
                                 val isCurrentPage = page == selectedPreviewPage
@@ -778,7 +779,7 @@ private fun MobileBangumiDetailContent(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(previewEpisodes) { episode ->
+                        items(previewEpisodes, key = { it.id }) { episode ->
                             EpisodeChip(
                                 episode = episode,
                                 onClick = { onEpisodeClick(episode) }
@@ -850,7 +851,7 @@ private fun MobileBangumiDetailContent(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(detail.seasons) { season ->
+                        items(detail.seasons, key = { it.seasonId }) { season ->
                             val isCurrentSeason = season.seasonId == detail.seasonId
                             Surface(
                                 modifier = Modifier.clickable {
@@ -980,7 +981,7 @@ private fun BangumiDetailMetaSection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(horizontal = 0.dp)
             ) {
-                items(metaChips) { chip ->
+                items(metaChips, key = { it }) { chip ->
                     AssistChip(
                         onClick = {},
                         label = {
@@ -999,7 +1000,7 @@ private fun BangumiDetailMetaSection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(horizontal = 0.dp)
             ) {
-                items(restrictionLabels) { label ->
+                items(restrictionLabels, key = { it }) { label ->
                     SuggestionChip(
                         onClick = {},
                         label = {
@@ -1039,7 +1040,7 @@ private fun BangumiSectionPreview(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(episodes.take(20)) { episode ->
+            items(episodes.take(20), key = { it.id }) { episode ->
                 EpisodeChip(
                     episode = episode,
                     onClick = { onEpisodeClick(episode) }
@@ -1250,7 +1251,7 @@ private fun EpisodeSelectionSheet(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(bottom = 8.dp)
                 ) {
-                    items(detail.seasons) { season ->
+                    items(detail.seasons, key = { it.seasonId }) { season ->
                         val isCurrentSeason = season.seasonId == detail.seasonId
                         
                         Surface(
@@ -1312,7 +1313,7 @@ private fun EpisodeSelectionSheet(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier.padding(bottom = 8.dp)
                 ) {
-                    items(totalPages) { page ->
+                    items(totalPages, key = { it }) { page ->
                         val start = page * episodesPerPage + 1
                         val end = minOf((page + 1) * episodesPerPage, episodes.size)
                         val isCurrentPage = page == selectedPage

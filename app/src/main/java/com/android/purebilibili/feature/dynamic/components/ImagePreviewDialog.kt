@@ -82,6 +82,7 @@ import com.android.purebilibili.core.store.SettingsManager
 import com.android.purebilibili.core.util.FormatUtils
 import com.android.purebilibili.core.util.rememberHapticFeedback
 import java.io.File
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  *  图片预览对话框 - 支持左右滑动切换和3D立体动画
@@ -162,7 +163,7 @@ fun ImagePreviewDialog(
 fun ImagePreviewOverlayHost(
     modifier: Modifier = Modifier
 ) {
-    val activeRequest by ImagePreviewOverlayController.request.collectAsState()
+    val activeRequest by ImagePreviewOverlayController.request.collectAsStateWithLifecycle()
     activeRequest?.let { request ->
         Dialog(
             onDismissRequest = {
@@ -255,7 +256,7 @@ private fun ImagePreviewOverlayContent(
     var activeZoomScale by remember { mutableFloatStateOf(1f) }
     var isVerticalDismissDragging by remember { mutableStateOf(false) }
     val longPressSaveEnabled by SettingsManager.getImagePreviewLongPressSaveEnabled(context)
-        .collectAsState(initial = true)
+        .collectAsStateWithLifecycle(initialValue = true)
     var imagePreviewTextVisible by remember(textContent, defaultTextVisible) {
         mutableStateOf(
             resolveImagePreviewInitialTextVisibility(

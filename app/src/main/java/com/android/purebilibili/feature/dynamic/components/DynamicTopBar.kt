@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,8 +63,7 @@ fun DynamicTopBarWithTabs(
     val uiPreset = LocalUiPreset.current
     val homeSettings by SettingsManager
         .getHomeSettings(context)
-        .collectAsState(
-            initial = HomeSettings(),
+        .collectAsStateWithLifecycle(initialValue = HomeSettings(),
             context = kotlin.coroutines.EmptyCoroutineContext
         )
     val statusBarHeight = WindowInsets.statusBars.getTop(density).let { with(density) { it.toDp() } }

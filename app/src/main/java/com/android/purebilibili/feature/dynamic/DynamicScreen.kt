@@ -97,6 +97,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 val LocalDynamicScrollChannel = compositionLocalOf<Channel<Unit>?> { null }
 
@@ -121,28 +122,28 @@ fun DynamicScreen(
     onHomeClick: () -> Unit = {},
     globalHazeState: dev.chrisbanes.haze.HazeState? = null  // [新增] 全局底栏模糊状态
 ) {
-    val state by viewModel.uiState.collectAsState()
-    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val listState = rememberLazyStaggeredGridState()
     val sidebarUserListState = rememberLazyListState()
     val horizontalUserListState = rememberLazyListState()
     val dynamicScrollChannel = LocalDynamicScrollChannel.current
 
     // 侧边栏状态
-    val followedUsers by viewModel.followedUsers.collectAsState()
-    val selectedUserId by viewModel.selectedUserId.collectAsState()
-    val isSidebarExpanded by viewModel.isSidebarExpanded.collectAsState()
-    val showHiddenUsers by viewModel.showHiddenUsers.collectAsState()
-    val hiddenUserIds by viewModel.hiddenUserIds.collectAsState()
-    val selectedTab by viewModel.selectedTab.collectAsState()
+    val followedUsers by viewModel.followedUsers.collectAsStateWithLifecycle()
+    val selectedUserId by viewModel.selectedUserId.collectAsStateWithLifecycle()
+    val isSidebarExpanded by viewModel.isSidebarExpanded.collectAsStateWithLifecycle()
+    val showHiddenUsers by viewModel.showHiddenUsers.collectAsStateWithLifecycle()
+    val hiddenUserIds by viewModel.hiddenUserIds.collectAsStateWithLifecycle()
+    val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     //  [新增] 点赞/转发状态
-    val likedDynamics by viewModel.likedDynamics.collectAsState()
+    val likedDynamics by viewModel.likedDynamics.collectAsStateWithLifecycle()
     var showRepostDialog by remember { mutableStateOf<String?>(null) }  // 存储要转发的动态ID
 
     val dynamicVisibleTabIds by SettingsManager.getDynamicTabVisibleTabs(context)
-        .collectAsState(initial = defaultDynamicTabVisibleIds)
+        .collectAsStateWithLifecycle(initialValue = defaultDynamicTabVisibleIds)
     val visibleTabs = remember(dynamicVisibleTabIds) {
         resolveDynamicVisibleTabs(dynamicVisibleTabIds)
     }
@@ -170,7 +171,7 @@ fun DynamicScreen(
     }
 
     //  布局模式状态（侧边栏/横向）
-    val displayMode by viewModel.displayMode.collectAsState()
+    val displayMode by viewModel.displayMode.collectAsStateWithLifecycle()
 
     //  [Haze] 模糊状态
     val hazeState = rememberRecoverableHazeState()

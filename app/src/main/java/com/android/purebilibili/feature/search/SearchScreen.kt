@@ -123,6 +123,7 @@ import com.android.purebilibili.data.model.response.SearchType
 import com.android.purebilibili.data.model.response.SearchTopicItem
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 internal fun shouldShowSearchHotSection(
     hotItemCount: Int,
@@ -428,7 +429,7 @@ fun SearchScreen(
     val searchChromeSpec = remember(uiPreset, androidNativeVariant) {
         resolveSearchChromeVisualSpec(uiPreset, androidNativeVariant)
     }
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
     val configuration = LocalConfiguration.current
     val windowSizeClass = LocalWindowSizeClass.current
@@ -509,12 +510,12 @@ fun SearchScreen(
             widthSizeClass = windowSizeClass.widthSizeClass
         )
     }
-    val cardAnimationEnabled by SettingsManager.getCardAnimationEnabled(context).collectAsState(initial = true)
-    val hotSearchEnabled by SettingsManager.getSearchHotSectionEnabled(context).collectAsState(initial = true)
-    val discoverSectionEnabled by SettingsManager.getSearchDiscoverSectionEnabled(context).collectAsState(initial = true)
-    val liquidGlassEnabled by SettingsManager.getLiquidGlassEnabled(context).collectAsState(initial = true)
-    val headerBlurEnabled by SettingsManager.getHeaderBlurEnabled(context).collectAsState(initial = true)
-    val bottomBarBlurEnabled by SettingsManager.getBottomBarBlurEnabled(context).collectAsState(initial = true)
+    val cardAnimationEnabled by SettingsManager.getCardAnimationEnabled(context).collectAsStateWithLifecycle(initialValue = true)
+    val hotSearchEnabled by SettingsManager.getSearchHotSectionEnabled(context).collectAsStateWithLifecycle(initialValue = true)
+    val discoverSectionEnabled by SettingsManager.getSearchDiscoverSectionEnabled(context).collectAsStateWithLifecycle(initialValue = true)
+    val liquidGlassEnabled by SettingsManager.getLiquidGlassEnabled(context).collectAsStateWithLifecycle(initialValue = true)
+    val headerBlurEnabled by SettingsManager.getHeaderBlurEnabled(context).collectAsStateWithLifecycle(initialValue = true)
+    val bottomBarBlurEnabled by SettingsManager.getBottomBarBlurEnabled(context).collectAsStateWithLifecycle(initialValue = true)
     val cardMotionTier = resolveEffectiveMotionTier(
         baseTier = deviceUiProfile.motionTier,
         animationEnabled = cardAnimationEnabled
@@ -542,8 +543,8 @@ fun SearchScreen(
             uiPreset = uiPreset
         )
     }
-    val cardTransitionEnabled by SettingsManager.getCardTransitionEnabled(context).collectAsState(initial = false)
-    val showOnlineCount by SettingsManager.getShowOnlineCount(context).collectAsState(initial = false)
+    val cardTransitionEnabled by SettingsManager.getCardTransitionEnabled(context).collectAsStateWithLifecycle(initialValue = false)
+    val showOnlineCount by SettingsManager.getShowOnlineCount(context).collectAsStateWithLifecycle(initialValue = false)
     val isSearchResultsScrolling by remember(historyListState, resultGridState, resultListState) {
         derivedStateOf {
             historyListState.isScrollInProgress ||
@@ -743,7 +744,7 @@ fun SearchScreen(
                                         )
                                     }
                                 
-                                itemsIndexed(state.searchResults) { index, video ->
+                                itemsIndexed(state.searchResults, key = { _, video -> video.bvid }) { index, video ->
                                         ElegantVideoCard(
                                             video = video,
                                             index = index,
@@ -862,7 +863,7 @@ fun SearchScreen(
                                         )
                                     }
 
-                                    itemsIndexed(state.upResults) { index, upItem ->
+                                    itemsIndexed(state.upResults, key = { _, upItem -> upItem.mid }) { index, upItem ->
                                         UpSearchResultCard(
                                             upItem = upItem,
                                             appearance = genericResultCardAppearance,
@@ -950,7 +951,7 @@ fun SearchScreen(
                                         )
                                     }
 
-                                    itemsIndexed(state.bangumiResults) { index, bangumiItem ->
+                                    itemsIndexed(state.bangumiResults, key = { _, bangumiItem -> bangumiItem.seasonId }) { index, bangumiItem ->
                                         BangumiSearchResultCard(
                                             item = bangumiItem,
                                             appearance = genericResultCardAppearance,
@@ -1015,7 +1016,7 @@ fun SearchScreen(
                                         )
                                     }
 
-                                    itemsIndexed(state.liveResults) { index, liveItem ->
+                                    itemsIndexed(state.liveResults, key = { _, liveItem -> liveItem.roomid }) { index, liveItem ->
                                         LiveSearchResultCard(
                                             item = liveItem,
                                             appearance = genericResultCardAppearance,
@@ -1101,7 +1102,7 @@ fun SearchScreen(
                                         )
                                     }
 
-                                    itemsIndexed(state.liveUserResults) { index, item ->
+                                    itemsIndexed(state.liveUserResults, key = { _, item -> item.uid }) { index, item ->
                                         LiveUserSearchResultCard(
                                             item = item,
                                             appearance = genericResultCardAppearance,
@@ -1161,7 +1162,7 @@ fun SearchScreen(
                                         )
                                     }
 
-                                    itemsIndexed(state.articleResults) { index, articleItem ->
+                                    itemsIndexed(state.articleResults, key = { _, articleItem -> articleItem.id }) { index, articleItem ->
                                         ArticleSearchResultCard(
                                             item = articleItem,
                                             appearance = genericResultCardAppearance,
@@ -1246,7 +1247,7 @@ fun SearchScreen(
                                         )
                                     }
 
-                                    itemsIndexed(state.topicResults) { index, item ->
+                                    itemsIndexed(state.topicResults, key = { _, item -> item.topicId }) { index, item ->
                                         TopicSearchResultCard(
                                             item = item,
                                             appearance = genericResultCardAppearance,
@@ -1296,7 +1297,7 @@ fun SearchScreen(
                                         )
                                     }
 
-                                    itemsIndexed(state.photoResults) { index, item ->
+                                    itemsIndexed(state.photoResults, key = { _, item -> item.id }) { index, item ->
                                         PhotoSearchResultCard(
                                             item = item,
                                             appearance = genericResultCardAppearance

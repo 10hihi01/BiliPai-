@@ -36,6 +36,7 @@ import com.android.purebilibili.core.util.responsiveContentWidth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  *  分类视频 ViewModel
@@ -104,17 +105,16 @@ fun CategoryScreen(
     onVideoClick: (String, Long, String) -> Unit = { _, _, _ -> },
     viewModel: CategoryViewModel = viewModel()
 ) {
-    val videos by viewModel.videos.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
+    val videos by viewModel.videos.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
     val gridState = rememberLazyGridState()
     val context = LocalContext.current
     
     //  [修复] 读取首页设置，保持显示模式一致
-    val homeSettings by SettingsManager.getHomeSettings(context).collectAsState(
-        initial = HomeSettings()
+    val homeSettings by SettingsManager.getHomeSettings(context).collectAsStateWithLifecycle(initialValue = HomeSettings()
     )
-    val showOnlineCount by SettingsManager.getShowOnlineCount(context).collectAsState(initial = false)
+    val showOnlineCount by SettingsManager.getShowOnlineCount(context).collectAsStateWithLifecycle(initialValue = false)
     val displayMode = homeSettings.displayMode
     
     // 📐 [Tablet Adaptation] Calculate adaptive columns

@@ -26,6 +26,7 @@ import io.github.alexzhirkevich.cupertino.icons.outlined.*
 import io.github.alexzhirkevich.cupertino.icons.filled.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
@@ -80,7 +81,7 @@ import com.android.purebilibili.feature.video.ui.section.shouldEmphasizePreciseP
 //  [预览播放] 相关引用已移除
 
 // 显式导入 collectAsState 以避免 ambiguity 或 missing reference
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlin.math.roundToInt
 
 internal fun shouldOpenLongPressMenu(
@@ -353,19 +354,21 @@ fun ElegantVideoCard(
     val densityValue = density.density  //  [新增] 屏幕密度值
     
     //  记录卡片位置（非 Compose State，避免滚动时触发高频重组）
-    val cardBoundsRef = remember { object { var value: androidx.compose.ui.geometry.Rect? = null } }
-    val coverBoundsRef = remember { object { var value: androidx.compose.ui.geometry.Rect? = null } }
-    val titleBoundsRef = remember { object { var value: androidx.compose.ui.geometry.Rect? = null } }
-    val menuButtonBoundsRef = remember { object { var value: androidx.compose.ui.geometry.Rect? = null } }
+    //  [性能优化] 存储 LayoutCoordinates 引用而非 Rect，boundsInRoot() 仅在交互时惰性计算，
+    //  避免滚动期间每帧 4 次坐标树遍历开销。
+    val cardCoordsRef = remember { object { var value: LayoutCoordinates? = null } }
+    val coverCoordsRef = remember { object { var value: LayoutCoordinates? = null } }
+    val titleCoordsRef = remember { object { var value: LayoutCoordinates? = null } }
+    val menuButtonCoordsRef = remember { object { var value: LayoutCoordinates? = null } }
     val localSharedElementSourceRoute = LocalVideoCardSharedElementSourceRoute.current
     val effectiveSharedElementSourceRoute = remember(sharedElementSourceRoute, localSharedElementSourceRoute) {
         sharedElementSourceRoute ?: localSharedElementSourceRoute
     }
 
-    val openDismissMenu: (androidx.compose.ui.geometry.Rect?, Offset?) -> Unit = { anchorBounds, pressOffset ->
+    val openDismissMenu: (LayoutCoordinates?, Offset?) -> Unit = { anchorCoords, pressOffset ->
         menuOffset = resolveVideoCardMenuOffset(
-            rootBoundsInRoot = cardBoundsRef.value,
-            anchorBoundsInRoot = anchorBounds,
+            rootBoundsInRoot = cardCoordsRef.value?.takeIf { it.isAttached }?.boundsInRoot(),
+            anchorBoundsInRoot = anchorCoords?.takeIf { it.isAttached }?.boundsInRoot(),
             density = densityValue,
             pressOffsetInAnchorPx = pressOffset
         )
@@ -373,7 +376,7 @@ fun ElegantVideoCard(
     }
     
     val triggerCardClick = {
-        cardBoundsRef.value?.let { bounds ->
+        cardCoordsRef.value?.takeIf { it.isAttached }?.boundsInRoot()?.let { bounds ->
             CardPositionManager.recordVideoCardPosition(
                 bvid = video.bvid,
                 sourceRoute = effectiveSharedElementSourceRoute,
@@ -405,9 +408,9 @@ fun ElegantVideoCard(
                 animationEnabled = enterAnimationEnabledAtMount,
                 motionTier = motionTier
             )
-            //  [新增] 记录卡片位置
+            //  [新增] 记录卡片位置（仅存引用，boundsInRoot() 在交互时惰性计算）
             .onGloballyPositioned { coordinates ->
-                cardBoundsRef.value = coordinates.boundsInRoot()
+                cardCoordsRef.value = coordinates
             }
             .padding(bottom = 12.dp)
     ) {
@@ -539,7 +542,7 @@ fun ElegantVideoCard(
                     clip = true
                 )
                 .onGloballyPositioned { coordinates ->
-                    coverBoundsRef.value = coordinates.boundsInRoot()
+                    coverCoordsRef.value = coordinates
                 }
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 //  [交互优化] 封面区域：点击跳转
@@ -556,7 +559,7 @@ fun ElegantVideoCard(
                                 if (onUnfavorite != null && onDismiss == null && onWatchLater == null) {
                                     showUnfavoriteDialog = true
                                 } else {
-                                    openDismissMenu(coverBoundsRef.value, pressOffset)
+                                    openDismissMenu(coverCoordsRef.value, pressOffset)
                                 }
                             }
                         },
@@ -953,7 +956,7 @@ fun ElegantVideoCard(
                 ),
                 modifier = titleModifier
                     .onGloballyPositioned { coordinates ->
-                        titleBoundsRef.value = coordinates.boundsInRoot()
+                        titleCoordsRef.value = coordinates
                     }
                     //  [交互优化] 标题区域：长按弹出菜单，点击跳转
                     .pointerInput(onDismiss, onWatchLater, onUnfavorite) {
@@ -969,7 +972,7 @@ fun ElegantVideoCard(
                                     if (onUnfavorite != null && onDismiss == null && onWatchLater == null) {
                                         showUnfavoriteDialog = true
                                     } else {
-                                        openDismissMenu(titleBoundsRef.value, pressOffset)
+                                        openDismissMenu(titleCoordsRef.value, pressOffset)
                                     }
                                 }
                             },
@@ -1013,11 +1016,11 @@ fun ElegantVideoCard(
                             .padding(start = 4.dp, top = 2.dp) // 微调位置对齐第一行文字
                             .size(20.dp)
                             .onGloballyPositioned { coordinates ->
-                                menuButtonBoundsRef.value = coordinates.boundsInRoot()
+                                menuButtonCoordsRef.value = coordinates
                             }
                             .clickable { 
                                 haptic(HapticType.LIGHT)
-                                openDismissMenu(menuButtonBoundsRef.value, null)
+                                openDismissMenu(menuButtonCoordsRef.value, null)
                             },
                         contentAlignment = Alignment.Center
                     ) {

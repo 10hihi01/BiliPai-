@@ -7,7 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,9 +33,7 @@ internal fun CollectionSubscriptionButton(
     val scope = rememberCoroutineScope()
     val cachedIsSubscribed by SettingsManager
         .isCollectionSubscribed(context, collectionId)
-        .collectAsState(
-            initial = false,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = false
         )
     var remoteIsSubscribed by remember(collectionId, currentBvid, currentAid) {
         mutableStateOf<Boolean?>(null)

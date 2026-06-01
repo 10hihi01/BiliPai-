@@ -29,6 +29,7 @@ import com.android.purebilibili.data.model.response.UgcSeason
 import io.github.alexzhirkevich.cupertino.icons.CupertinoIcons
 import io.github.alexzhirkevich.cupertino.icons.outlined.Play
 import kotlinx.coroutines.launch
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  *  视频合集底部弹窗
@@ -57,9 +58,7 @@ fun CollectionSheet(
     }
     val sortMode by SettingsManager
         .getCollectionSortMode(context, collectionSubscriptionId)
-        .collectAsState(
-            initial = CollectionSortMode.ASCENDING,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = CollectionSortMode.ASCENDING
         )
     val sortedEpisodes = remember(allEpisodes, sortMode, currentBvid, currentCid) {
         sortCollectionEpisodes(
@@ -176,7 +175,7 @@ fun CollectionSheet(
                     .heightIn(max = 400.dp),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
-                itemsIndexed(sortedEpisodes) { index, episode ->
+                itemsIndexed(sortedEpisodes, key = { _, episode -> episode.id }) { index, episode ->
                     val isCurrentEpisode = isCurrentUgcEpisode(
                         currentBvid = currentBvid,
                         currentCid = currentCid,

@@ -76,7 +76,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.math.abs
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.purebilibili.feature.video.ui.components.AnimatedGesturePercentText
 import com.android.purebilibili.feature.video.ui.components.DanmakuSettingsPanel
 import com.android.purebilibili.feature.video.ui.components.VideoAspectRatio
@@ -186,9 +186,7 @@ fun FullscreenPlayerOverlay(
     //  视频比例状态
     val fixedFullscreenAspectRatio by SettingsManager
         .getFullscreenAspectRatio(context)
-        .collectAsState(
-            initial = FullscreenAspectRatio.FIT,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = FullscreenAspectRatio.FIT
         )
     var aspectRatio by remember { mutableStateOf(fixedFullscreenAspectRatio.toVideoAspectRatio()) }
     var showRatioMenu by remember { mutableStateOf(false) }
@@ -257,21 +255,15 @@ fun FullscreenPlayerOverlay(
     }
     val doubleTapSeekEnabled by SettingsManager
         .getDoubleTapSeekEnabled(context)
-        .collectAsState(
-            initial = false,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = false
         )
     val seekForwardSeconds by SettingsManager
         .getSeekForwardSeconds(context)
-        .collectAsState(
-            initial = 10,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = 10
         )
     val seekBackwardSeconds by SettingsManager
         .getSeekBackwardSeconds(context)
-        .collectAsState(
-            initial = 10,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = 10
         )
     
     // 亮度状态
@@ -661,8 +653,7 @@ fun FullscreenPlayerOverlay(
         val danmakuScope = com.android.purebilibili.core.store.DanmakuSettingsScope.LANDSCAPE
         val danmakuSettings by SettingsManager
             .getDanmakuSettings(context, danmakuScope)
-            .collectAsState(
-                initial = DanmakuSettings(),
+            .collectAsStateWithLifecycle(initialValue = DanmakuSettings(),
                 context = kotlin.coroutines.EmptyCoroutineContext
             )
         val danmakuEnabled = danmakuSettings.enabled

@@ -56,7 +56,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -163,15 +163,15 @@ fun SpaceScreen(
         { bvid -> playbackProgressManager.getCachedPosition(bvid) }
     }
     val dynamicInteractionViewModel: DynamicViewModel = viewModel()
-    val uiState by viewModel.uiState.collectAsState()
-    val likedDynamics by dynamicInteractionViewModel.likedDynamics.collectAsState()
-    val followGroupDialogVisible by viewModel.followGroupDialogVisible.collectAsState()
-    val followGroupTags by viewModel.followGroupTags.collectAsState()
-    val followGroupSelectedTagIds by viewModel.followGroupSelectedTagIds.collectAsState()
-    val isFollowGroupsLoading by viewModel.isFollowGroupsLoading.collectAsState()
-    val isSavingFollowGroups by viewModel.isSavingFollowGroups.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val likedDynamics by dynamicInteractionViewModel.likedDynamics.collectAsStateWithLifecycle()
+    val followGroupDialogVisible by viewModel.followGroupDialogVisible.collectAsStateWithLifecycle()
+    val followGroupTags by viewModel.followGroupTags.collectAsStateWithLifecycle()
+    val followGroupSelectedTagIds by viewModel.followGroupSelectedTagIds.collectAsStateWithLifecycle()
+    val isFollowGroupsLoading by viewModel.isFollowGroupsLoading.collectAsStateWithLifecycle()
+    val isSavingFollowGroups by viewModel.isSavingFollowGroups.collectAsStateWithLifecycle()
     val blockedUpRepository = remember { com.android.purebilibili.data.repository.BlockedUpRepository(context) }
-    val isBlocked by blockedUpRepository.isBlocked(mid).collectAsState(initial = false)
+    val isBlocked by blockedUpRepository.isBlocked(mid).collectAsStateWithLifecycle(initialValue = false)
     val coroutineScope = rememberCoroutineScope()
 
     var showMenu by remember { mutableStateOf(false) }

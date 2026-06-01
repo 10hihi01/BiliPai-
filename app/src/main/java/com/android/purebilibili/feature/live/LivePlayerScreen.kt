@@ -108,6 +108,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 private const val TAG = "LivePlayerScreen"
 
@@ -134,7 +135,7 @@ fun LivePlayerScreen(
     val sharedTransitionScope = LocalSharedTransitionScope.current
     val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
 
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val palette = rememberLiveChromePalette()
     val roomColorTokens = resolveLivePiliPlusRoomColorTokens()
     
@@ -168,10 +169,10 @@ fun LivePlayerScreen(
     var showRoomMenu by remember { mutableStateOf(false) }
     val successState = uiState as? LivePlayerState.Success
     val isLiveAudioOnly = successState?.isAudioOnly == true
-    val superChatItems by viewModel.superChatItems.collectAsState()
-    val replyTarget by viewModel.replyTarget.collectAsState()
-    val emoticonPackages by viewModel.emoticonPackages.collectAsState()
-    val shieldInfo by viewModel.shieldInfo.collectAsState()
+    val superChatItems by viewModel.superChatItems.collectAsStateWithLifecycle()
+    val replyTarget by viewModel.replyTarget.collectAsStateWithLifecycle()
+    val emoticonPackages by viewModel.emoticonPackages.collectAsStateWithLifecycle()
+    val shieldInfo by viewModel.shieldInfo.collectAsStateWithLifecycle()
     val roomInfo = successState?.roomInfo ?: RoomInfo()
     val anchorInfo = successState?.anchorInfo ?: AnchorInfo()
     val isPortraitLive = roomInfo.isPortrait
@@ -200,7 +201,7 @@ fun LivePlayerScreen(
     }
     val liveDanmakuSettings by SettingsManager
         .getDanmakuSettings(context, liveDanmakuSettingsScope)
-        .collectAsState(initial = DanmakuSettings())
+        .collectAsStateWithLifecycle(initialValue = DanmakuSettings())
     val liveDanmakuDisplayArea = liveDanmakuSettings.displayArea
     val portraitOverlayMetrics = remember(configuration.screenHeightDp) {
         resolveLivePortraitOverlayMetrics(configuration.screenHeightDp)

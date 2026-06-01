@@ -115,6 +115,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.lifecycle.compose.currentStateAsState
 import com.android.purebilibili.feature.video.playback.session.PendingPlaybackUserAction
 import dev.chrisbanes.haze.HazeState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 internal fun shouldShowEpisodeEntryFromVideoData(
     relatedVideosCount: Int,
@@ -760,45 +761,31 @@ fun VideoPlayerOverlay(
     }
     val showFullscreenLockButton by SettingsManager
         .getShowFullscreenLockButton(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     val showFullscreenScreenshotButton by SettingsManager
         .getShowFullscreenScreenshotButton(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     val showFullscreenBatteryLevel by SettingsManager
         .getShowFullscreenBatteryLevel(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     val showFullscreenTime by SettingsManager
         .getShowFullscreenTime(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     val showFullscreenActionItems by SettingsManager
         .getShowFullscreenActionItems(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     val showOnlineCount by SettingsManager
         .getShowOnlineCount(context)
-        .collectAsState(
-            initial = false,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = false
         )
     val bottomProgressBehavior by SettingsManager
         .getBottomProgressBehavior(context)
-        .collectAsState(
-            initial = BottomProgressBehavior.ALWAYS_SHOW,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = BottomProgressBehavior.ALWAYS_SHOW
         )
     val displayedOnlineCount = remember(onlineCount, showOnlineCount) {
         resolveDisplayedOnlineCount(
@@ -835,9 +822,7 @@ fun VideoPlayerOverlay(
     }
     val playbackCompletionBehavior by SettingsManager
         .getPlaybackCompletionBehavior(context)
-        .collectAsState(
-            initial = PlaybackCompletionBehavior.CONTINUE_CURRENT_LOGIC,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = PlaybackCompletionBehavior.CONTINUE_CURRENT_LOGIC
         )
 
     DisposableEffect(player) {
@@ -2194,9 +2179,7 @@ fun LandscapeEndDrawer(
     }
     val cardAnimationEnabled by SettingsManager
         .getCardAnimationEnabled(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     val overlayMotionTier = resolveEffectiveMotionTier(
         baseTier = deviceUiProfile.motionTier,
@@ -2404,7 +2387,7 @@ fun LandscapeEndDrawer(
                                             modifier = Modifier.padding(bottom = 8.dp)
                                         )
                                     }
-                                    items(section.episodes) { episode ->
+                                    items(section.episodes, key = { it.id }) { episode ->
                                         LandscapeEpisodeItem(
                                             episode = episode,
                                             layoutPolicy = layoutPolicy,

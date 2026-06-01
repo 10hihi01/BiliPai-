@@ -1089,9 +1089,7 @@ fun VideoDetailScreen(
     val configuration = LocalConfiguration.current
     val homeUpBadgesVisible by com.android.purebilibili.core.store.SettingsManager
         .getHomeUpBadgesVisible(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     val motionSpec = remember(transitionEnterDurationMillis) {
         resolveVideoDetailMotionSpec(transitionEnterDurationMillis)
@@ -3058,10 +3056,8 @@ fun VideoDetailScreen(
                     //  读取竖屏播放器滚动缩小模式
                     val portraitPlayerCollapseMode by com.android.purebilibili.core.store.SettingsManager
                         .getPortraitPlayerCollapseMode(context)
-                        .collectAsState(
-                            initial = PortraitPlayerCollapseMode.OFF,
-                            context = kotlin.coroutines.EmptyCoroutineContext
-                        )
+                        .collectAsStateWithLifecycle(initialValue = PortraitPlayerCollapseMode.OFF
+        )
                     val inlinePortraitScrollEnabled = shouldEnableInlinePortraitScrollTransform(
                         collapseMode = portraitPlayerCollapseMode,
                         selectedTabIndex = selectedVideoContentTabIndex,
@@ -3251,6 +3247,7 @@ fun VideoDetailScreen(
                     )
                     
                     //  为播放器容器添加共享元素标记（封面 ↔ 播放器区域映射）
+                    val isFullscreenTarget = activeVideoSharedTransitionVisualSpec.fillTargetViewport
                     val playerContainerModifier = if (
                         shouldEnableVideoCoverSharedTransition(
                             transitionEnabled = transitionEnabled,
@@ -3258,7 +3255,6 @@ fun VideoDetailScreen(
                             hasAnimatedVisibilityScope = animatedVisibilityScope != null
                         ) &&
                         activeVideoSharedTransitionVisualSpec.useCoverSharedBounds &&
-                        activeVideoSharedTransitionVisualSpec.targetMode != VideoSharedTransitionTargetMode.InlineCover &&
                         !forceCoverOnlyForReturn
                     ) {
                         with(requireNotNull(sharedTransitionScope)) {
@@ -3273,8 +3269,9 @@ fun VideoDetailScreen(
                                     animatedVisibilityScope = requireNotNull(animatedVisibilityScope),
                                     boundsTransform = { _, _ ->
                                         if (homeSharedTransitionMotionSpec.enabled) {
+                                            val duration = if (isFullscreenTarget) com.android.purebilibili.core.ui.transition.FULLSCREEN_SHARED_TRANSITION_DURATION_MILLIS else homeSharedTransitionMotionSpec.durationMillis
                                             tween(
-                                                durationMillis = homeSharedTransitionMotionSpec.durationMillis,
+                                                durationMillis = duration,
                                                 easing = homeSharedTransitionMotionSpec.easing
                                             )
                                         } else {
@@ -3290,13 +3287,13 @@ fun VideoDetailScreen(
                         Modifier
                     }
 
-                    // 🎬 返回时视频 → 封面 crossfade
                     val isLeaving = isReturningFromDetail || isExitTransitionInProgress
                     val coverCrossfadeAlpha by animateFloatAsState(
                         targetValue = if (isLeaving) 1f else 0f,
                         animationSpec = tween(
-                            durationMillis = 200,
-                            delayMillis = if (isLeaving) 100 else 0
+                            durationMillis = 240,
+                            delayMillis = if (isLeaving) 40 else 0,
+                            easing = com.android.purebilibili.core.ui.transition.VIDEO_RETURN_CROSSFADE_EASING
                         ),
                         label = "coverCrossfade"
                     )
@@ -3304,7 +3301,8 @@ fun VideoDetailScreen(
                         targetValue = if (isLeaving) 0f else 1f,
                         animationSpec = tween(
                             durationMillis = 200,
-                            delayMillis = if (isLeaving) 60 else 0
+                            delayMillis = if (isLeaving) 20 else 0,
+                            easing = com.android.purebilibili.core.ui.transition.VIDEO_RETURN_FADE_OUT_EASING
                         ),
                         label = "playerFade"
                     )
@@ -3467,7 +3465,7 @@ fun VideoDetailScreen(
                                 val currentPageIndex = success.info.pages.indexOfFirst { it.cid == success.info.cid }.coerceAtLeast(0)
                                 
                                 //  下载进度
-                                val downloadProgress by viewModel.downloadProgress.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+                                val downloadProgress by viewModel.downloadProgress.collectAsStateWithLifecycle()
                                 
                                 // 📱 [优化] 视频切换过渡动画
                                 AnimatedContent(
@@ -3508,9 +3506,9 @@ fun VideoDetailScreen(
                                             // 配合 isTransitionFinished 状态
                                             // 🎬 返回时非核心内容延迟淡出
                                             val detailContentRevealEnter =
-                                                fadeIn(tween(motionSpec.contentRevealFadeDurationMillis))
+                                                fadeIn(tween(motionSpec.contentRevealFadeDurationMillis, easing = com.android.purebilibili.core.ui.motion.AppMotionEasing.EmphasizedEnter))
                                             val detailContentExitFade =
-                                                fadeOut(tween(durationMillis = 180, delayMillis = 60))
+                                                fadeOut(tween(durationMillis = 180, delayMillis = 60, easing = com.android.purebilibili.core.ui.motion.AppMotionEasing.EmphasizedExit))
                                             val detailContentVisible = isTransitionFinished && !isLeaving
                                             androidx.compose.animation.AnimatedVisibility(
                                                 visible = detailContentVisible,
@@ -3846,15 +3844,16 @@ fun VideoDetailScreen(
             visible = showPortraitFullscreen && success != null,
             enter = if (shouldAnimatePortraitPager) {
                 fadeIn(
-                    animationSpec = tween(portraitPagerMotionSpec.enterDurationMillis)
+                    animationSpec = tween(portraitPagerMotionSpec.enterDurationMillis, easing = com.android.purebilibili.core.ui.motion.AppMotionEasing.EmphasizedEnter)
                 )
             } else {
                 androidx.compose.animation.EnterTransition.None
             },
             exit = if (shouldAnimatePortraitPager) {
+                val exitEasing = com.android.purebilibili.core.ui.motion.AppMotionEasing.EmphasizedExit
                 val exitSpec = tween<Float>(
                     durationMillis = portraitPagerMotionSpec.exitDurationMillis,
-                    easing = FastOutSlowInEasing
+                    easing = exitEasing
                 )
                 fadeOut(
                     animationSpec = exitSpec
@@ -3865,7 +3864,7 @@ fun VideoDetailScreen(
                 ) + slideOutVertically(
                     animationSpec = tween(
                         durationMillis = portraitPagerMotionSpec.exitDurationMillis,
-                        easing = FastOutSlowInEasing
+                        easing = exitEasing
                     ),
                     targetOffsetY = {
                         -(it * portraitPagerMotionSpec.exitTranslateUpFraction).roundToInt()
@@ -3994,9 +3993,9 @@ fun VideoDetailScreen(
         )
 
         //  [新增] 投币对话框
-        val coinDialogVisible by viewModel.coinDialogVisible.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+        val coinDialogVisible by viewModel.coinDialogVisible.collectAsStateWithLifecycle()
         val currentCoinCount = (uiState as? PlayerUiState.Success)?.coinCount ?: 0
-        val userBalance by viewModel.userCoinBalance.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+        val userBalance by viewModel.userCoinBalance.collectAsStateWithLifecycle()
         CoinDialog(
             visible = coinDialogVisible,
             currentCoinCount = currentCoinCount,
@@ -4038,8 +4037,8 @@ fun VideoDetailScreen(
         )
         
         //  [新增] 弹幕发送对话框
-        val showDanmakuDialog by viewModel.showDanmakuDialog.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-        val isSendingDanmaku by viewModel.isSendingDanmaku.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+        val showDanmakuDialog by viewModel.showDanmakuDialog.collectAsStateWithLifecycle()
+        val isSendingDanmaku by viewModel.isSendingDanmaku.collectAsStateWithLifecycle()
         val fallbackPlayerBottomPx = with(LocalDensity.current) {
             val fallbackPlayerHeight = configuration.screenWidthDp.dp * 9f / 16f
             val fallbackStableStatusBar = resolveVideoDetailStableStatusBarHeightDp(
@@ -4081,22 +4080,16 @@ fun VideoDetailScreen(
         val danmakuSendPreferenceScope = rememberCoroutineScope()
         val rememberedDanmakuSendColor by com.android.purebilibili.core.store.SettingsManager
             .getDanmakuSendColor(context)
-            .collectAsState(
-                initial = 16777215,
-                context = kotlin.coroutines.EmptyCoroutineContext
-            )
+            .collectAsStateWithLifecycle(initialValue = 16777215
+        )
         val rememberedDanmakuSendMode by com.android.purebilibili.core.store.SettingsManager
             .getDanmakuSendMode(context)
-            .collectAsState(
-                initial = 1,
-                context = kotlin.coroutines.EmptyCoroutineContext
-            )
+            .collectAsStateWithLifecycle(initialValue = 1
+        )
         val rememberedDanmakuSendFontSize by com.android.purebilibili.core.store.SettingsManager
             .getDanmakuSendFontSize(context)
-            .collectAsState(
-                initial = 25,
-                context = kotlin.coroutines.EmptyCoroutineContext
-            )
+            .collectAsStateWithLifecycle(initialValue = 25
+        )
         com.android.purebilibili.feature.video.ui.components.DanmakuSendDialog(
             visible = showDanmakuDialog,
             onDismiss = { viewModel.hideDanmakuSendDialog() },
@@ -4119,11 +4112,11 @@ fun VideoDetailScreen(
         )
         
         //  [新增] 评论输入对话框
-        val showCommentInput by viewModel.showCommentDialog.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-        val isSendingComment by viewModel.isSendingComment.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext) // 暂时复用 ViewModel 状态?
-        val replyingToComment by viewModel.replyingToComment.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-        val emotePackages by viewModel.emotePackages.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext) // [新增]
-        val mentionSearchState by viewModel.commentMentionSearchState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+        val showCommentInput by viewModel.showCommentDialog.collectAsStateWithLifecycle()
+        val isSendingComment by viewModel.isSendingComment.collectAsStateWithLifecycle() // 暂时复用 ViewModel 状态?
+        val replyingToComment by viewModel.replyingToComment.collectAsStateWithLifecycle()
+        val emotePackages by viewModel.emotePackages.collectAsStateWithLifecycle() // [新增]
+        val mentionSearchState by viewModel.commentMentionSearchState.collectAsStateWithLifecycle()
         
         com.android.purebilibili.feature.video.ui.components.CommentInputDialog(
             visible = showCommentInput,
@@ -4146,9 +4139,9 @@ fun VideoDetailScreen(
         )
         
         //  [新增] 下载选项菜单 & 画质选择
-        val showDownloadDialog by viewModel.showDownloadDialog.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+        val showDownloadDialog by viewModel.showDownloadDialog.collectAsStateWithLifecycle()
         val successForDownload = uiState as? PlayerUiState.Success
-        val downloadTasks by com.android.purebilibili.feature.download.DownloadManager.tasks.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+        val downloadTasks by com.android.purebilibili.feature.download.DownloadManager.tasks.collectAsStateWithLifecycle()
         
         // 本地状态控制画质选择弹窗
         var showQualitySelection by remember { mutableStateOf(false) }
@@ -4452,7 +4445,7 @@ fun VideoDetailScreen(
         }
         
         // 🎉 点赞成功爆裂动画
-        val likeBurstVisible by viewModel.likeBurstVisible.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+        val likeBurstVisible by viewModel.likeBurstVisible.collectAsStateWithLifecycle()
         if (likeBurstVisible) {
             Box(
                 modifier = Modifier
@@ -4471,7 +4464,7 @@ fun VideoDetailScreen(
         }
         
         // 🎉 三连成功庆祝动画
-        val tripleCelebrationVisible by viewModel.tripleCelebrationVisible.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+        val tripleCelebrationVisible by viewModel.tripleCelebrationVisible.collectAsStateWithLifecycle()
         val tripleCelebrationPlacement = resolveTripleCelebrationPlacement(
             isFullscreen = isFullscreenMode,
             isLandscape = isLandscape
@@ -4561,19 +4554,19 @@ fun VideoDetailScreen(
 private fun VideoDetailFollowGroupDialog(
     viewModel: PlayerViewModel
 ) {
-    val followGroupDialogVisible by viewModel.followGroupDialogVisible.collectAsState(
+    val followGroupDialogVisible by viewModel.followGroupDialogVisible.collectAsStateWithLifecycle(
         context = kotlin.coroutines.EmptyCoroutineContext
     )
-    val followGroupTags by viewModel.followGroupTags.collectAsState(
+    val followGroupTags by viewModel.followGroupTags.collectAsStateWithLifecycle(
         context = kotlin.coroutines.EmptyCoroutineContext
     )
-    val followGroupSelectedTagIds by viewModel.followGroupSelectedTagIds.collectAsState(
+    val followGroupSelectedTagIds by viewModel.followGroupSelectedTagIds.collectAsStateWithLifecycle(
         context = kotlin.coroutines.EmptyCoroutineContext
     )
-    val isFollowGroupsLoading by viewModel.isFollowGroupsLoading.collectAsState(
+    val isFollowGroupsLoading by viewModel.isFollowGroupsLoading.collectAsStateWithLifecycle(
         context = kotlin.coroutines.EmptyCoroutineContext
     )
-    val isSavingFollowGroups by viewModel.isSavingFollowGroups.collectAsState(
+    val isSavingFollowGroups by viewModel.isSavingFollowGroups.collectAsStateWithLifecycle(
         context = kotlin.coroutines.EmptyCoroutineContext
     )
     if (!followGroupDialogVisible) return
@@ -4668,7 +4661,7 @@ private fun VideoDetailPlaybackEndedDialog(
     viewModel: PlayerViewModel,
     player: Player
 ) {
-    val showPlaybackEndedDialog by viewModel.showPlaybackEndedDialog.collectAsState(
+    val showPlaybackEndedDialog by viewModel.showPlaybackEndedDialog.collectAsStateWithLifecycle(
         context = kotlin.coroutines.EmptyCoroutineContext
     )
     if (!showPlaybackEndedDialog) return
@@ -4851,7 +4844,7 @@ private fun VideoDetailDanmakuContextMenu(
     activeDanmakuScope: com.android.purebilibili.core.store.DanmakuSettingsScope,
     sortPreferenceScope: CoroutineScope
 ) {
-    val danmakuMenuState by viewModel.danmakuMenuState.collectAsState(
+    val danmakuMenuState by viewModel.danmakuMenuState.collectAsStateWithLifecycle(
         context = kotlin.coroutines.EmptyCoroutineContext
     )
     if (!danmakuMenuState.visible) return

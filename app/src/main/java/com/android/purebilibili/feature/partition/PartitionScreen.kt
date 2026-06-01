@@ -108,6 +108,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  *  分区数据类
@@ -324,7 +325,7 @@ fun PartitionContent(
 ) {
     val context = LocalContext.current
     val uiPreset = LocalUiPreset.current
-    val homeSettings by SettingsManager.getHomeSettings(context).collectAsState(initial = HomeSettings())
+    val homeSettings by SettingsManager.getHomeSettings(context).collectAsStateWithLifecycle(initialValue = HomeSettings())
     val liquidGlassIndicatorEnabled = remember(
         homeSettings.isBottomBarLiquidGlassEnabled,
         homeSettings.androidNativeLiquidGlassEnabled,
@@ -336,7 +337,7 @@ fun PartitionContent(
             androidNativeLiquidGlassEnabled = homeSettings.androidNativeLiquidGlassEnabled
         )
     }
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val layoutDirection = LocalLayoutDirection.current
     val startPadding = contentPadding.calculateStartPadding(layoutDirection)

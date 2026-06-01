@@ -54,6 +54,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.math.abs
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  * 手势模式枚举
@@ -78,7 +79,7 @@ fun OfflineVideoPlayerScreen(
     val miniPlayerManager = remember(context) { MiniPlayerManager.getInstance(context) }
     val danmakuManager = rememberDanmakuManager()
     
-    val tasks by DownloadManager.tasks.collectAsState()
+    val tasks by DownloadManager.tasks.collectAsStateWithLifecycle()
     var currentTaskId by remember(taskId) { mutableStateOf(taskId) }
     val task = tasks[currentTaskId]
     

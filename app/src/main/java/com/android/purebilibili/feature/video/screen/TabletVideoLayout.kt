@@ -58,6 +58,7 @@ import androidx.compose.foundation.shape.CircleShape
 import com.android.purebilibili.core.ui.LocalSharedTransitionScope
 import com.android.purebilibili.core.ui.LocalAnimatedVisibilityScope
 import com.android.purebilibili.core.ui.transition.VIDEO_SHARED_COVER_ASPECT_RATIO
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  * 🖥️ 平板端视频详情页布局
@@ -128,9 +129,7 @@ fun TabletVideoLayout(
     val context = LocalContext.current
     val commentMemberDecorationsEnabled by com.android.purebilibili.core.store.SettingsManager
         .getCommentMemberDecorationsEnabled(context)
-        .collectAsState(
-            initial = false,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = false
         )
     val activity = remember(context) {
         (context as? android.app.Activity)
@@ -243,7 +242,7 @@ fun TabletVideoLayout(
                 if (uiState is PlayerUiState.Success) {
                     val success = uiState as PlayerUiState.Success
                     val currentPageIndex = success.info.pages.indexOfFirst { it.cid == success.info.cid }.coerceAtLeast(0)
-                    val downloadProgress by viewModel.downloadProgress.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+                    val downloadProgress by viewModel.downloadProgress.collectAsStateWithLifecycle()
                     
                     ScrollableVideoInfoSection(
                         info = success.info,
@@ -343,7 +342,7 @@ private fun TabletSecondaryContent(
         initialPage = selectedTab,
         pageCount = { 2 }
     )
-    val subReplyState by commentViewModel.subReplyState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val subReplyState by commentViewModel.subReplyState.collectAsStateWithLifecycle()
     val tabs = listOf("评论 ${if (commentState.replyCount > 0) "(${commentState.replyCount})" else ""}", "相关推荐")
     
     // 评论图片预览状态
@@ -962,7 +961,7 @@ private fun ScrollableVideoInfoSection(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(end = 4.dp)
                 ) {
-                    items(relatedVideos.take(10)) { video ->
+                    items(relatedVideos.take(10), key = { it.bvid }) { video ->
                         Column(
                             modifier = Modifier
                                 .width(160.dp)

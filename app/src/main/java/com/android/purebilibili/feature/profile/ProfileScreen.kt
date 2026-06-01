@@ -20,7 +20,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -58,7 +58,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import kotlin.coroutines.EmptyCoroutineContext
 import com.android.purebilibili.core.theme.iOSBlue
 import com.android.purebilibili.core.theme.iOSGreen
 import com.android.purebilibili.core.theme.iOSOrange
@@ -237,9 +236,9 @@ fun ProfileScreen(
     deferImmersiveRenderBudget: Boolean = false
     // [注意] 移除了 globalHazeState - 双 hazeSource 模式与 Haze 库冲突
 ) {
-    val state by viewModel.uiState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-    val accounts by viewModel.accounts.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
-    val activeAccountMid by viewModel.activeAccountMid.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val accounts by viewModel.accounts.collectAsStateWithLifecycle()
+    val activeAccountMid by viewModel.activeAccountMid.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val view = LocalView.current
     var showAccountSwitchDialog by remember { mutableStateOf(false) }
@@ -599,10 +598,7 @@ private fun BoxScope.ProfileBackground(
     val windowSizeClass = LocalWindowSizeClass.current
     val isTablet = windowSizeClass.shouldUseSplitLayout
     val isImmersive = user.topPhoto.isNotEmpty()
-    val bgTransform by viewModel.getProfileBgTransform(isTablet).collectAsState(
-        initial = ProfileWallpaperTransform(),
-        context = EmptyCoroutineContext
-    )
+    val bgTransform by viewModel.getProfileBgTransform(isTablet).collectAsStateWithLifecycle(initialValue = ProfileWallpaperTransform())
     val profileWallpaperLayout = remember(windowSizeClass.widthSizeClass) {
         resolveProfileWallpaperLayout(windowSizeClass.widthSizeClass)
     }
@@ -859,10 +855,8 @@ private fun ProfileSpaceContent(
     var showEditDialog by remember { mutableStateOf(false) }
     var showAdjustmentSheet by remember { mutableStateOf(false) }
     var tempSelectedUri by remember { mutableStateOf<Uri?>(null) }
-    val customBackgroundUri by viewModel.getProfileBgUri().collectAsState(
-        initial = null,
-        context = EmptyCoroutineContext
-    )
+    val customBackgroundUri by viewModel.getProfileBgUri().collectAsStateWithLifecycle(initialValue = null
+        )
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
@@ -1285,7 +1279,7 @@ private fun ProfileSpaceTabs(selectedTab: ProfileSpaceMainTab, onTabSelected: (P
     val context = LocalContext.current
     val bottomBarLiquidGlassEnabled by SettingsManager
         .getBottomBarLiquidGlassEnabled(context)
-        .collectAsState(initial = true, context = EmptyCoroutineContext)
+        .collectAsStateWithLifecycle(initialValue = true)
     val selectedIndex = tabs.indexOfFirst { it.tab == selectedTab }.coerceAtLeast(0)
     if (bottomBarLiquidGlassEnabled) {
         BottomBarLiquidSegmentedControl(
@@ -1958,7 +1952,7 @@ private fun ProfileDynamicMajorContent(item: SpaceDynamicItem, onVideoClick: (St
     var sourceRect by remember(item.id_str, imageUrls) { mutableStateOf<Rect?>(null) }
     val context = LocalContext.current
     val dynamicPreviewTextVisible by SettingsManager.getDynamicImagePreviewTextVisible(context)
-        .collectAsState(initial = true)
+        .collectAsStateWithLifecycle(initialValue = true)
     val previewText = remember(item, title) {
         ImagePreviewTextContent(
             headline = resolveProfileDynamicAuthorName(item),
@@ -2348,10 +2342,8 @@ fun MobileProfileContent(
     // [New] Adjustment Sheet State
     var showAdjustmentSheet by remember { mutableStateOf(false) }
     var tempSelectedUri by remember { mutableStateOf<Uri?>(null) }
-    val customBackgroundUri by viewModel.getProfileBgUri().collectAsState(
-        initial = null,
-        context = EmptyCoroutineContext
-    )
+    val customBackgroundUri by viewModel.getProfileBgUri().collectAsStateWithLifecycle(initialValue = null
+        )
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -2770,15 +2762,11 @@ private fun ProfileWallpaperActionCard(
     }
     val headerBlurEnabled by com.android.purebilibili.core.store.SettingsManager
         .getHeaderBlurEnabled(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     val bottomBarBlurEnabled by com.android.purebilibili.core.store.SettingsManager
         .getBottomBarBlurEnabled(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     val blurEnabled = remember(headerBlurEnabled, bottomBarBlurEnabled) {
         resolveProfileWallpaperActionBlurEnabled(

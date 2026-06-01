@@ -154,7 +154,7 @@ fun JsonPluginEditorContent(
             }
         }
         
-        itemsIndexed(rules) { index, rule ->
+        itemsIndexed(rules, key = { index, _ -> index }) { index, rule ->
             RuleEditor(
                 rule = rule,
                 pluginType = pluginType,

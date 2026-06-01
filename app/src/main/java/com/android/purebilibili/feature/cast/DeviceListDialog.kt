@@ -17,6 +17,7 @@ import com.android.purebilibili.core.plugin.CastPluginApi
 import com.android.purebilibili.core.plugin.CastPluginRoute
 import com.android.purebilibili.core.plugin.PluginManager
 import kotlinx.coroutines.flow.combine
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 private data class PluginRouteEntry(
     val plugin: CastPluginApi,
@@ -32,7 +33,7 @@ fun DeviceListDialog(
     val context = LocalContext.current
 
     // Generic cast plugin routes
-    val allPlugins by PluginManager.pluginsFlow.collectAsState()
+    val allPlugins by PluginManager.pluginsFlow.collectAsStateWithLifecycle()
     val castPlugins = remember(allPlugins) {
         allPlugins.filter { it.enabled }.mapNotNull { it.plugin as? CastPluginApi }
     }

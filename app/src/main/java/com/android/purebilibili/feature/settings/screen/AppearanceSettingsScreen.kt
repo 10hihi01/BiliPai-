@@ -71,6 +71,7 @@ import com.github.skydoves.colorpicker.compose.SaturationSlider
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import top.yukonga.miuix.kmp.basic.Scaffold as MiuixScaffold
 import top.yukonga.miuix.kmp.basic.SmallTopAppBar as MiuixSmallTopAppBar
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  *  外观设置二级页面
@@ -85,7 +86,7 @@ fun AppearanceSettingsScreen(
     onNavigateToAnimationSettings: () -> Unit = {}  //  [新增] 动画设置导航
 ) {
     val context = LocalContext.current
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     var pendingLanguageRestart by remember { mutableStateOf<AppLanguage?>(null) }
     val backLabel = stringResource(R.string.common_back)
@@ -236,7 +237,7 @@ fun AppearanceSettingsContent(
     onAppLanguageChange: (AppLanguage) -> Unit
 ) {
     val listState = rememberLazyListState()
-    val focusRequest by SettingsSearchFocusController.request.collectAsState()
+    val focusRequest by SettingsSearchFocusController.request.collectAsStateWithLifecycle()
     // Animation Trigger
     val displayModeTint = rememberAdaptiveSemanticIconTint(iOSBlue)
 
@@ -376,23 +377,23 @@ fun AppearanceSettingsContent(
     )
     val compactVideoStatsOnCover by SettingsManager
         .getCompactVideoStatsOnCover(context)
-        .collectAsState(initial = true)
+        .collectAsStateWithLifecycle(initialValue = true)
     val dedicatedHomeWallpaperUri by SettingsManager
         .getHomeWallpaperUri(context)
-        .collectAsState(initial = "")
+        .collectAsStateWithLifecycle(initialValue = "")
     val splashWallpaperFallbackUri by SettingsManager
         .getSplashWallpaperUri(context)
-        .collectAsState(initial = "")
+        .collectAsStateWithLifecycle(initialValue = "")
     val resolvedHomeWallpaperUri = remember(dedicatedHomeWallpaperUri, splashWallpaperFallbackUri) {
         dedicatedHomeWallpaperUri.ifBlank { splashWallpaperFallbackUri }.trim()
     }
     val homeWallpaperFollowsSplash = dedicatedHomeWallpaperUri.isBlank() && splashWallpaperFallbackUri.isNotBlank()
     val homeWallpaperEffectMode by SettingsManager
         .getHomeWallpaperEffectMode(context)
-        .collectAsState(initial = HomeWallpaperEffectMode.SOFT_BLUR)
+        .collectAsStateWithLifecycle(initialValue = HomeWallpaperEffectMode.SOFT_BLUR)
     val homeWallpaperEffectScope by SettingsManager
         .getHomeWallpaperEffectScope(context)
-        .collectAsState(initial = HomeWallpaperEffectScope.HOME_ONLY)
+        .collectAsStateWithLifecycle(initialValue = HomeWallpaperEffectScope.HOME_ONLY)
     val homeWallpaperEffectOptions = remember {
         listOf(
             PlaybackSegmentOption(HomeWallpaperEffectMode.OFF, "关闭"),
@@ -416,13 +417,13 @@ fun AppearanceSettingsContent(
     }
     val homeUpBadgesVisible by SettingsManager
         .getHomeUpBadgesVisible(context)
-        .collectAsState(initial = true)
+        .collectAsStateWithLifecycle(initialValue = true)
     val homeVideoDurationBadgesVisible by SettingsManager
         .getHomeVideoDurationBadgesVisible(context)
-        .collectAsState(initial = true)
+        .collectAsStateWithLifecycle(initialValue = true)
     val showOnlineCount by SettingsManager
         .getShowOnlineCount(context)
-        .collectAsState(initial = false)
+        .collectAsStateWithLifecycle(initialValue = false)
     val isLiquidGlassAvailable = shouldAllowHomeChromeLiquidGlass(Build.VERSION.SDK_INT)
     val showThemeColorPicker = state.md3ColorSource == Md3ColorSource.CUSTOM
     var showMd3ColorPickerDialog by remember { mutableStateOf(false) }
@@ -958,11 +959,11 @@ fun AppearanceSettingsContent(
         item {
             Box(modifier = Modifier.entrance()) {
                 IOSGroup {
-                    val isSplashEnabled by com.android.purebilibili.core.store.SettingsManager.isSplashEnabled(context).collectAsState(initial = false)
-                    val splashRandomEnabled by com.android.purebilibili.core.store.SettingsManager.getSplashRandomEnabled(context).collectAsState(initial = false)
-                    val splashRandomPoolUris by com.android.purebilibili.core.store.SettingsManager.getSplashRandomPoolUris(context).collectAsState(initial = emptyList())
-                    val splashIconAnimationEnabled by com.android.purebilibili.core.store.SettingsManager.getSplashIconAnimationEnabled(context).collectAsState(initial = true)
-                    val splashWallpaperUri by com.android.purebilibili.core.store.SettingsManager.getSplashWallpaperUri(context).collectAsState(initial = null)
+                    val isSplashEnabled by com.android.purebilibili.core.store.SettingsManager.isSplashEnabled(context).collectAsStateWithLifecycle(initialValue = false)
+                    val splashRandomEnabled by com.android.purebilibili.core.store.SettingsManager.getSplashRandomEnabled(context).collectAsStateWithLifecycle(initialValue = false)
+                    val splashRandomPoolUris by com.android.purebilibili.core.store.SettingsManager.getSplashRandomPoolUris(context).collectAsStateWithLifecycle(initialValue = emptyList())
+                    val splashIconAnimationEnabled by com.android.purebilibili.core.store.SettingsManager.getSplashIconAnimationEnabled(context).collectAsStateWithLifecycle(initialValue = true)
+                    val splashWallpaperUri by com.android.purebilibili.core.store.SettingsManager.getSplashWallpaperUri(context).collectAsStateWithLifecycle(initialValue = null)
                     val hasSplashWallpaper = !splashWallpaperUri.isNullOrBlank()
                     val splashRandomPoolPreview = remember(splashRandomPoolUris) {
                         resolveSplashRandomPoolPreviewState(poolUris = splashRandomPoolUris)
@@ -1588,7 +1589,7 @@ fun AppearanceSettingsContent(
                                                 )
                                             }
                                         }
-                                        items(6) { i ->
+                                        items(6, key = { it }) { i ->
                                             val count = i + 1
                                             val isSelected = state.gridColumnCount == count
                                             Box(
@@ -1777,7 +1778,7 @@ private fun Md3CustomColorPickerDialog(
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(ThemeColors.size) { index ->
+                    items(ThemeColors.size, key = { it }) { index ->
                         val color = ThemeColors[index]
                         val hex = formatMd3CustomColorHex(color)
                         Box(

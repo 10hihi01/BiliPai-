@@ -218,7 +218,7 @@ fun BangumiPlayerContent(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         modifier = Modifier.padding(bottom = 8.dp)
                     ) {
-                        items(totalPages) { page ->
+                        items(totalPages, key = { it }) { page ->
                             val start = page * episodesPerPage + 1
                             val end = minOf((page + 1) * episodesPerPage, detail.episodes.size)
                             val isCurrentPage = page == selectedPage
@@ -247,7 +247,7 @@ fun BangumiPlayerContent(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(pageEpisodes) { episode ->
+                        items(pageEpisodes, key = { it.id }) { episode ->
                             EpisodeChipSelectable(
                                 episode = episode,
                                 isSelected = episode.id == currentEpisode.id,
@@ -263,7 +263,7 @@ fun BangumiPlayerContent(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(detail.episodes) { episode ->
+                        items(detail.episodes, key = { it.id }) { episode ->
                             EpisodeChipSelectable(
                                 episode = episode,
                                 isSelected = episode.id == currentEpisode.id,

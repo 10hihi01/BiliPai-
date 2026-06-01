@@ -17,7 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -84,7 +84,7 @@ fun DynamicDetailScreen(
 
     val context = LocalContext.current
     val gifImageLoader = context.imageLoader
-    val likedDynamics by interactionViewModel.likedDynamics.collectAsState()
+    val likedDynamics by interactionViewModel.likedDynamics.collectAsStateWithLifecycle()
     var showRepostDialog by remember { mutableStateOf<String?>(null) }
     var hasHandledRoutedComment by rememberSaveable(
         dynamicId,

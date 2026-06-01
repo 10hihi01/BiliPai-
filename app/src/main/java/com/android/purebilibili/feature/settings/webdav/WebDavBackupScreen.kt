@@ -34,7 +34,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -79,7 +79,7 @@ fun WebDavBackupScreen(
     val refreshLabel = stringResource(R.string.common_refresh)
     val saveLabel = stringResource(R.string.common_save)
     val cancelLabel = stringResource(R.string.common_cancel)
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val listState = rememberLazyListState()
     val hazeState = com.android.purebilibili.core.ui.blur.rememberRecoverableHazeState()

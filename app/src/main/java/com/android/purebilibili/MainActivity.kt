@@ -157,6 +157,7 @@ import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import kotlin.math.max
 import kotlin.math.pow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 private const val TAG = "MainActivity"
 private const val PREFS_NAME = "app_welcome"
@@ -1057,14 +1058,12 @@ open class MainActivity : AppCompatActivity() {
             // var showWelcome by remember { mutableStateOf(!prefs.getBoolean(KEY_FIRST_LAUNCH, false)) }
 
             // 1. 获取存储的模式 (默认为跟随系统)
-            val uiPreset by SettingsManager.getUiPreset(context).collectAsState(initial = UiPreset.MD3)
-            val androidNativeVariant by SettingsManager.getAndroidNativeVariant(context).collectAsState(
-                initial = AndroidNativeVariant.MATERIAL3
+            val uiPreset by SettingsManager.getUiPreset(context).collectAsStateWithLifecycle(initialValue = UiPreset.MD3)
+            val androidNativeVariant by SettingsManager.getAndroidNativeVariant(context).collectAsStateWithLifecycle(initialValue = AndroidNativeVariant.MATERIAL3
             )
-            val themeMode by SettingsManager.getThemeMode(context).collectAsState(initial = AppThemeMode.FOLLOW_SYSTEM)
-            val darkThemeStyle by SettingsManager.getDarkThemeStyle(context).collectAsState(initial = DarkThemeStyle.DEFAULT)
-            val appLanguage by SettingsManager.getAppLanguage(context).collectAsState(
-                initial = SettingsManager.getAppLanguageSync(context)
+            val themeMode by SettingsManager.getThemeMode(context).collectAsStateWithLifecycle(initialValue = AppThemeMode.FOLLOW_SYSTEM)
+            val darkThemeStyle by SettingsManager.getDarkThemeStyle(context).collectAsStateWithLifecycle(initialValue = DarkThemeStyle.DEFAULT)
+            val appLanguage by SettingsManager.getAppLanguage(context).collectAsStateWithLifecycle(initialValue = SettingsManager.getAppLanguageSync(context)
             )
 
             //  检查并请求所有文件访问权限 (Android 11+)
@@ -1072,38 +1071,32 @@ open class MainActivity : AppCompatActivity() {
             // LaunchedEffect(Unit) { ... }
 
             //  2. [新增] 获取动态取色设置 (默认为 true)
-            val md3ColorSource by SettingsManager.getMd3ColorSource(context).collectAsState(
-                initial = Md3ColorSource.FOLLOW_WALLPAPER
+            val md3ColorSource by SettingsManager.getMd3ColorSource(context).collectAsStateWithLifecycle(initialValue = Md3ColorSource.FOLLOW_WALLPAPER
             )
-            val md3CustomColorHex by SettingsManager.getMd3CustomColorHex(context).collectAsState(
-                initial = "#007AFF"
+            val md3CustomColorHex by SettingsManager.getMd3CustomColorHex(context).collectAsStateWithLifecycle(initialValue = "#007AFF"
             )
-            val colorStyle by SettingsManager.getThemeColorStyle(context).collectAsState(
-                initial = PaletteStyle.TonalSpot
+            val colorStyle by SettingsManager.getThemeColorStyle(context).collectAsStateWithLifecycle(initialValue = PaletteStyle.TonalSpot
             )
-            val colorSpec by SettingsManager.getThemeColorSpec(context).collectAsState(
-                initial = ColorSpec.SpecVersion.SPEC_2021
+            val colorSpec by SettingsManager.getThemeColorSpec(context).collectAsStateWithLifecycle(initialValue = ColorSpec.SpecVersion.SPEC_2021
             )
             
             //  3. [新增] 获取主题色索引
-            val themeColorIndex by SettingsManager.getThemeColorIndex(context).collectAsState(initial = 0)
-            val appFontSizePreset by SettingsManager.getAppFontSizePreset(context).collectAsState(
-                initial = AppFontSizePreset.DEFAULT
+            val themeColorIndex by SettingsManager.getThemeColorIndex(context).collectAsStateWithLifecycle(initialValue = 0)
+            val appFontSizePreset by SettingsManager.getAppFontSizePreset(context).collectAsStateWithLifecycle(initialValue = AppFontSizePreset.DEFAULT
             )
-            val appFontFileName by SettingsManager.getAppFontFileName(context).collectAsState(initial = "")
-            val appUiScalePreset by SettingsManager.getAppUiScalePreset(context).collectAsState(
-                initial = AppUiScalePreset.STANDARD
+            val appFontFileName by SettingsManager.getAppFontFileName(context).collectAsStateWithLifecycle(initialValue = "")
+            val appUiScalePreset by SettingsManager.getAppUiScalePreset(context).collectAsStateWithLifecycle(initialValue = AppUiScalePreset.STANDARD
             )
-            val appDpiOverridePercent by SettingsManager.getAppDpiOverridePercent(context).collectAsState(initial = 0)
+            val appDpiOverridePercent by SettingsManager.getAppDpiOverridePercent(context).collectAsStateWithLifecycle(initialValue = 0)
             val appGestureScreenshotEnabled by SettingsManager
                 .getAppGestureScreenshotEnabled(context)
-                .collectAsState(initial = false)
+                .collectAsStateWithLifecycle(initialValue = false)
             val appScreenshotGestureMode by SettingsManager
                 .getAppScreenshotGestureMode(context)
-                .collectAsState(initial = AppScreenshotGestureMode.TOP_RIGHT_TWO_FINGER_LONG_PRESS)
+                .collectAsStateWithLifecycle(initialValue = AppScreenshotGestureMode.TOP_RIGHT_TWO_FINGER_LONG_PRESS)
             val appScreenshotCaptureMode by SettingsManager
                 .getAppScreenshotCaptureMode(context)
-                .collectAsState(initial = AppScreenshotCaptureMode.FULL_WINDOW)
+                .collectAsStateWithLifecycle(initialValue = AppScreenshotCaptureMode.FULL_WINDOW)
             
             // 4. 获取系统当前的深色状态
             val systemInDark = systemInDarkThemeSnapshot

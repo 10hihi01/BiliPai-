@@ -55,7 +55,7 @@ import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -167,7 +167,7 @@ fun CommonListScreen(
     globalHazeState: HazeState? = null, // [新增] 接收全局 HazeState
     scrollToTopChannel: Channel<Unit>? = null
 ) {
-    val state by viewModel.uiState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val primaryGridState = rememberLazyGridState()
     val subscribedFolderListState = androidx.compose.foundation.lazy.rememberLazyListState()
     val favoritePagerGridStates = remember { mutableStateMapOf<Int, androidx.compose.foundation.lazy.grid.LazyGridState>() }
@@ -176,12 +176,9 @@ fun CommonListScreen(
     // Fix: 手机端(Compact)使用较小的最小宽度以保证2列显示 (360dp / 170dp = 2.1 -> 2列)
     // 平板端(Expanded)使用较大的最小宽度以避免卡片过小
     val context = LocalContext.current
-    val showOnlineCount by SettingsManager.getShowOnlineCount(context).collectAsState(
-        initial = false,
-        context = kotlin.coroutines.EmptyCoroutineContext
-    )
-    val homeSettings by SettingsManager.getHomeSettings(context).collectAsState(
-        initial = com.android.purebilibili.core.store.HomeSettings(),
+    val showOnlineCount by SettingsManager.getShowOnlineCount(context).collectAsStateWithLifecycle(initialValue = false
+        )
+    val homeSettings by SettingsManager.getHomeSettings(context).collectAsStateWithLifecycle(initialValue = com.android.purebilibili.core.store.HomeSettings(),
         context = kotlin.coroutines.EmptyCoroutineContext
     )
     val uiPreset = LocalUiPreset.current
@@ -208,15 +205,15 @@ fun CommonListScreen(
     val favoriteViewModel = viewModel as? FavoriteViewModel
     val historyViewModel = viewModel as? HistoryViewModel
     val seasonSeriesDetailViewModel = viewModel as? SeasonSeriesDetailViewModel
-    val historyDeleteSession by historyViewModel?.deleteSession?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val historyDeleteSession by historyViewModel?.deleteSession?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<HistoryDeleteSession?>(null) }
-    val isHistoryPaused by historyViewModel?.isHistoryPausedState?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val isHistoryPaused by historyViewModel?.isHistoryPausedState?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
-    val isHistoryManagementBusy by historyViewModel?.isHistoryManagementBusyState?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val isHistoryManagementBusy by historyViewModel?.isHistoryManagementBusyState?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
-    val historyHasMore by historyViewModel?.hasMoreState?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val historyHasMore by historyViewModel?.hasMoreState?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
-    val historyIsLoadingMore by historyViewModel?.isLoadingMoreState?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val historyIsLoadingMore by historyViewModel?.isLoadingMoreState?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
     var isHistoryBatchMode by rememberSaveable { androidx.compose.runtime.mutableStateOf(false) }
     var selectedHistoryKeys by rememberSaveable { androidx.compose.runtime.mutableStateOf(setOf<String>()) }
@@ -261,21 +258,21 @@ fun CommonListScreen(
     val scope = androidx.compose.runtime.rememberCoroutineScope()
 
     // 📁 [新增] 收藏夹切换 Tab
-    val foldersState by favoriteViewModel?.folders?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val foldersState by favoriteViewModel?.folders?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(emptyList()) }
-    val subscribedFoldersState by favoriteViewModel?.subscribedFolders?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val subscribedFoldersState by favoriteViewModel?.subscribedFolders?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(emptyList()) }
-    val subscribedFolderProgressState by favoriteViewModel?.subscribedFolderProgressState?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val subscribedFolderProgressState by favoriteViewModel?.subscribedFolderProgressState?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember {
             androidx.compose.runtime.mutableStateOf(FavoriteViewModel.SubscribedFolderProgressState())
         }
-    val selectedFolderIndex by favoriteViewModel?.selectedFolderIndex?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val selectedFolderIndex by favoriteViewModel?.selectedFolderIndex?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableIntStateOf(0) }
-    val favoriteOrder by favoriteViewModel?.favoriteOrderState?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val favoriteOrder by favoriteViewModel?.favoriteOrderState?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(FavoriteResourceOrder.FAVORITE_TIME) }
-    val isFavoriteManaging by favoriteViewModel?.isFavoriteManagingState?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val isFavoriteManaging by favoriteViewModel?.isFavoriteManagingState?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
-    val favoriteDetailProgressState by seasonSeriesDetailViewModel?.favoriteDetailProgressState?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val favoriteDetailProgressState by seasonSeriesDetailViewModel?.favoriteDetailProgressState?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember {
             androidx.compose.runtime.mutableStateOf(SeasonSeriesDetailViewModel.FavoriteDetailProgressState())
         }
@@ -307,11 +304,11 @@ fun CommonListScreen(
     )
     val selectedFolderUiState by favoriteViewModel
         ?.getFolderUiState(selectedFolderIndex)
-        ?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+        ?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(ListUiState()) }
     val singleFolderUiState by favoriteViewModel
         ?.getFolderUiState(0)
-        ?.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+        ?.collectAsStateWithLifecycle()
         ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(ListUiState()) }
     val activeFavoriteItems = resolveFavoritePlayAllItems(
         mode = favoriteContentMode,
@@ -629,7 +626,7 @@ fun CommonListScreen(
                             beyondViewportPageCount = 1 // 预加载
                         ) { page ->
                             // 获取当前页面的状态
-                            val folderUiState by favoriteVm.getFolderUiState(page).collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+                            val folderUiState by favoriteVm.getFolderUiState(page).collectAsStateWithLifecycle()
 
                             // 确保数据加载
                             LaunchedEffect(page) {
@@ -669,7 +666,7 @@ fun CommonListScreen(
 
                     FavoriteContentMode.SINGLE_FOLDER -> {
                         val favoriteVm = requireNotNull(favoriteViewModel)
-                        val folderUiState by favoriteVm.getFolderUiState(0).collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+                        val folderUiState by favoriteVm.getFolderUiState(0).collectAsStateWithLifecycle()
                         LaunchedEffect(favoriteVm) {
                             favoriteVm.loadFolder(0)
                         }
@@ -1279,7 +1276,7 @@ private fun CommonListContent(
             verticalArrangement = Arrangement.spacedBy(spacing),
             modifier = viewportModifier
         ) {
-            items(columns * 4) { VideoGridItemSkeleton() }
+            items(columns * 4, key = { it }) { VideoGridItemSkeleton() }
         }
     } else if (error != null && items.isEmpty()) {
         Box(viewportModifier, contentAlignment = Alignment.Center) {

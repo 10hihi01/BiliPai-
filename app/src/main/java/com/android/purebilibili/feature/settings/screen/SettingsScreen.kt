@@ -76,6 +76,7 @@ import com.android.purebilibili.core.ui.animation.EntranceGroup
 import com.android.purebilibili.core.ui.animation.entrance
 import com.android.purebilibili.feature.dynamic.defaultDynamicTabVisibleIds
 import com.android.purebilibili.feature.dynamic.resolveDynamicVisibleTabIdsAfterToggle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 const val GITHUB_URL = OFFICIAL_GITHUB_URL
 
@@ -105,32 +106,31 @@ fun SettingsScreen(
     val versionClickThreshold = EasterEggs.VERSION_EASTER_EGG_THRESHOLD
     
     // State Collection
-    val state by viewModel.state.collectAsState()
-    val privacyModeEnabled by SettingsManager.getPrivacyModeEnabled(context).collectAsState(initial = false)
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val privacyModeEnabled by SettingsManager.getPrivacyModeEnabled(context).collectAsStateWithLifecycle(initialValue = false)
     val privacyContentAuthenticationEnabled by SettingsManager
         .getPrivacyContentAuthenticationEnabled(context)
-        .collectAsState(initial = false)
+        .collectAsStateWithLifecycle(initialValue = false)
     val crashTrackingEnabled by SettingsManager.getCrashTrackingEnabled(context)
-        .collectAsState(initial = DEFAULT_CRASH_TRACKING_ENABLED)
+        .collectAsStateWithLifecycle(initialValue = DEFAULT_CRASH_TRACKING_ENABLED)
     val analyticsEnabled by SettingsManager.getAnalyticsEnabled(context)
-        .collectAsState(initial = DEFAULT_ANALYTICS_ENABLED)
-    val easterEggEnabled by SettingsManager.getEasterEggEnabled(context).collectAsState(initial = true)
-    val customDownloadPath by SettingsManager.getDownloadPath(context).collectAsState(initial = null)
-    val downloadExportTreeUri by SettingsManager.getDownloadExportTreeUri(context).collectAsState(initial = null)
-    val imageSaveTreeUri by SettingsManager.getImageSaveTreeUri(context).collectAsState(initial = null)
-    val feedApiType by SettingsManager.getFeedApiType(context).collectAsState(
-        initial = SettingsManager.FeedApiType.WEB
+        .collectAsStateWithLifecycle(initialValue = DEFAULT_ANALYTICS_ENABLED)
+    val easterEggEnabled by SettingsManager.getEasterEggEnabled(context).collectAsStateWithLifecycle(initialValue = true)
+    val customDownloadPath by SettingsManager.getDownloadPath(context).collectAsStateWithLifecycle(initialValue = null)
+    val downloadExportTreeUri by SettingsManager.getDownloadExportTreeUri(context).collectAsStateWithLifecycle(initialValue = null)
+    val imageSaveTreeUri by SettingsManager.getImageSaveTreeUri(context).collectAsStateWithLifecycle(initialValue = null)
+    val feedApiType by SettingsManager.getFeedApiType(context).collectAsStateWithLifecycle(initialValue = SettingsManager.FeedApiType.WEB
     )
     val autoCheckUpdateEnabled by SettingsManager.getAutoCheckAppUpdate(context)
-        .collectAsState(initial = true)
+        .collectAsStateWithLifecycle(initialValue = true)
     val incrementalTimelineRefreshEnabled by SettingsManager.getIncrementalTimelineRefresh(context)
-        .collectAsState(initial = false)
+        .collectAsStateWithLifecycle(initialValue = false)
     val homeRefreshCount by SettingsManager.getHomeRefreshCount(context)
-        .collectAsState(initial = com.android.purebilibili.core.store.DEFAULT_HOME_REFRESH_COUNT)
+        .collectAsStateWithLifecycle(initialValue = com.android.purebilibili.core.store.DEFAULT_HOME_REFRESH_COUNT)
     val dynamicVisibleTabIds by SettingsManager.getDynamicTabVisibleTabs(context)
-        .collectAsState(initial = defaultDynamicTabVisibleIds)
+        .collectAsStateWithLifecycle(initialValue = defaultDynamicTabVisibleIds)
     val dynamicImagePreviewTextVisible by SettingsManager.getDynamicImagePreviewTextVisible(context)
-        .collectAsState(initial = true)
+        .collectAsStateWithLifecycle(initialValue = true)
     
     // Local UI State
     var showCacheDialog by remember { mutableStateOf(false) }
@@ -1271,7 +1271,7 @@ private fun MobileSettingsLayout(
         )
     }
     val sectionOrder = remember { resolveSettingsRootCategoryOrder() }
-    val focusRequest by SettingsSearchFocusController.request.collectAsState()
+    val focusRequest by SettingsSearchFocusController.request.collectAsStateWithLifecycle()
     val bottomBarVisible = LocalBottomBarVisible.current
     val bottomInset = resolveSettingsContentBottomPadding(
         navigationBarsBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(),

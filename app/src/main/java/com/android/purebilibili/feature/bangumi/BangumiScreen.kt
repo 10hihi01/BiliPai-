@@ -78,6 +78,7 @@ import com.android.purebilibili.feature.bangumi.ui.list.BangumiSearchCardGrid
 import java.util.Calendar
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  * 番剧主页面
@@ -91,16 +92,16 @@ fun BangumiScreen(
     initialType: Int = 1,  // 初始类型：1=番剧 2=电影 等
     viewModel: BangumiViewModel = viewModel()
 ) {
-    val displayMode by viewModel.displayMode.collectAsState()
-    val selectedType by viewModel.selectedType.collectAsState()
-    val listState by viewModel.listState.collectAsState()
-    val timelineState by viewModel.timelineState.collectAsState()
-    val searchState by viewModel.searchState.collectAsState()
-    val myFollowState by viewModel.myFollowState.collectAsState()
-    val myFollowType by viewModel.myFollowType.collectAsState()
-    val myFollowStats by viewModel.myFollowStats.collectAsState()
-    val filter by viewModel.filter.collectAsState()
-    val searchKeyword by viewModel.searchKeyword.collectAsState()
+    val displayMode by viewModel.displayMode.collectAsStateWithLifecycle()
+    val selectedType by viewModel.selectedType.collectAsStateWithLifecycle()
+    val listState by viewModel.listState.collectAsStateWithLifecycle()
+    val timelineState by viewModel.timelineState.collectAsStateWithLifecycle()
+    val searchState by viewModel.searchState.collectAsStateWithLifecycle()
+    val myFollowState by viewModel.myFollowState.collectAsStateWithLifecycle()
+    val myFollowType by viewModel.myFollowType.collectAsStateWithLifecycle()
+    val myFollowStats by viewModel.myFollowStats.collectAsStateWithLifecycle()
+    val filter by viewModel.filter.collectAsStateWithLifecycle()
+    val searchKeyword by viewModel.searchKeyword.collectAsStateWithLifecycle()
     
     // 搜索状态
     var showSearchBar by remember { mutableStateOf(false) }
@@ -697,7 +698,7 @@ private fun BangumiTimelinePreviewSection(
             val selectedDay = visibleDays.getOrNull(selectedIndex) ?: visibleDays.first()
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(visibleDays.size) { index ->
+                    items(visibleDays.size, key = { index -> visibleDays[index].date }) { index ->
                         val day = visibleDays[index]
                         val selected = index == selectedIndex
                         Surface(

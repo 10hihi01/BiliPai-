@@ -12,7 +12,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -172,7 +172,7 @@ internal fun <T> IOSSlidingSegmentedControl(
     val context = LocalContext.current
     val homeSettings by SettingsManager
         .getHomeSettings(context)
-        .collectAsState(initial = HomeSettings())
+        .collectAsStateWithLifecycle(initialValue = HomeSettings())
     val effectiveAndroidNativeLiquidGlassEnabled =
         forceLiquidIndicator || homeSettings.androidNativeLiquidGlassEnabled
     val chrome = remember(uiPreset, effectiveAndroidNativeLiquidGlassEnabled) {

@@ -38,6 +38,7 @@ import com.android.purebilibili.core.ui.rememberAppBackIcon
 import com.android.purebilibili.core.ui.rememberAppSettingsIcon
 import dev.chrisbanes.haze.HazeState
 import kotlinx.coroutines.launch
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun TabletSettingsLayout(
@@ -145,7 +146,7 @@ fun TabletSettingsLayout(
     // I should add viewModel parameter to TabletSettingsLayout.
     val viewModel: SettingsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val context = androidx.compose.ui.platform.LocalContext.current
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val fallbackCategoryIcon = rememberAppSettingsIcon()
     val categoryOrder = remember { resolveTabletSettingsRootCategoryOrder() }
     val rootCategoryActions = SettingsRootCategoryActions(
@@ -424,7 +425,7 @@ fun TabletSettingsLayout(
                                 val repository = remember { com.android.purebilibili.data.repository.BlockedUpRepository(context) }
                                 val fileService = remember { BlockedListFileService(context.applicationContext) }
                                 val syncRepository = remember { com.android.purebilibili.data.repository.BilibiliBlockedListSyncRepository(repository) }
-                                val blockedUps by repository.getAllBlockedUps().collectAsState(initial = emptyList())
+                                val blockedUps by repository.getAllBlockedUps().collectAsStateWithLifecycle(initialValue = emptyList())
                                 val latestBlockedUps by rememberUpdatedState(blockedUps)
                                 // Pass scope for unblocking
                                 val scope = rememberCoroutineScope()
@@ -520,8 +521,8 @@ fun TabletSettingsLayout(
                                 // Need to manage editing state locally for the tablet view
                                 var editingPlugin by remember { mutableStateOf<com.android.purebilibili.core.plugin.json.JsonRulePlugin?>(null) }
                                 
-                                val plugins by com.android.purebilibili.core.plugin.PluginManager.pluginsFlow.collectAsState()
-                                val jsonPlugins by com.android.purebilibili.core.plugin.json.JsonPluginManager.plugins.collectAsState()
+                                val plugins by com.android.purebilibili.core.plugin.PluginManager.pluginsFlow.collectAsStateWithLifecycle()
+                                val jsonPlugins by com.android.purebilibili.core.plugin.json.JsonPluginManager.plugins.collectAsStateWithLifecycle()
                                 
                                 if (editingPlugin != null) {
                                     // Show Editor

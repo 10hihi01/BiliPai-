@@ -4,7 +4,7 @@ package com.android.purebilibili.core.ui.blur
 import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.draw.BlurredEdgeTreatment
@@ -43,7 +43,7 @@ fun ProvideUnifiedBlurIntensity(
 ) {
     val context = LocalContext.current
     val blurIntensity by SettingsManager.getBlurIntensity(context)
-        .collectAsState(initial = BlurIntensity.THIN)
+        .collectAsStateWithLifecycle(initialValue = BlurIntensity.THIN)
     CompositionLocalProvider(
         LocalUnifiedBlurIntensity provides blurIntensity,
         content = content
@@ -59,7 +59,7 @@ fun currentUnifiedBlurIntensity(): BlurIntensity {
 
     val context = LocalContext.current
     val fallbackBlurIntensity by SettingsManager.getBlurIntensity(context)
-        .collectAsState(initial = BlurIntensity.THIN)
+        .collectAsStateWithLifecycle(initialValue = BlurIntensity.THIN)
     return fallbackBlurIntensity
 }
 

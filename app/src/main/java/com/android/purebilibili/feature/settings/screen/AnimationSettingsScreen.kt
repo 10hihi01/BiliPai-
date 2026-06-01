@@ -50,6 +50,7 @@ import kotlinx.coroutines.launch
 import android.os.Build
 import top.yukonga.miuix.kmp.basic.Scaffold as MiuixScaffold
 import top.yukonga.miuix.kmp.basic.SmallTopAppBar as MiuixSmallTopAppBar
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  *  动画与效果设置二级页面
@@ -62,7 +63,7 @@ fun AnimationSettingsScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val screenTitle = stringResource(R.string.animation_effects_title)
     val backLabel = stringResource(R.string.common_back)
     val scope = rememberCoroutineScope()
@@ -113,7 +114,7 @@ fun AnimationSettingsContent(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-    val focusRequest by SettingsSearchFocusController.request.collectAsState()
+    val focusRequest by SettingsSearchFocusController.request.collectAsStateWithLifecycle()
     val windowSizeClass = LocalWindowSizeClass.current
     val warningTint = rememberAdaptiveSemanticIconTint(iOSOrange)
     val deviceUiProfile = remember(windowSizeClass.widthSizeClass) {
@@ -142,9 +143,9 @@ fun AnimationSettingsContent(
     val isLiquidGlassAvailable = shouldAllowHomeChromeLiquidGlass(Build.VERSION.SDK_INT)
     val bottomBarLiquidGlassEnabled = state.bottomBarLiquidGlassEnabled
     val bottomBarLiquidGlassPreset by SettingsManager.getBottomBarLiquidGlassPreset(context)
-        .collectAsState(initial = BottomBarLiquidGlassPreset.BILIPAI_TUNED)
+        .collectAsStateWithLifecycle(initialValue = BottomBarLiquidGlassPreset.BILIPAI_TUNED)
     val uiEntranceAnimationEnabled by SettingsManager.getUiEntranceAnimationEnabled(context)
-        .collectAsState(initial = true)
+        .collectAsStateWithLifecycle(initialValue = true)
     val effectiveEntranceSpec = rememberEffectiveEntranceMotionSpec()
     // 开关开着、但有效参数被降级为不动画 → 系统减弱动效在生效。
     val entranceDowngradedBySystem = uiEntranceAnimationEnabled && !effectiveEntranceSpec.animate

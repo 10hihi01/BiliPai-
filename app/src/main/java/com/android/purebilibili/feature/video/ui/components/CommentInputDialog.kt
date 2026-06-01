@@ -671,7 +671,7 @@ fun CommentInputDialog(
                                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                                             ) {
-                                                items(kaomojis.size) { i ->
+                                                items(kaomojis.size, key = { i -> kaomojis[i] }) { i ->
                                                     Box(
                                                         contentAlignment = Alignment.Center,
                                                         modifier = Modifier
@@ -699,7 +699,7 @@ fun CommentInputDialog(
                                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                                             ) {
-                                                items(emojis.size) { i ->
+                                                items(emojis.size, key = { i -> emojis[i] }) { i ->
                                                     Box(
                                                         contentAlignment = Alignment.Center,
                                                         modifier = Modifier
@@ -722,7 +722,7 @@ fun CommentInputDialog(
                                                     verticalArrangement = Arrangement.spacedBy(12.dp),
                                                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                                                 ) {
-                                                    items(emotes.size) { i ->
+                                                    items(emotes.size, key = { i -> emotes[i].text }) { i ->
                                                         val emote = emotes[i]
                                                         Column(
                                                             horizontalAlignment = Alignment.CenterHorizontally,

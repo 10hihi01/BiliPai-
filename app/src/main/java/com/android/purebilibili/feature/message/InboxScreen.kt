@@ -38,6 +38,7 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +48,7 @@ fun InboxScreen(
     onSessionClick: (talkerId: Long, sessionType: Int, userName: String) -> Unit,
     viewModel: InboxViewModel = viewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var lastAutoLoadEndTs by remember { mutableLongStateOf(0L) }
     var pendingRemoveSession by remember { mutableStateOf<SessionItem?>(null) }
     var pendingInterceptSession by remember { mutableStateOf<SessionItem?>(null) }

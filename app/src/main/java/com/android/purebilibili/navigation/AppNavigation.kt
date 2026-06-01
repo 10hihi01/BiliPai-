@@ -18,7 +18,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState //  新增
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue //  新增
 import androidx.compose.runtime.LaunchedEffect // 新增
 import androidx.compose.runtime.DisposableEffect
@@ -291,10 +291,8 @@ fun AppNavigation(
     val settingsViewModel: SettingsViewModel = viewModel(
         factory = remember(application) { SettingsViewModelFactory(application) }
     )
-    val privacyAuthenticationEnabled by SettingsManager.getPrivacyContentAuthenticationEnabled(context).collectAsState(
-        initial = false,
-        context = kotlin.coroutines.EmptyCoroutineContext
-    )
+    val privacyAuthenticationEnabled by SettingsManager.getPrivacyContentAuthenticationEnabled(context).collectAsStateWithLifecycle(initialValue = false
+        )
     var privacySessionUnlocked by remember { mutableStateOf(false) }
     LaunchedEffect(privacyAuthenticationEnabled) {
         if (!privacyAuthenticationEnabled) {
@@ -302,12 +300,11 @@ fun AppNavigation(
         }
     }
     val uriHandler = LocalUriHandler.current
-    val downloadTasks by com.android.purebilibili.feature.download.DownloadManager.tasks.collectAsState(
+    val downloadTasks by com.android.purebilibili.feature.download.DownloadManager.tasks.collectAsStateWithLifecycle(
         context = kotlin.coroutines.EmptyCoroutineContext
     )
     val uiPreset = LocalUiPreset.current
-    val homeSettings by SettingsManager.getHomeSettings(context).collectAsState(
-        initial = com.android.purebilibili.core.store.HomeSettings(),
+    val homeSettings by SettingsManager.getHomeSettings(context).collectAsStateWithLifecycle(initialValue = com.android.purebilibili.core.store.HomeSettings(),
         context = kotlin.coroutines.EmptyCoroutineContext
     )
     val effectiveHomeSettings = remember(homeSettings, uiPreset) {
@@ -381,13 +378,9 @@ fun AppNavigation(
         }
         val currentNavigation3Key = navigation3BackStack.lastOrNull()
         val currentRoute = currentNavigation3Key?.toLegacyRoute()
-        val configuredHomeWallpaperUri by SettingsManager.getHomeWallpaperUri(context).collectAsState(
-            initial = "",
-            context = kotlin.coroutines.EmptyCoroutineContext
+        val configuredHomeWallpaperUri by SettingsManager.getHomeWallpaperUri(context).collectAsStateWithLifecycle(initialValue = ""
         )
-        val splashWallpaperUri by SettingsManager.getSplashWallpaperUri(context).collectAsState(
-            initial = "",
-            context = kotlin.coroutines.EmptyCoroutineContext
+        val splashWallpaperUri by SettingsManager.getSplashWallpaperUri(context).collectAsStateWithLifecycle(initialValue = ""
         )
         val globalHomeWallpaperUri = remember(configuredHomeWallpaperUri, splashWallpaperUri) {
             resolveHomeWallpaperUri(
@@ -427,8 +420,7 @@ fun AppNavigation(
             previousVideoBvidForStopPolicy = currentVideoBvidForStopPolicy
         }
 
-        val appNavigationSettings by SettingsManager.getAppNavigationSettings(context).collectAsState(
-            initial = AppNavigationSettings(),
+        val appNavigationSettings by SettingsManager.getAppNavigationSettings(context).collectAsStateWithLifecycle(initialValue = AppNavigationSettings(),
             context = kotlin.coroutines.EmptyCoroutineContext
         )
         val bottomBarVisibilityMode = appNavigationSettings.bottomBarVisibilityMode
@@ -1350,7 +1342,7 @@ fun AppNavigation(
                             globalHazeState = mainHazeState
                         )
                         BiliPaiNavEntryContentRole.SEARCH -> {
-                            val homeState by homeViewModel.uiState.collectAsState(
+                            val homeState by homeViewModel.uiState.collectAsStateWithLifecycle(
                                 context = kotlin.coroutines.EmptyCoroutineContext
                             )
                             SearchScreen(

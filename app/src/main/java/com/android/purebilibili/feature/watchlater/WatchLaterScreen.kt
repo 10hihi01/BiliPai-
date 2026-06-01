@@ -86,6 +86,7 @@ import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import com.android.purebilibili.core.util.FormatUtils
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 // 辅助函数：格式化时长
 private fun formatDuration(seconds: Int): String {
@@ -514,10 +515,9 @@ fun WatchLaterScreen(
     viewModel: WatchLaterViewModel = viewModel(),
     globalHazeState: HazeState? = null // [新增]
 ) {
-    val state by viewModel.uiState.collectAsState(context = kotlin.coroutines.EmptyCoroutineContext)
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val homeSettings by SettingsManager.getHomeSettings(context).collectAsState(
-        initial = com.android.purebilibili.core.store.HomeSettings(),
+    val homeSettings by SettingsManager.getHomeSettings(context).collectAsStateWithLifecycle(initialValue = com.android.purebilibili.core.store.HomeSettings(),
         context = kotlin.coroutines.EmptyCoroutineContext
     )
     val hazeState = rememberRecoverableHazeState()

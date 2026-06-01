@@ -75,6 +75,7 @@ import kotlinx.coroutines.launch
 import com.android.purebilibili.core.ui.components.*
 import com.android.purebilibili.core.ui.animation.EntranceGroup
 import com.android.purebilibili.core.ui.animation.entrance
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  *  底栏项目配置
@@ -196,7 +197,7 @@ fun BottomBarSettingsScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    val settingsLiquidGlassEnabled by SettingsManager.getLiquidGlassEnabled(context).collectAsState(initial = true)
+    val settingsLiquidGlassEnabled by SettingsManager.getLiquidGlassEnabled(context).collectAsStateWithLifecycle(initialValue = true)
     val screenTitle = stringResource(R.string.bottom_bar_management_title)
     val backLabel = stringResource(R.string.common_back)
     AdaptiveScaffold(
@@ -234,7 +235,7 @@ fun BottomBarSettingsContent(
     val windowSizeClass = LocalWindowSizeClass.current
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-    val focusRequest by SettingsSearchFocusController.request.collectAsState()
+    val focusRequest by SettingsSearchFocusController.request.collectAsStateWithLifecycle()
     val deviceUiProfile = remember(windowSizeClass.widthSizeClass) {
         resolveDeviceUiProfile(
             widthSizeClass = windowSizeClass.widthSizeClass
@@ -252,21 +253,21 @@ fun BottomBarSettingsContent(
 
     
     // 读取当前配置
-    val order by SettingsManager.getBottomBarOrder(context).collectAsState(initial = listOf("HOME", "DYNAMIC", "HISTORY", "PROFILE"))
-    val visibleTabs by SettingsManager.getBottomBarVisibleTabs(context).collectAsState(initial = setOf("HOME", "DYNAMIC", "HISTORY", "PROFILE"))
-    val topTabOrder by SettingsManager.getTopTabOrder(context).collectAsState(initial = defaultTopTabIds)
-    val topTabVisible by SettingsManager.getTopTabVisibleTabs(context).collectAsState(initial = defaultTopTabIds.toSet())
+    val order by SettingsManager.getBottomBarOrder(context).collectAsStateWithLifecycle(initialValue = listOf("HOME", "DYNAMIC", "HISTORY", "PROFILE"))
+    val visibleTabs by SettingsManager.getBottomBarVisibleTabs(context).collectAsStateWithLifecycle(initialValue = setOf("HOME", "DYNAMIC", "HISTORY", "PROFILE"))
+    val topTabOrder by SettingsManager.getTopTabOrder(context).collectAsStateWithLifecycle(initialValue = defaultTopTabIds)
+    val topTabVisible by SettingsManager.getTopTabVisibleTabs(context).collectAsStateWithLifecycle(initialValue = defaultTopTabIds.toSet())
     val topTabLabelMode by SettingsManager.getTopTabLabelMode(context)
-        .collectAsState(initial = SettingsManager.TopTabLabelMode.TEXT_ONLY)
+        .collectAsStateWithLifecycle(initialValue = SettingsManager.TopTabLabelMode.TEXT_ONLY)
     val headerBlurMode by SettingsManager.getHomeHeaderBlurMode(context)
-        .collectAsState(initial = HomeHeaderBlurMode.FOLLOW_PRESET)
+        .collectAsStateWithLifecycle(initialValue = HomeHeaderBlurMode.FOLLOW_PRESET)
     val homeTopLayoutOrder by SettingsManager.getHomeTopLayoutOrder(context)
-        .collectAsState(initial = HomeTopLayoutOrder.SEARCH_THEN_TABS)
+        .collectAsStateWithLifecycle(initialValue = HomeTopLayoutOrder.SEARCH_THEN_TABS)
     val homeHeaderCollapseMode by SettingsManager.getHomeHeaderCollapseMode(context)
-        .collectAsState(initial = HomeHeaderCollapseMode.SEARCH_ONLY)
+        .collectAsStateWithLifecycle(initialValue = HomeHeaderCollapseMode.SEARCH_ONLY)
     val homeTopRightAction by SettingsManager.getHomeTopRightAction(context)
-        .collectAsState(initial = HomeTopRightAction.SETTINGS)
-    val tabletUseSidebar by SettingsManager.getTabletUseSidebar(context).collectAsState(initial = false)
+        .collectAsStateWithLifecycle(initialValue = HomeTopRightAction.SETTINGS)
+    val tabletUseSidebar by SettingsManager.getTabletUseSidebar(context).collectAsStateWithLifecycle(initialValue = false)
     
     // 可编辑的本地状态
     var localOrder by remember(order) { mutableStateOf(order) }
@@ -305,7 +306,7 @@ fun BottomBarSettingsContent(
     }
     
     //  [新增] 读取项目颜色配置
-    val itemColors by SettingsManager.getBottomBarItemColors(context).collectAsState(initial = emptyMap())
+    val itemColors by SettingsManager.getBottomBarItemColors(context).collectAsStateWithLifecycle(initialValue = emptyMap())
     
     // 保存配置
     fun saveConfig() {
@@ -378,8 +379,8 @@ fun BottomBarSettingsContent(
                 Box(modifier = Modifier.entrance()) {
                     IOSGroup {
                         val scope = rememberCoroutineScope()
-                        val visibilityMode by SettingsManager.getBottomBarVisibilityMode(context).collectAsState(initial = SettingsManager.BottomBarVisibilityMode.ALWAYS_VISIBLE)
-                        val labelMode by SettingsManager.getBottomBarLabelMode(context).collectAsState(initial = 0)
+                        val visibilityMode by SettingsManager.getBottomBarVisibilityMode(context).collectAsStateWithLifecycle(initialValue = SettingsManager.BottomBarVisibilityMode.ALWAYS_VISIBLE)
+                        val labelMode by SettingsManager.getBottomBarLabelMode(context).collectAsStateWithLifecycle(initialValue = 0)
                         
                         //  底栏显示模式选择（抽屉式）
                         var visibilityModeExpanded by remember { mutableStateOf(false) }

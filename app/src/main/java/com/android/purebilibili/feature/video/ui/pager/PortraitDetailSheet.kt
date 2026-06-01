@@ -37,6 +37,7 @@ import com.android.purebilibili.core.ui.resolveAdaptiveBottomSheetMotionSpec
 import com.android.purebilibili.feature.video.ui.section.resolvePublishTimeRowText
 import com.android.purebilibili.feature.video.ui.section.shouldEmphasizePrecisePublishTime
 import kotlinx.coroutines.launch
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  * 竖屏视频详情页 (简介)
@@ -162,10 +163,8 @@ fun PortraitDetailSheet(
                             // 标题
                             val context = LocalContext.current
                             val blockedUpRepository = remember { com.android.purebilibili.data.repository.BlockedUpRepository(context) }
-                            val isBlocked by blockedUpRepository.isBlocked(info.owner.mid).collectAsState(
-                                initial = false,
-                                context = kotlin.coroutines.EmptyCoroutineContext
-                            )
+                            val isBlocked by blockedUpRepository.isBlocked(info.owner.mid).collectAsStateWithLifecycle(initialValue = false
+        )
                             val scope = rememberCoroutineScope()
                             var showBlockConfirmDialog by remember { mutableStateOf(false) }
                             

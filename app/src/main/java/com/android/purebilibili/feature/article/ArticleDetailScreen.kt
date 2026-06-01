@@ -318,7 +318,7 @@ private fun ArticleDetailContent(
             }
         }
 
-        itemsIndexed(article.blocks) { index, block ->
+        itemsIndexed(article.blocks, key = { index, _ -> index }) { index, block ->
             when (block) {
                 is ArticleContentBlock.Heading -> {
                     Text(

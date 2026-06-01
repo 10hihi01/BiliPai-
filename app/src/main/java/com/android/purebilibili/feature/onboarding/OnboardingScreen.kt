@@ -47,7 +47,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -261,7 +261,7 @@ private fun OnboardingAnimatedPage(
 @Composable
 private fun WelcomePage(motionSpec: OnboardingMotionSpec) {
     val context = LocalContext.current
-    val appIconKey by SettingsManager.getAppIcon(context).collectAsState(initial = "icon_3d")
+    val appIconKey by SettingsManager.getAppIcon(context).collectAsStateWithLifecycle(initialValue = "icon_3d")
     val heroIconSpec = remember(appIconKey) { resolveOnboardingHeroIconSpec(appIconKey) }
 
     OnboardingFloatingContent(motionSpec = motionSpec) {

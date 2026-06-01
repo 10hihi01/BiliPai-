@@ -101,6 +101,7 @@ import com.android.purebilibili.feature.video.note.VideoNoteUiState
 import com.android.purebilibili.feature.video.note.buildVideoNoteShareText
 import com.android.purebilibili.feature.video.note.shouldShowVideoNoteCard
 import kotlin.math.abs
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 internal fun shouldShowDanmakuSendInput(isPlayerCollapsed: Boolean): Boolean = !isPlayerCollapsed
 
@@ -1073,21 +1074,15 @@ private fun VideoHeaderContent(
     val context = LocalContext.current
     val videoAiSummaryEntryEnabled by com.android.purebilibili.core.store.SettingsManager
         .getVideoAiSummaryEntryEnabled(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     val videoNoteEnabled by com.android.purebilibili.core.store.SettingsManager
         .getVideoNoteEnabled(context)
-        .collectAsState(
-            initial = true,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = true
         )
     val videoNoteDefaultCollapsed by com.android.purebilibili.core.store.SettingsManager
         .getVideoNoteDefaultCollapsed(context)
-        .collectAsState(
-            initial = false,
-            context = kotlin.coroutines.EmptyCoroutineContext
+        .collectAsStateWithLifecycle(initialValue = false
         )
     Column(
         modifier = Modifier
@@ -1200,8 +1195,7 @@ private fun VideoDetailDanmakuSettingsPanel(
     val danmakuScope = com.android.purebilibili.core.store.DanmakuSettingsScope.PORTRAIT
     val danmakuSettings by SettingsManager
         .getDanmakuSettings(context, danmakuScope)
-        .collectAsState(
-            initial = DanmakuSettings(),
+        .collectAsStateWithLifecycle(initialValue = DanmakuSettings(),
             context = kotlin.coroutines.EmptyCoroutineContext
         )
 

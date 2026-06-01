@@ -63,6 +63,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import java.io.File
 import kotlin.math.abs
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 // 声明 DataStore 扩展属性
 internal val Context.settingsDataStore by preferencesDataStore(name = "settings_prefs")

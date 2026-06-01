@@ -33,6 +33,7 @@ import com.android.purebilibili.core.ui.components.IOSSectionTitle
 import com.android.purebilibili.core.ui.components.UserLevelBadge
 import com.android.purebilibili.core.util.ShareUtils
 import kotlinx.coroutines.launch
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +44,7 @@ fun BlockedListScreen(
     val repository = remember { BlockedUpRepository(context) }
     val fileService = remember { BlockedListFileService(context.applicationContext) }
     val syncRepository = remember { BilibiliBlockedListSyncRepository(repository) }
-    val blockedUps by repository.getAllBlockedUps().collectAsState(initial = emptyList())
+    val blockedUps by repository.getAllBlockedUps().collectAsStateWithLifecycle(initialValue = emptyList())
     val latestBlockedUps by rememberUpdatedState(blockedUps)
     val scope = rememberCoroutineScope()
     var syncingBlockedList by remember { mutableStateOf(false) }

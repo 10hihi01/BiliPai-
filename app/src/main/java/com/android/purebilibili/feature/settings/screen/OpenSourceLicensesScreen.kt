@@ -384,7 +384,7 @@ fun OpenSourceLicensesScreen(
                 }
             }
             
-            items(openSourceLibraries) { library ->
+            items(openSourceLibraries, key = { it.name }) { library ->
                 LicenseCard(
                     library = library,
                     onClick = { uriHandler.openUri(library.url) }

@@ -63,6 +63,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.android.purebilibili.core.util.PinyinUtils
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 // UI 状态
 sealed class FollowingListUiState {
@@ -613,11 +614,11 @@ fun FollowingListScreen(
     onUserClick: (Long) -> Unit,  // 点击跳转到 UP 主空间
     viewModel: FollowingListViewModel = viewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val isBatchUnfollowing by viewModel.isBatchUnfollowing.collectAsState()
-    val followGroupTags by viewModel.followGroupTags.collectAsState()
-    val userFollowGroupIds by viewModel.userFollowGroupIds.collectAsState()
-    val isFollowGroupMetaLoading by viewModel.isFollowGroupMetaLoading.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isBatchUnfollowing by viewModel.isBatchUnfollowing.collectAsStateWithLifecycle()
+    val followGroupTags by viewModel.followGroupTags.collectAsStateWithLifecycle()
+    val userFollowGroupIds by viewModel.userFollowGroupIds.collectAsStateWithLifecycle()
+    val isFollowGroupMetaLoading by viewModel.isFollowGroupMetaLoading.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val pullRefreshState = rememberPullToRefreshState()
