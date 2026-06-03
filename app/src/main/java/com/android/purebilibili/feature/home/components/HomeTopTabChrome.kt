@@ -75,6 +75,8 @@ internal fun HomeTopTabChrome(
     val density = LocalDensity.current
     val gestureThresholdPx = with(density) { 40.dp.toPx() }
     val showCollapsedHandle = gestureEnabled && isTabsCollapsed
+    val safeTabHorizontalPadding = tabHorizontalPadding.coerceAtLeast(0.dp)
+    val safeTabVerticalPadding = tabVerticalPadding.coerceAtLeast(0.dp)
     val containerAlpha = if (showCollapsedHandle) {
         tabAlpha
     } else {
@@ -124,7 +126,7 @@ internal fun HomeTopTabChrome(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = tabHorizontalPadding, vertical = tabVerticalPadding)
+                .padding(horizontal = safeTabHorizontalPadding, vertical = safeTabVerticalPadding)
                 .then(
                     if (drawChromeSurface && isTabFloating) {
                         Modifier.shadow(

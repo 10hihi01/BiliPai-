@@ -1698,6 +1698,13 @@ class iOSHomeHeaderVisualPolicyTest {
     }
 
     @Test
+    fun `top tab chrome padding never passes negative values into compose`() {
+        assertEquals(0.dp, resolveNonNegativeHomeTopPadding((-4).dp))
+        assertEquals(0.dp, resolveNonNegativeHomeTopPadding(0.dp))
+        assertEquals(8.dp, resolveNonNegativeHomeTopPadding(8.dp))
+    }
+
+    @Test
     fun `docked top tabs keep neutral spacing beneath search`() {
         assertEquals(0f, resolveHomeTopTabVerticalPaddingDp(isTabFloating = false), 0.0001f)
         assertEquals(0f, resolveHomeTopTabYOffsetDp(isTabFloating = false), 0.0001f)

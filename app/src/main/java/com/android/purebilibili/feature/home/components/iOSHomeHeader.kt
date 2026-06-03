@@ -344,6 +344,8 @@ internal fun resolveHomeTopTabVerticalPaddingDp(isTabFloating: Boolean): Float {
     return if (isTabFloating) 2f else 0f
 }
 
+internal fun resolveNonNegativeHomeTopPadding(padding: Dp): Dp = padding.coerceAtLeast(0.dp)
+
 internal fun resolveHomeTopTabYOffsetDp(isTabFloating: Boolean): Float {
     return if (isTabFloating) (-4f) else 0f
 }
@@ -2103,11 +2105,15 @@ fun iOSHomeHeader(
             tabContentAlpha = tabContentAlpha,
             containerZIndex = if (useUnifiedTopPanel) 0f else -1f,
             tabHorizontalPadding = if (embedTopTabsInUnifiedPanel) {
-                resolveHomeTopEmbeddedTabHorizontalPadding(uiPreset)
+                resolveNonNegativeHomeTopPadding(resolveHomeTopEmbeddedTabHorizontalPadding(uiPreset))
             } else {
-                tabHorizontalPadding
+                resolveNonNegativeHomeTopPadding(tabHorizontalPadding)
             },
-            tabVerticalPadding = if (embedTopTabsInUnifiedPanel) 0.dp else tabVerticalPadding,
+            tabVerticalPadding = if (embedTopTabsInUnifiedPanel) {
+                0.dp
+            } else {
+                resolveNonNegativeHomeTopPadding(tabVerticalPadding)
+            },
             tabVerticalOffset = if (embedTopTabsInUnifiedPanel) 0.dp else tabVerticalOffset,
             isTabFloating = if (embedTopTabsInUnifiedPanel) false else isTabFloating,
             effectiveTabShadowElevation = if (embedTopTabsInUnifiedPanel) 0.dp else effectiveTabShadowElevation,
