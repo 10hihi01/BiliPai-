@@ -15,7 +15,7 @@
 </p>
 
 <p>
-  <img src="https://img.shields.io/badge/Version-9.0.5-007AFF?style=flat-square&labelColor=ffffff" alt="Version 9.0.5" />
+  <img src="https://img.shields.io/badge/Version-9.0.6-007AFF?style=flat-square&labelColor=ffffff" alt="Version 9.0.6" />
   <img src="https://img.shields.io/badge/Android-8.0%2B-34C759?style=flat-square&logo=android&logoColor=white" alt="Android 8.0+" />
   <img src="https://img.shields.io/badge/Kotlin-100%25-7F52FF?style=flat-square&logo=kotlin&logoColor=white" alt="Kotlin" />
   <img src="https://img.shields.io/badge/License-GPL--3.0-FF3B30?style=flat-square" alt="GPL-3.0" />
@@ -37,7 +37,7 @@
   </a>
 </p>
 
-<sub>README 更新：2026-06-03 · 当前构建版本以 app/build.gradle.kts 为准 · 发布记录以 <a href="CHANGELOG.md">CHANGELOG.md</a> 为准</sub>
+<sub>README 更新：2026-06-04 · 当前构建版本以 app/build.gradle.kts 为准 · 发布记录以 <a href="CHANGELOG.md">CHANGELOG.md</a> 为准</sub>
 
 </div>
 
@@ -182,10 +182,9 @@ cd BiliPai
 
 ## 最近更新
 
-当前仓库版本号已更新到 `9.0.5 / versionCode 218`。公开发布说明请以 [CHANGELOG.md](CHANGELOG.md) 为准；最新完整记录为 `v9.0.5`：
+当前仓库版本号已更新到 `9.0.6 / versionCode 219`。公开发布说明请以 [CHANGELOG.md](CHANGELOG.md) 为准；最新完整记录为 `v9.0.6`：
 
-- 修复设置界面液态分段控件外层圆角与选中指示器不匹配的问题。
-- 优化评论冻结入口、播放器恢复、竖屏沉浸和首页标签布局体验。
+- 解决了一些已知问题。
 
 ## 路线图
 

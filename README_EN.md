@@ -5,11 +5,11 @@
 </p>
 
 <p align="center">
-  <sub>Last updated: 2026-06-03 · Synced to v9.0.5 (source of truth: <a href="CHANGELOG.md">CHANGELOG</a> + code)</sub>
+  <sub>Last updated: 2026-06-04 · Synced to v9.0.6 (source of truth: <a href="CHANGELOG.md">CHANGELOG</a> + code)</sub>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-9.0.5-fb7299?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/Version-9.0.6-fb7299?style=flat-square" alt="Version">
   <img src="https://img.shields.io/github/stars/jay3-yy/BiliPai?style=flat-square&color=yellow" alt="Stars">
   <img src="https://img.shields.io/github/forks/jay3-yy/BiliPai?style=flat-square&color=green" alt="Forks">
   <img src="https://img.shields.io/github/last-commit/jay3-yy/BiliPai?style=flat-square&color=purple" alt="Last Commit">
@@ -436,10 +436,9 @@ A lightweight plugin format requiring **no coding**, just a simple JSON file to 
 
 See full changelog: [CHANGELOG.md](CHANGELOG.md)
 
-### Latest (v9.0.5 · 2026-06-03)
+### Latest (v9.0.6 · 2026-06-04)
 
-- Fixed mismatched rounded corners between settings segmented controls and their active indicator.
-- Improved frozen comment entry, playback resume behavior, portrait immersion, and home tab layout.
+- Fixed some known issues.
 
 ---
 
