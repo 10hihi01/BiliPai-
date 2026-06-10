@@ -92,7 +92,7 @@ android {
         // 👇👇👇 指定打包的 CPU 架构（64 位 only）👇👇👇
         ndk {
             // arm64-v8a: modern 64-bit devices
-            abiFilters += listOf("arm64-v8a")
+            abiFilters += listOf("arm64-v8a","armeabi-v7a")
         }
 
         manifestPlaceholders["castServiceProcess"] = castServiceProcess
